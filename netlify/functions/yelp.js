@@ -5,12 +5,13 @@ const FUSION_KEY = process.env.YELP_FUSION_KEY;
 
 function basicAuth() { return 'Basic ' + Buffer.from(USER + ':' + PASS).toString('base64'); }
 
-function req(host, path, method, extraHeaders, body) {
+function req(host, path, method, auth, body) {
   return new Promise((resolve, reject) => {
-    const opts = { hostname: host, path, method: method||'GET', headers: { Authorization: basicAuth(), 'Content-Type': 'application/json', ...extraHeaders } };
+    const headers = { Authorization: auth || basicAuth(), 'Content-Type': 'application/json' };
+    const opts = { hostname: host, path, method: method||'GET', headers };
     const r = https.request(opts, res => {
       let d = ''; res.on('data', c => d += c);
-      res.on('end', () => { try { resolve({status:res.statusCode,body:JSON.parse(d)}); } catch(e) { resolve({status:res.statusCode,raw:d.substring(0,200)}); } });
+      res.on('end', () => { try { resolve({status:res.statusCode,body:JSON.parse(d)}); } catch(e) { resolve({status:res.statusCode,raw:d.substring(0,300)}); } });
     });
     r.on('error', e => resolve({error:e.message}));
     if (body) r.write(body); r.end();
@@ -22,41 +23,45 @@ exports.handler = async (event) => {
   const path = (event.queryStringParameters||{}).path || '';
   const body = event.body ? JSON.parse(event.body) : {};
 
-  if (path === 'health') return {statusCode:200,headers:cors,body:JSON.stringify({status:'ok',user:USER?'set':'missing'})};
+  if (path === 'health') return {statusCode:200,headers:cors,body:JSON.stringify({status:'ok',user:USER,pass:PASS?'set':'missing'})};
 
   if (path === 'probe') {
+    // Try username as account ID in path, and also try OAuth-style bearer token
+    const passAsBearer = 'Bearer ' + PASS;
     const tests = [
-      ['partner-api.yelp.com', '/v1/programs'],
-      ['partner-api.yelp.com', '/v1/businesses'],
-      ['partner-api.yelp.com', '/v1/reseller/programs'],
-      ['partner-api.yelp.com', '/v1/reseller/accounts'],
-      ['partner-api.yelp.com', '/v1/channel_partner/programs'],
-      ['partner-api.yelp.com', '/v2/programs'],
-      ['partner-api.yelp.com', '/v3/programs'],
+      ['partner-api.yelp.com', '/v1/account/' + USER + '/programs', 'GET', basicAuth()],
+      ['partner-api.yelp.com', '/v1/accounts/' + USER + '/programs', 'GET', basicAuth()],
+      ['partner-api.yelp.com', '/v1/account/programs', 'GET', passAsBearer],
+      ['partner-api.yelp.com', '/v1/programs', 'GET', passAsBearer],
+      ['partner-api.yelp.com', '/v3/oauth/token', 'GET', basicAuth()],
+      ['api.yelp.com', '/v3/businesses/search?term=test&location=LA', 'GET', 'Bearer ' + FUSION_KEY],
     ];
     const results = {};
-    for (const [host, p] of tests) {
-      const r = await req(host, p);
-      results[host+p] = {status:r.status, preview:JSON.stringify(r.body||r.raw||r.error).substring(0,100)};
+    for (const [host, p, method, auth] of tests) {
+      try {
+        const r = await req(host, p, method, auth);
+        results[p] = {status:r.status, preview:JSON.stringify(r.body||r.raw).substring(0,150)};
+      } catch(e) { results[p] = {error:e.message}; }
     }
     return {statusCode:200,headers:cors,body:JSON.stringify(results)};
   }
 
   if (path === 'programs') {
-    const r = await req('partner-api.yelp.com', '/v1/programs');
-    const programs = (r.body||{}).programs || (r.body||{}).data || [];
-    return {statusCode:200,headers:cors,body:JSON.stringify({programs, raw: r})};
+    const r = await req('partner-api.yelp.com', '/v1/account/' + USER + '/programs');
+    const data = r.body || {};
+    const programs = data.programs || data.data || data || [];
+    return {statusCode:200,headers:cors,body:JSON.stringify({programs:Array.isArray(programs)?programs:[], raw:r})};
   }
 
   if (path === 'report/create') {
     const payload = JSON.stringify({...body,metrics:['impressions','ad_clicks','user_views','leads','biz_page_calls','biz_page_messages','total_spend','cpc'],granularity:'MONTH'});
-    const r = await req('api.yelp.com', '/v3/reporting/reports', 'POST', {Authorization:'Bearer '+FUSION_KEY,'Content-Length':Buffer.byteLength(payload)}, payload);
+    const r = await req('api.yelp.com', '/v3/reporting/reports', 'POST', 'Bearer '+FUSION_KEY, payload);
     return {statusCode:200,headers:cors,body:JSON.stringify(r)};
   }
 
   if (path.startsWith('report/')) {
     const id = path.split('/')[1];
-    const r = await req('api.yelp.com', '/v3/reporting/reports/'+id, 'GET', {Authorization:'Bearer '+FUSION_KEY});
+    const r = await req('api.yelp.com', '/v3/reporting/reports/'+id, 'GET', 'Bearer '+FUSION_KEY);
     return {statusCode:200,headers:cors,body:JSON.stringify(r)};
   }
 
