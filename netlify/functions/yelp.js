@@ -15,7 +15,7 @@ function req(options, body) {
       res.on('data', c => d += c);
       res.on('end', () => {
         try { resolve({status: res.statusCode, body: JSON.parse(d)}); }
-        catch(e) { resolve({status: res.statusCode, body: d.substring(0,200)}); }
+        catch(e) { resolve({status: res.statusCode, raw: d.substring(0,300)}); }
       });
     });
     r.on('error', reject);
@@ -27,7 +27,6 @@ function req(options, body) {
 exports.handler = async (event) => {
   const cors = {'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'Content-Type','Content-Type':'application/json'};
   if (event.httpMethod === 'OPTIONS') return {statusCode:200,headers:cors,body:''};
-
   const path = (event.queryStringParameters && event.queryStringParameters.path) || '';
   const body = event.body ? JSON.parse(event.body) : {};
 
@@ -35,38 +34,39 @@ exports.handler = async (event) => {
     let result;
 
     if (path === 'health') {
-      return {statusCode:200,headers:cors,body:JSON.stringify({status:'ok',user:USER?'set':'missing',pass:PASS?'set':'missing'})};
+      return {statusCode:200,headers:cors,body:JSON.stringify({status:'ok',user:USER?'set':'missing'})};
     }
 
-    // Probe all possible endpoint variants
     else if (path === 'probe') {
+      // Test www.yelp.com endpoints (where ads-api redirects)
       const endpoints = [
-        {host:'partner-api.yelp.com', path:'/v1/account/programs'},
-        {host:'partner-api.yelp.com', path:'/v2/account/programs'},
-        {host:'ads-api.yelp.com', path:'/v1/programs'},
-        {host:'ads-api.yelp.com', path:'/v1/account/programs'},
-        {host:'api.yelp.com', path:'/v3/ads/programs'},
+        {host:'www.yelp.com', path:'/v1/programs'},
+        {host:'www.yelp.com', path:'/v1/account/programs'},
+        {host:'www.yelp.com', path:'/v1/ads/programs'},
+        {host:'partner-api.yelp.com', path:'/v3/programs'},
+        {host:'partner-api.yelp.com', path:'/ads/v1/programs'},
       ];
       const results = {};
       for (const ep of endpoints) {
         try {
-          const r = await req({hostname:ep.host, path:ep.path, method:'GET', headers:{Authorization:basicAuth()}});
-          results[ep.host+ep.path] = {status:r.status, preview:JSON.stringify(r.body).substring(0,100)};
-        } catch(e) {
-          results[ep.host+ep.path] = {error:e.message};
-        }
+          const r = await req({hostname:ep.host, path:ep.path, method:'GET', headers:{Authorization:basicAuth(), 'User-Agent':'ShefaDashboard/1.0'}});
+          results[ep.host+ep.path] = {status:r.status, preview:JSON.stringify(r.body||r.raw).substring(0,120)};
+        } catch(e) { results[ep.host+ep.path] = {error:e.message}; }
       }
       return {statusCode:200,headers:cors,body:JSON.stringify(results)};
     }
 
     else if (path === 'programs') {
-      // Try the most likely correct endpoint based on Yelp Ads API docs
-      const r = await req({hostname:'partner-api.yelp.com', path:'/v1/account/programs', method:'GET', headers:{Authorization:basicAuth()}});
-      result = r;
+      // Use www.yelp.com as redirect destination
+      const r = await req({hostname:'www.yelp.com', path:'/v1/programs', method:'GET', headers:{Authorization:basicAuth(), 'User-Agent':'ShefaDashboard/1.0'}});
+      // If programs is an array, map to our client format
+      const data = r.body;
+      const programs = data.programs || data.data || data || [];
+      result = Array.isArray(programs) ? {programs} : data;
     }
 
     else if (path === 'report/create') {
-      const payload = JSON.stringify({...body, metrics:['impressions','ad_clicks','user_views','leads','biz_page_calls','biz_page_messages','total_spend','cpc'],granularity:'MONTH'});
+      const payload = JSON.stringify({...body,metrics:['impressions','ad_clicks','user_views','leads','biz_page_calls','biz_page_messages','total_spend','cpc'],granularity:'MONTH'});
       const r = await req({hostname:'api.yelp.com',path:'/v3/reporting/reports',method:'POST',headers:{Authorization:'Bearer '+FUSION_KEY,'Content-Type':'application/json','Content-Length':Buffer.byteLength(payload)}},payload);
       result = r;
     }
@@ -79,28 +79,28 @@ exports.handler = async (event) => {
 
     else if (path.startsWith('pause/')) {
       const id = path.split('/')[1];
-      const r = await req({hostname:'partner-api.yelp.com',path:'/program/'+id+'/pause/v1',method:'POST',headers:{Authorization:basicAuth()}});
+      const r = await req({hostname:'www.yelp.com',path:'/program/'+id+'/pause/v1',method:'POST',headers:{Authorization:basicAuth()}});
       result = r;
     }
 
     else if (path.startsWith('resume/')) {
       const id = path.split('/')[1];
-      const r = await req({hostname:'partner-api.yelp.com',path:'/program/'+id+'/resume/v1',method:'POST',headers:{Authorization:basicAuth()}});
+      const r = await req({hostname:'www.yelp.com',path:'/program/'+id+'/resume/v1',method:'POST',headers:{Authorization:basicAuth()}});
       result = r;
     }
 
     else if (path.startsWith('budget/')) {
       const id = path.split('/')[1];
-      const r = await req({hostname:'partner-api.yelp.com',path:'/v1/reseller/program/'+id+'/edit?budget='+body.budget,method:'POST',headers:{Authorization:basicAuth()}});
+      const r = await req({hostname:'www.yelp.com',path:'/v1/reseller/program/'+id+'/edit?budget='+body.budget,method:'POST',headers:{Authorization:basicAuth()}});
       result = r;
     }
 
     else {
-      return {statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown path: '+path})};
+      return {statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
     }
 
     return {statusCode:200,headers:cors,body:JSON.stringify(result)};
   } catch(e) {
-    return {statusCode:500,headers:cors,body:JSON.stringify({error:e.message,stack:e.stack})};
+    return {statusCode:500,headers:cors,body:JSON.stringify({error:e.message})};
   }
 };
