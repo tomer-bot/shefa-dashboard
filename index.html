@@ -91,7 +91,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <!-- Config Modal -->
 <div class="config-modal" id="configModal">
   <div class="config-box">
-    <h3>⚙ API Configuration</h3>
+    <h3>â API Configuration</h3>
     <div class="field">
       <label>Yelp Partner Username</label>
       <input id="cfg_user" type="text" placeholder="partner username">
@@ -109,7 +109,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
       <input id="cfg_anthropic" type="password" placeholder="sk-ant-...">
     </div>
     <div class="field">
-      <label>Proxy Server URL (optional — for CORS)</label>
+      <label>Proxy Server URL (optional â for CORS)</label>
       <input id="cfg_proxy" type="text" placeholder="http://your-server:3400 (leave blank for direct)">
     </div>
     <div class="config-actions">
@@ -123,23 +123,24 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:10px">
     <div class="status-dot" id="serverDot" style="background:#555"></div>
-    <h1>Shefa — Yelp Campaign Control Panel</h1>
+    <h1>Shefa â Yelp Campaign Control Panel</h1>
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn btn-gray btn-sm" onclick="loadDashboard()">↻ Refresh</button>
-    <button class="btn btn-gray btn-sm" onclick="openConfig()">⚙ Config</button>
+    <button class="btn btn-gray btn-sm" onclick="loadDashboard()">â» Refresh</button>
+    <button class="btn btn-green btn-sm" id="syncBtn" onclick="syncFromYelp()" title="Sync live data from Yelp">&#8635; Sync from Yelp</button>
+    <button class="btn btn-gray btn-sm" onclick="openConfig()">â Config</button>
   </div>
 </div>
 
 <!-- KPI Strip -->
 <div class="kpi-strip">
-  <div class="kpi"><div class="kpi-val" id="kpi_clients">—</div><div class="kpi-lbl">Active Clients</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_spend">—</div><div class="kpi-lbl">Spend MTD</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_rebate">—</div><div class="kpi-lbl">Rebate (16%)</div><div class="kpi-sub">net earned</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_leads">—</div><div class="kpi-lbl">Total Leads</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_calls">—</div><div class="kpi-lbl">Total Calls</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_cpl">—</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_clients">â</div><div class="kpi-lbl">Active Clients</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_spend">â</div><div class="kpi-lbl">Spend MTD</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_rebate">â</div><div class="kpi-lbl">Rebate (16%)</div><div class="kpi-sub">net earned</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_leads">â</div><div class="kpi-lbl">Total Leads</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_calls">â</div><div class="kpi-lbl">Total Calls</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_cpl">â</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
 </div>
 
 <!-- Main -->
@@ -147,7 +148,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
   <!-- Clients -->
   <div class="clients-panel">
     <div class="clients-header">
-      <input class="search-box" id="searchBox" placeholder="Search clients…" oninput="filterClients()">
+      <input class="search-box" id="searchBox" placeholder="Search clientsâ¦" oninput="filterClients()">
       <button class="btn btn-gray btn-sm" onclick="loadDashboard()">Load</button>
     </div>
     <div id="clientsList"></div>
@@ -156,7 +157,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
   <!-- AI Panel -->
   <div class="ai-panel">
     <div class="ai-header">
-      <h3>🤖 AI Weekly Briefing</h3>
+      <h3>ð¤ AI Weekly Briefing</h3>
       <button class="btn btn-green btn-sm" id="analyzeBtn" onclick="runAnalysis(false)">Generate</button>
     </div>
     <div class="ai-body">
@@ -170,14 +171,14 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 </div>
 
 <script>
-// ─── State ────────────────────────────────────────────────────────────────────
+// âââ State ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let CFG = {};
 let clients = [];
 let filteredClients = [];
 let analysisCache = { text: null, ts: null };
 let currentMonth = null;
 
-// ─── Config ───────────────────────────────────────────────────────────────────
+// âââ Config âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function loadConfig() {
   try {
     const s = localStorage.getItem('shefa_cfg');
@@ -214,7 +215,7 @@ function closeConfig() {
   document.getElementById('configModal').classList.remove('open');
 }
 
-// ─── Month selector ───────────────────────────────────────────────────────────
+// âââ Month selector âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function buildMonthSelect() {
   const sel = document.getElementById('monthSel');
   sel.innerHTML = '';
@@ -236,7 +237,7 @@ function onMonthChange() {
   loadDashboard();
 }
 
-// ─── API helpers ──────────────────────────────────────────────────────────────
+// âââ API helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const YELP_FN='/.netlify/functions/yelp';
 async function yelpFn(path,method,body){const o={method:method||'GET',headers:{'Content-Type':'application/json'}};if(body)o.body=JSON.stringify(body);const r=await fetch(YELP_FN+'?path='+path,o);return r.json();}
 function yelpGet(path){return yelpFn('programs','GET');}
@@ -244,40 +245,41 @@ function yelpPost(path,body){let p=path;if(path.includes('/pause/'))p='pause/'+p
 function createReport(bizIds){const now=new Date();const[yr,mo]=currentMonth.split('-');const s=yr+'-'+mo+'-01';const e2=currentMonth===(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))?now.toISOString().slice(0,10):new Date(parseInt(yr),parseInt(mo),0).toISOString().slice(0,10);return yelpFn('report/create','POST',{business_ids:bizIds,start_date:s,end_date:e2});}
 async function pollReport(id,max){max=max||20;for(let i=0;i<max;i++){await new Promise(r=>setTimeout(r,3000));const d=await yelpFn('report/'+id,'GET');if(d.status==='COMPLETE'||d.data)return d;if(d.status==='FAILED')throw new Error('Report failed');}throw new Error('Report timed out');}
 
-// ─── Load dashboard ───────────────────────────────────────────────────────────
+// âââ Load dashboard âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function loadDashboard() {
   
   try {
-    toast('Loading campaigns…', 'success');
+    toast('Loading campaignsâ¦', 'success');
     // Get all programs under account
-    const data = await yelpGet('/v1/account/programs');
+    const data = await yelpFn('programs', 'GET');
     const programs = data.programs || data.data || [];
 
     if (!programs.length) {
       document.getElementById('clientsList').innerHTML =
-        '<div class="empty-state">No programs found. Check your credentials in ⚙ Config.</div>';
+        '<div class="empty-state">No programs found. Check your credentials in â Config.</div>';
       return;
     }
 
     // Map programs to client objects
-    clients = programs.map(p => ({
-      id:          p.id || p.program_id,
-      business_id: p.business_id,
-      name:        p.business_name || p.name || `Business ${p.business_id}`,
-      category:    p.category_name || '',
-      status:      p.status || 'ACTIVE',
-      budget_cents:(p.budget || 0) * 100,
-      spend_cents: 0,
-      impressions: 0,
-      ad_clicks:   0,
-      ctr:         0,
-      page_views:  0,
-      leads:       0,
-      calls:       0,
-      messages:    0,
-      cpc:         0,
-      has_bot:     false,
-    }));
+    clients = programs
+      .filter(p => p.status === 'ACTIVE')
+      .map(p => ({
+        id:           p.id || p.bizId,
+        name:         p.name || p.campaign_name || 'Unknown',
+        category:     '',
+        status:       'ACTIVE',
+        budget_cents: p.budget_cents || 0,
+        spend_cents:  p.spend_cents || 0,
+        impressions:  p.impressions || 0,
+        ad_clicks:    p.clicks || p.ad_clicks || 0,
+        ctr:          parseFloat(p.ctr || 0).toFixed(2),
+        page_views:   p.page_views || 0,
+        leads:        p.leads || 0,
+        calls:        p.calls || 0,
+        messages:     p.messages || 0,
+        cpc:          parseFloat(p.avg_cpc || p.cpc || 0).toFixed(2),
+        has_bot:      false,
+      }));
 
     renderClients();
     updateKPIs();
@@ -302,7 +304,7 @@ async function loadReportingData() {
     const reportId = report.id || report.report_id;
     if (!reportId) return;
 
-    toast('⏳ Fetching metrics (takes ~30s)…', 'success');
+    toast('â³ Fetching metrics (takes ~30s)â¦', 'success');
     const result = await pollReport(reportId);
 
     const rows = result.data || result.rows || [];
@@ -324,14 +326,14 @@ async function loadReportingData() {
 
     renderClients();
     updateKPIs();
-    toast('Metrics loaded ✓', 'success');
+    toast('Metrics loaded â', 'success');
   } catch(e) {
     console.warn('Reporting error:', e.message);
     toast('Reporting: ' + e.message, 'error');
   }
 }
 
-// ─── Demo data (when no credentials) ─────────────────────────────────────────
+// âââ Demo data (when no credentials) âââââââââââââââââââââââââââââââââââââââââ
 function renderDemoData() {
   const demos = [
     {id:'p1',name:'Pacific Roofing Co',category:'Roofing',status:'ACTIVE',budget_cents:500000,spend_cents:380000,impressions:24300,ad_clicks:412,ctr:'1.70',page_views:8800,leads:28,calls:42,messages:11,has_bot:true},
@@ -344,20 +346,20 @@ function renderDemoData() {
   clients = demos;
   renderClients();
   updateKPIs();
-  toast('Showing demo data — add credentials in ⚙', 'error');
+  toast('Showing demo data â add credentials in â', 'error');
 }
 
 function renderNoConfig() {
   document.getElementById('clientsList').innerHTML =
     `<div class="empty-state">
-      <div style="font-size:24px;margin-bottom:12px">⚙</div>
+      <div style="font-size:24px;margin-bottom:12px">â</div>
       <div style="color:#ccc;margin-bottom:8px">No credentials configured</div>
       <button class="btn btn-green" onclick="openConfig()">Configure API Keys</button>
     </div>`;
   renderDemoData();
 }
 
-// ─── Render clients ───────────────────────────────────────────────────────────
+// âââ Render clients âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function filterClients() {
   const q = document.getElementById('searchBox').value.toLowerCase();
   filteredClients = q ? clients.filter(c => c.name.toLowerCase().includes(q) || (c.category||'').toLowerCase().includes(q)) : clients;
@@ -376,9 +378,9 @@ function renderClients() {
 
 function renderClientRow(c) {
   const totalConvs = (c.leads||0) + (c.calls||0) + (c.messages||0);
-  const cpl = totalConvs && c.spend_cents ? '$' + ((c.spend_cents/100)/totalConvs).toFixed(0) : '—';
-  const spend = c.spend_cents ? '$' + (c.spend_cents/100).toLocaleString() : '—';
-  const budget = c.budget_cents ? '$' + (c.budget_cents/100).toLocaleString() : '—';
+  const cpl = totalConvs && c.spend_cents ? '$' + ((c.spend_cents/100)/totalConvs).toFixed(0) : 'â';
+  const spend = c.spend_cents ? '$' + (c.spend_cents/100).toLocaleString() : 'â';
+  const budget = c.budget_cents ? '$' + (c.budget_cents/100).toLocaleString() : 'â';
   const statusTag = c.status === 'ACTIVE'
     ? `<span class="tag tag-active">ACTIVE</span>`
     : c.status === 'PAUSED'
@@ -388,7 +390,7 @@ function renderClientRow(c) {
   return `
 <div class="client-row" id="row_${c.id}">
   <div class="client-main" onclick="toggleRow('${c.id}')">
-    <span class="expand-btn">▶</span>
+    <span class="expand-btn">â¶</span>
     <div>
       <div class="client-name">${c.name}</div>
       <div class="client-cat">${c.category||''}${c.has_bot ? ' <span class="client-has-bot">BOT</span>' : ''}</div>
@@ -396,7 +398,7 @@ function renderClientRow(c) {
     <div class="metric-cell">${statusTag}</div>
     <div class="metric-cell"><div class="metric-val">${budget}</div><div class="metric-lbl">Budget</div></div>
     <div class="metric-cell"><div class="metric-val">${spend}</div><div class="metric-lbl">Spend</div></div>
-    <div class="metric-cell"><div class="metric-val">${totalConvs||'—'}</div><div class="metric-lbl">Convs</div></div>
+    <div class="metric-cell"><div class="metric-val">${totalConvs||'â'}</div><div class="metric-lbl">Convs</div></div>
     <div class="metric-cell"><div class="metric-val">${cpl}</div><div class="metric-lbl">Cost/Conv</div></div>
   </div>
   <div class="client-detail">
@@ -412,8 +414,8 @@ function renderClientRow(c) {
     </div>
     <div class="controls-row">
       ${c.status === 'ACTIVE'
-        ? `<button class="btn btn-red btn-sm" onclick="pauseCampaign('${c.id}', event)">⏸ Pause</button>`
-        : `<button class="btn btn-green btn-sm" onclick="resumeCampaign('${c.id}', event)">▶ Resume</button>`}
+        ? `<button class="btn btn-red btn-sm" onclick="pauseCampaign('${c.id}', event)">â¸ Pause</button>`
+        : `<button class="btn btn-green btn-sm" onclick="resumeCampaign('${c.id}', event)">â¶ Resume</button>`}
       <input class="budget-input" id="bgt_${c.id}" type="number" value="${((c.budget_cents||0)/100).toFixed(0)}" placeholder="Budget $">
       <button class="btn btn-gray btn-sm" onclick="changeBudget('${c.id}', event)">Set Budget</button>
       <label style="font-size:11px;color:#666;margin-left:8px">
@@ -429,7 +431,7 @@ function toggleRow(id) {
   row.classList.toggle('expanded');
 }
 
-// ─── KPIs ─────────────────────────────────────────────────────────────────────
+// âââ KPIs âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function updateKPIs() {
   const active = clients.filter(c => c.status === 'ACTIVE');
   const spend  = clients.reduce((s,c) => s + (c.spend_cents||0), 0) / 100;
@@ -439,14 +441,14 @@ function updateKPIs() {
   const cpl    = convs ? (spend / convs).toFixed(0) : 0;
 
   document.getElementById('kpi_clients').textContent = active.length;
-  document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString() : '—';
-  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend * 0.16).toLocaleString('en',{maximumFractionDigits:0}) : '—';
-  document.getElementById('kpi_leads').textContent   = leads || '—';
-  document.getElementById('kpi_calls').textContent   = (calls) || '—';
-  document.getElementById('kpi_cpl').textContent     = cpl ? '$' + cpl : '—';
+  document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString() : 'â';
+  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend * 0.16).toLocaleString('en',{maximumFractionDigits:0}) : 'â';
+  document.getElementById('kpi_leads').textContent   = leads || 'â';
+  document.getElementById('kpi_calls').textContent   = (calls) || 'â';
+  document.getElementById('kpi_cpl').textContent     = cpl ? '$' + cpl : 'â';
 }
 
-// ─── Campaign controls ────────────────────────────────────────────────────────
+// âââ Campaign controls ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function pauseCampaign(id, e) {
   e.stopPropagation();
   if (!confirm('Pause this campaign?')) return;
@@ -500,10 +502,10 @@ function toggleBot(id, val) {
   if (c) { c.has_bot = val; updateKPIs(); }
 }
 
-// ─── AI Analysis ──────────────────────────────────────────────────────────────
+// âââ AI Analysis ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function runAnalysis(force) {
   if (!CFG.anthropic) {
-    toast('Add Anthropic API key in ⚙ Config', 'error');
+    toast('Add Anthropic API key in â Config', 'error');
     openConfig();
     return;
   }
@@ -518,9 +520,9 @@ async function runAnalysis(force) {
 
   const btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Analyzing…';
+  btn.innerHTML = '<span class="spinner"></span>Analyzingâ¦';
 
-  document.getElementById('aiContent').innerHTML = '<div class="loading-bar"></div><div style="color:#555;font-size:12px">Claude is analyzing your portfolio…</div>';
+  document.getElementById('aiContent').innerHTML = '<div class="loading-bar"></div><div style="color:#555;font-size:12px">Claude is analyzing your portfolioâ¦</div>';
 
   try {
     const spend = clients.reduce((s,c) => s + (c.spend_cents||0), 0) / 100;
@@ -532,7 +534,7 @@ async function runAnalysis(force) {
   Leads: ${c.leads||0} | Calls: ${c.calls||0} | Messages: ${c.messages||0} | Total Convs: ${convs} | Cost/Conv: ${cpl} | Bot: ${c.has_bot?'Yes':'No'}`;
     }).join('\n\n');
 
-    const prompt = `Shefa Marketing Campaign Analysis — ${currentMonth}
+    const prompt = `Shefa Marketing Campaign Analysis â ${currentMonth}
 Total clients: ${clients.length} | Active: ${clients.filter(c=>c.status==='ACTIVE').length} | Spend MTD: $${spend.toLocaleString()} | Rebate (16% net): $${(spend*0.16).toFixed(0)}
 
 ${rows}
@@ -566,7 +568,7 @@ Sections: ## Portfolio Health | ## Top Performers | ## Needs Attention | ## Budg
     toast('Analysis failed: ' + err.message, 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '↻ Refresh';
+    btn.innerHTML = 'â» Refresh';
   }
 }
 
@@ -581,19 +583,19 @@ function renderAnalysis(text, ts, cached) {
 
   const age = ts ? new Date(ts).toLocaleTimeString() : '';
   document.getElementById('aiContent').innerHTML =
-    `<div class="rebate-banner">💰 Portfolio rebate this month: $${(clients.reduce((s,c)=>s+(c.spend_cents||0),0)/100*0.16).toLocaleString('en',{maximumFractionDigits:0})}</div>
+    `<div class="rebate-banner">ð° Portfolio rebate this month: $${(clients.reduce((s,c)=>s+(c.spend_cents||0),0)/100*0.16).toLocaleString('en',{maximumFractionDigits:0})}</div>
      ${html}
      <div class="ai-ts">${cached?'Cached':'Generated'} at ${age}</div>`;
 }
 
-// ─── Health check ─────────────────────────────────────────────────────────────
+// âââ Health check âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function checkHealth(){const dot=document.getElementById('serverDot');try{const d=await yelpFn('health','GET');dot.style.background=d.status==='ok'?'#00e87a':'#ffc107';}catch(e){dot.style.background='#ff3b3b';}}
   } catch {
     dot.style.background = '#ff3b3b';
   }
 }
 
-// ─── Toast ─────────────────────────────────────────────────────────────────────
+// âââ Toast âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function toast(msg, type='success') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
@@ -602,7 +604,7 @@ function toast(msg, type='success') {
   setTimeout(() => el.remove(), 3500);
 }
 
-// ─── Init ──────────────────────────────────────────────────────────────────────
+// âââ Init ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 loadConfig();
 buildMonthSelect();
 checkHealth();
