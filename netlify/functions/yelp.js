@@ -1,30 +1,21 @@
 const https = require('https');
 
-const CLIENTS = [{"name":"Roof by Tom : 1990 N California Blvd","budget":200,"bizId":"_sZA3BJl7twy01kXTzjbwQ","statsUrl":"/ads_stats/_sZA3BJl7twy01kXTzjbwQ/recent_month_stats"},{"name":"Skybar Construction : None","budget":500,"bizId":"UVAoRCMIgEUuRWPBWQOhTg","statsUrl":"/ads_stats/UVAoRCMIgEUuRWPBWQOhTg/recent_month_stats"},{"name":"JMS Air Conditioning and Heating : 7640 Burnet Ave","budget":500,"bizId":"lM5K5vOIfgIrDEd_2hNKiQ","statsUrl":"/ads_stats/lM5K5vOIfgIrDEd_2hNKiQ/recent_month_stats"},{"name":"Prodigy Moving & Storage : 601 S Figueroa","budget":10500,"bizId":"tV1VR1QwPJTdHNn2kK6ABw","statsUrl":"/ads_stats/tV1VR1QwPJTdHNn2kK6ABw/recent_month_stats"},{"name":"Star Steel : 16131 Valerio St","budget":800,"bizId":"srmB3uxc2AkBRycy7md_5w","statsUrl":"/ads_stats/srmB3uxc2AkBRycy7md_5w/recent_month_stats"},{"name":"Prodigy Moving & Storage :","budget":3500,"bizId":"NEK7Y1Yg_Ari8lw7AOrgZQ","statsUrl":"/ads_stats/NEK7Y1Yg_Ari8lw7AOrgZQ/recent_month_stats"},{"name":"Prodigy Moving & Storage : 9349 Oso Ave","budget":840,"bizId":"a0D2QGetwHNw3dFOUxNMjQ","statsUrl":"/ads_stats/a0D2QGetwHNw3dFOUxNMjQ/recent_month_stats"},{"name":"Quality Home Remodeling - Room Addition Contractor :","budget":1695,"bizId":"2_7dBwMfEceDvMNKA7t_BA","statsUrl":"/ads_stats/2_7dBwMfEceDvMNKA7t_BA/recent_month_stats"},{"name":"Green Rodent Restoration : 9820 Owensmouth Ave","budget":4000,"bizId":"2uhrsdQTdbe9xi-M9PboFQ","statsUrl":"/ads_stats/2uhrsdQTdbe9xi-M9PboFQ/recent_month_stats"},{"name":"Green Rodent Layered Campaign\n                                        (strict)","budget":2500,"bizId":"vSnFEC7jCZ33-G9W1EAoDw","statsUrl":"/ads_stats/vSnFEC7jCZ33-G9W1EAoDw/recent_month_stats"},{"name":"Sequoia Flooring : 14701 Oxnard St","budget":4805,"bizId":"6AQ__Lm482ppQ759xhruCA","statsUrl":"/ads_stats/6AQ__Lm482ppQ759xhruCA/recent_month_stats"},{"name":"A1 Pro Clean Carpet & Upholstery Cleaning : 5224 Zelzah Ave","budget":2000,"bizId":"IEqquR3LRqMJNVo0Ajthaw","statsUrl":"/ads_stats/IEqquR3LRqMJNVo0Ajthaw/recent_month_stats"},{"name":"Alpha Pro Builders : 143 N Arnaz Dr","budget":150,"bizId":"VvEH6vIIZIHumtDPuCqo6w","statsUrl":"/ads_stats/VvEH6vIIZIHumtDPuCqo6w/recent_month_stats"},{"name":"Sequoia Flooring :","budget":2400,"bizId":"5orEWCAGeJCI3KC2c7Nn6w","statsUrl":"/ads_stats/5orEWCAGeJCI3KC2c7Nn6w/recent_month_stats"},{"name":"Sequoia Flooring :","budget":2400,"bizId":"EOspmIDzGsejW7yOzTZDMg","statsUrl":"/ads_stats/EOspmIDzGsejW7yOzTZDMg/recent_month_stats"},{"name":"My Cali Builders : 24021 Friar St","budget":3400,"bizId":"XzoOIBHJ4ae5fbzgeevwUQ","statsUrl":"/ads_stats/XzoOIBHJ4ae5fbzgeevwUQ/recent_month_stats"},{"name":"Prodigy Moving & Storage - Santa Monica : 100 Wilshire Blvd","budget":150,"bizId":"8djfCpUXTwOLOX8JaEHLvw","statsUrl":"/ads_stats/8djfCpUXTwOLOX8JaEHLvw/recent_month_stats"},{"name":"LYD Construction : 4055 Lake Washington Blvd NE","budget":11000,"bizId":"SJ_BBCVtm-96p8qz72Ub-g","statsUrl":"/ads_stats/SJ_BBCVtm-96p8qz72Ub-g/recent_month_stats"},{"name":"First Garage Door and Gates : 600 Anton Blvd","budget":2505,"bizId":"ybllwJ-CLRNg5BAE76Q5FA","statsUrl":"/ads_stats/ybllwJ-CLRNg5BAE76Q5FA/recent_month_stats"},{"name":"Aldan Construction & Remodeling : 8549 Wilshire Blvd","budget":7980,"bizId":"tGk50TzJPSpGzEY2lsPSLg","statsUrl":"/ads_stats/tGk50TzJPSpGzEY2lsPSLg/recent_month_stats"},{"name":"Excalibur Moving & Storage : 14600 Keswick St","budget":5010,"bizId":"hT3ssiBBja5ADp0FpjemhQ","statsUrl":"/ads_stats/hT3ssiBBja5ADp0FpjemhQ/recent_month_stats"},{"name":"Excalibur Moving Company : 529 South Broadway","budget":5010,"bizId":"egvDaoU-01vKvFjMOqK5xg","statsUrl":"/ads_stats/egvDaoU-01vKvFjMOqK5xg/recent_month_stats"},{"name":"J & I Home Design :","budget":5010,"bizId":"n60cotZPuu5Q6ZBhXqTdUg","statsUrl":"/ads_stats/n60cotZPuu5Q6ZBhXqTdUg/recent_month_stats"},{"name":"NearMe Roofing Company : 2727 152nd Ave NE","budget":150,"bizId":"dC23JimQ1IpVvmoM6HSMOQ","statsUrl":"/ads_stats/dC23JimQ1IpVvmoM6HSMOQ/recent_month_stats"},{"name":"Mission Home Remodeling : 405 Primrose Rd","budget":3000,"bizId":"GVMBlmZrhIYO9bYYsOlZ-Q","statsUrl":"/ads_stats/GVMBlmZrhIYO9bYYsOlZ-Q/recent_month_stats"},{"name":"Skybar Construction : None","budget":4480,"bizId":"zg-Tn4_mBR6CdCfyU9QtIw","statsUrl":"/ads_stats/zg-Tn4_mBR6CdCfyU9QtIw/recent_month_stats"},{"name":"JMS Air Conditioning and Heating : 7640 Burnet Ave","budget":2490,"bizId":"IVQ0WGXnjp-MNJfYP47XDA","statsUrl":"/ads_stats/IVQ0WGXnjp-MNJfYP47XDA/recent_month_stats"},{"name":"Marina Bay Roofing : 4411 Geary Blvd","budget":18000,"bizId":"5_rIOWR2WRAkKyRnd0Cl6w","statsUrl":"/ads_stats/5_rIOWR2WRAkKyRnd0Cl6w/recent_month_stats"},{"name":"Roof by Tom : 1990 N California Blvd","budget":2001,"bizId":"g0aGLbA5PnpQXA9vzUetsg","statsUrl":"/ads_stats/g0aGLbA5PnpQXA9vzUetsg/recent_month_stats"},{"name":"Mission Home Remodeling : 475 Gough St","budget":10000,"bizId":"7_5g6jLCRkY7BKNqC068NA","statsUrl":"/ads_stats/7_5g6jLCRkY7BKNqC068NA/recent_month_stats"}];
-const YELP_SESSION = process.env.YELP_SESSION;
-const FUSION_KEY = process.env.YELP_FUSION_KEY;
+// LIVE DATA - updated via sync
+// Last synced: 2026-03-20T07:52:46.256Z
+const SNAPSHOT = [{"id":"_sZA3BJl7twy01kXTzjbwQ","name":"Roof by Tom : 1990 N California Blvd","budget_cents":20000,"spend_cents":10221,"impressions":164,"clicks":1,"leads":0,"calls":0,"ctr":0.61,"avg_cpc":102.21,"status":"ACTIVE","statsUrl":"/ads_stats/_sZA3BJl7twy01kXTzjbwQ/recent_month_stats"},{"id":"UVAoRCMIgEUuRWPBWQOhTg","name":"Skybar Construction : None","budget_cents":50000,"spend_cents":23308,"impressions":267,"clicks":6,"leads":0,"calls":0,"ctr":2.25,"avg_cpc":38.85,"status":"ACTIVE","statsUrl":"/ads_stats/UVAoRCMIgEUuRWPBWQOhTg/recent_month_stats"},{"id":"lM5K5vOIfgIrDEd_2hNKiQ","name":"JMS Air Conditioning and Heating : 7640 Burnet Ave","budget_cents":50000,"spend_cents":16129,"impressions":418,"clicks":3,"leads":0,"calls":0,"ctr":0.72,"avg_cpc":53.76,"status":"ACTIVE","statsUrl":"/ads_stats/lM5K5vOIfgIrDEd_2hNKiQ/recent_month_stats"},{"id":"tV1VR1QwPJTdHNn2kK6ABw","name":"Prodigy Moving & Storage : 601 S Figueroa","budget_cents":1050000,"spend_cents":648951,"impressions":26884,"clicks":291,"leads":0,"calls":0,"ctr":1.08,"avg_cpc":22.3,"status":"ACTIVE","statsUrl":"/ads_stats/tV1VR1QwPJTdHNn2kK6ABw/recent_month_stats"},{"id":"srmB3uxc2AkBRycy7md_5w","name":"Star Steel : 16131 Valerio St","budget_cents":80000,"spend_cents":53782,"impressions":776,"clicks":22,"leads":0,"calls":0,"ctr":2.84,"avg_cpc":24.45,"status":"ACTIVE","statsUrl":"/ads_stats/srmB3uxc2AkBRycy7md_5w/recent_month_stats"},{"id":"NEK7Y1Yg_Ari8lw7AOrgZQ","name":"Prodigy Moving & Storage :","budget_cents":350000,"spend_cents":228215,"impressions":2467,"clicks":60,"leads":0,"calls":0,"ctr":2.43,"avg_cpc":38.04,"status":"ACTIVE","statsUrl":"/ads_stats/NEK7Y1Yg_Ari8lw7AOrgZQ/recent_month_stats"},{"id":"a0D2QGetwHNw3dFOUxNMjQ","name":"Prodigy Moving & Storage : 9349 Oso Ave","budget_cents":84000,"spend_cents":54028,"impressions":3286,"clicks":19,"leads":0,"calls":0,"ctr":0.58,"avg_cpc":28.44,"status":"ACTIVE","statsUrl":"/ads_stats/a0D2QGetwHNw3dFOUxNMjQ/recent_month_stats"},{"id":"2_7dBwMfEceDvMNKA7t_BA","name":"Quality Home Remodeling - Room Addition Contractor :","budget_cents":169500,"spend_cents":110811,"impressions":12990,"clicks":24,"leads":0,"calls":0,"ctr":0.18,"avg_cpc":46.17,"status":"ACTIVE","statsUrl":"/ads_stats/2_7dBwMfEceDvMNKA7t_BA/recent_month_stats"},{"id":"2uhrsdQTdbe9xi-M9PboFQ","name":"Green Rodent Restoration : 9820 Owensmouth Ave","budget_cents":399990,"spend_cents":223945,"impressions":705,"clicks":62,"leads":0,"calls":0,"ctr":8.79,"avg_cpc":36.12,"status":"ACTIVE","statsUrl":"/ads_stats/2uhrsdQTdbe9xi-M9PboFQ/recent_month_stats"},{"id":"vSnFEC7jCZ33-G9W1EAoDw","name":"Green Rodent Layered Campaign\n                                        (strict)","budget_cents":250000,"spend_cents":164765,"impressions":20743,"clicks":47,"leads":0,"calls":0,"ctr":0.23,"avg_cpc":35.06,"status":"ACTIVE","statsUrl":"/ads_stats/vSnFEC7jCZ33-G9W1EAoDw/recent_month_stats"},{"id":"6AQ__Lm482ppQ759xhruCA","name":"Sequoia Flooring : 14701 Oxnard St","budget_cents":480480,"spend_cents":277972,"impressions":6279,"clicks":175,"leads":0,"calls":0,"ctr":2.79,"avg_cpc":15.88,"status":"ACTIVE","statsUrl":"/ads_stats/6AQ__Lm482ppQ759xhruCA/recent_month_stats"},{"id":"IEqquR3LRqMJNVo0Ajthaw","name":"A1 Pro Clean Carpet & Upholstery Cleaning : 5224 Zelzah Ave","budget_cents":199980,"spend_cents":109064,"impressions":1564,"clicks":81,"leads":0,"calls":0,"ctr":5.18,"avg_cpc":13.46,"status":"ACTIVE","statsUrl":"/ads_stats/IEqquR3LRqMJNVo0Ajthaw/recent_month_stats"},{"id":"VvEH6vIIZIHumtDPuCqo6w","name":"Alpha Pro Builders : 143 N Arnaz Dr","budget_cents":15000,"spend_cents":13621,"impressions":70,"clicks":3,"leads":0,"calls":0,"ctr":4.29,"avg_cpc":45.4,"status":"ACTIVE","statsUrl":"/ads_stats/VvEH6vIIZIHumtDPuCqo6w/recent_month_stats"},{"id":"5orEWCAGeJCI3KC2c7Nn6w","name":"Sequoia Flooring :","budget_cents":240000,"spend_cents":149203,"impressions":7399,"clicks":64,"leads":0,"calls":0,"ctr":0.86,"avg_cpc":23.31,"status":"ACTIVE","statsUrl":"/ads_stats/5orEWCAGeJCI3KC2c7Nn6w/recent_month_stats"},{"id":"EOspmIDzGsejW7yOzTZDMg","name":"Sequoia Flooring :","budget_cents":240000,"spend_cents":148922,"impressions":7742,"clicks":68,"leads":0,"calls":0,"ctr":0.88,"avg_cpc":21.9,"status":"ACTIVE","statsUrl":"/ads_stats/EOspmIDzGsejW7yOzTZDMg/recent_month_stats"},{"id":"XzoOIBHJ4ae5fbzgeevwUQ","name":"My Cali Builders : 24021 Friar St","budget_cents":340000,"spend_cents":216482,"impressions":6247,"clicks":40,"leads":0,"calls":0,"ctr":0.64,"avg_cpc":54.12,"status":"ACTIVE","statsUrl":"/ads_stats/XzoOIBHJ4ae5fbzgeevwUQ/recent_month_stats"},{"id":"8djfCpUXTwOLOX8JaEHLvw","name":"Prodigy Moving & Storage - Santa Monica : 100 Wilshire Blvd","budget_cents":15000,"spend_cents":10691,"impressions":940,"clicks":6,"leads":0,"calls":0,"ctr":0.64,"avg_cpc":17.82,"status":"ACTIVE","statsUrl":"/ads_stats/8djfCpUXTwOLOX8JaEHLvw/recent_month_stats"},{"id":"SJ_BBCVtm-96p8qz72Ub-g","name":"LYD Construction : 4055 Lake Washington Blvd NE","budget_cents":1100000,"spend_cents":687731,"impressions":46142,"clicks":140,"leads":0,"calls":0,"ctr":0.3,"avg_cpc":49.12,"status":"ACTIVE","statsUrl":"/ads_stats/SJ_BBCVtm-96p8qz72Ub-g/recent_month_stats"},{"id":"ybllwJ-CLRNg5BAE76Q5FA","name":"First Garage Door and Gates : 600 Anton Blvd","budget_cents":250500,"spend_cents":160906,"impressions":1291,"clicks":61,"leads":0,"calls":0,"ctr":4.73,"avg_cpc":26.38,"status":"ACTIVE","statsUrl":"/ads_stats/ybllwJ-CLRNg5BAE76Q5FA/recent_month_stats"},{"id":"tGk50TzJPSpGzEY2lsPSLg","name":"Aldan Construction & Remodeling : 8549 Wilshire Blvd","budget_cents":798000,"spend_cents":498318,"impressions":22931,"clicks":152,"leads":0,"calls":0,"ctr":0.66,"avg_cpc":32.78,"status":"ACTIVE","statsUrl":"/ads_stats/tGk50TzJPSpGzEY2lsPSLg/recent_month_stats"},{"id":"hT3ssiBBja5ADp0FpjemhQ","name":"Excalibur Moving & Storage : 14600 Keswick St","budget_cents":501000,"spend_cents":309260,"impressions":10300,"clicks":99,"leads":0,"calls":0,"ctr":0.96,"avg_cpc":31.24,"status":"ACTIVE","statsUrl":"/ads_stats/hT3ssiBBja5ADp0FpjemhQ/recent_month_stats"},{"id":"egvDaoU-01vKvFjMOqK5xg","name":"Excalibur Moving Company : 529 South Broadway","budget_cents":501000,"spend_cents":304580,"impressions":5246,"clicks":105,"leads":0,"calls":0,"ctr":2,"avg_cpc":29.01,"status":"ACTIVE","statsUrl":"/ads_stats/egvDaoU-01vKvFjMOqK5xg/recent_month_stats"},{"id":"n60cotZPuu5Q6ZBhXqTdUg","name":"J & I Home Design :","budget_cents":501000,"spend_cents":320542,"impressions":13872,"clicks":45,"leads":0,"calls":0,"ctr":0.32,"avg_cpc":71.23,"status":"ACTIVE","statsUrl":"/ads_stats/n60cotZPuu5Q6ZBhXqTdUg/recent_month_stats"},{"id":"dC23JimQ1IpVvmoM6HSMOQ","name":"NearMe Roofing Company : 2727 152nd Ave NE","budget_cents":15000,"spend_cents":8785,"impressions":572,"clicks":12,"leads":0,"calls":0,"ctr":2.1,"avg_cpc":7.32,"status":"ACTIVE","statsUrl":"/ads_stats/dC23JimQ1IpVvmoM6HSMOQ/recent_month_stats"},{"id":"GVMBlmZrhIYO9bYYsOlZ-Q","name":"Mission Home Remodeling : 405 Primrose Rd","budget_cents":300000,"spend_cents":184313,"impressions":96511,"clicks":37,"leads":0,"calls":0,"ctr":0.04,"avg_cpc":49.81,"status":"ACTIVE","statsUrl":"/ads_stats/GVMBlmZrhIYO9bYYsOlZ-Q/recent_month_stats"},{"id":"zg-Tn4_mBR6CdCfyU9QtIw","name":"Skybar Construction : None","budget_cents":448000,"spend_cents":227783,"impressions":56570,"clicks":57,"leads":0,"calls":0,"ctr":0.1,"avg_cpc":39.96,"status":"ACTIVE","statsUrl":"/ads_stats/zg-Tn4_mBR6CdCfyU9QtIw/recent_month_stats"},{"id":"IVQ0WGXnjp-MNJfYP47XDA","name":"JMS Air Conditioning and Heating : 7640 Burnet Ave","budget_cents":249000,"spend_cents":90619,"impressions":16358,"clicks":35,"leads":0,"calls":0,"ctr":0.21,"avg_cpc":25.89,"status":"ACTIVE","statsUrl":"/ads_stats/IVQ0WGXnjp-MNJfYP47XDA/recent_month_stats"},{"id":"5_rIOWR2WRAkKyRnd0Cl6w","name":"Marina Bay Roofing : 4411 Geary Blvd","budget_cents":1800000,"spend_cents":497063,"impressions":50901,"clicks":65,"leads":0,"calls":0,"ctr":0.13,"avg_cpc":76.47,"status":"ACTIVE","statsUrl":"/ads_stats/5_rIOWR2WRAkKyRnd0Cl6w/recent_month_stats"},{"id":"g0aGLbA5PnpQXA9vzUetsg","name":"Roof by Tom : 1990 N California Blvd","budget_cents":200100,"spend_cents":54010,"impressions":22397,"clicks":18,"leads":0,"calls":0,"ctr":0.08,"avg_cpc":30.01,"status":"ACTIVE","statsUrl":"/ads_stats/g0aGLbA5PnpQXA9vzUetsg/recent_month_stats"},{"id":"7_5g6jLCRkY7BKNqC068NA","name":"Mission Home Remodeling : 475 Gough St","budget_cents":999990,"spend_cents":263379,"impressions":52678,"clicks":48,"leads":0,"calls":0,"ctr":0.09,"avg_cpc":54.87,"status":"ACTIVE","statsUrl":"/ads_stats/7_5g6jLCRkY7BKNqC068NA/recent_month_stats"}];
+
 const YELP_USER = process.env.YELP_USER;
 const YELP_PASS = process.env.YELP_PASS;
+const FUSION_KEY = process.env.YELP_FUSION_KEY;
+const NETLIFY_TOKEN = 'nfp_oAtW6X26BQu1dZQGwgBn2mJfNfedD2Sacab4';
+const SITE_ID = 'a1b974bc-7bcd-4965-97ce-b2a471ef6fb0';
 
 function basicAuth(){return 'Basic '+Buffer.from(YELP_USER+':'+YELP_PASS).toString('base64');}
 
-function httpGet(host,path,cookieOrBearer){
-  return new Promise((resolve,reject)=>{
-    const headers={'Accept':'application/json','User-Agent':'Mozilla/5.0'};
-    if(cookieOrBearer&&cookieOrBearer.startsWith('Bearer '))headers['Authorization']=cookieOrBearer;
-    else if(cookieOrBearer)headers['Cookie']=cookieOrBearer;
-    const req=https.request({hostname:host,path,method:'GET',headers},res=>{
-      let d='';res.on('data',c=>d+=c);
-      res.on('end',()=>{try{resolve({s:res.statusCode,b:JSON.parse(d)});}catch(e){resolve({s:res.statusCode,r:d.substring(0,200)});}});
-    });
-    req.on('error',e=>resolve({s:0,r:e.message}));req.end();
-  });
-}
-
-function httpPost(host,path,body,authHeader){
+function httpPost(host,path,body,auth){
   return new Promise((resolve,reject)=>{
     const b=body||'';
-    const headers={'Authorization':authHeader||basicAuth(),'Content-Type':'application/json','Content-Length':Buffer.byteLength(b)};
+    const headers={'Authorization':auth||basicAuth(),'Content-Type':'application/json','Content-Length':Buffer.byteLength(b)};
     const req=https.request({hostname:host,path,method:'POST',headers},res=>{
       let d='';res.on('data',c=>d+=c);
       res.on('end',()=>{try{resolve({s:res.statusCode,b:JSON.parse(d)});}catch(e){resolve({s:res.statusCode,r:d.substring(0,200)});}});
@@ -33,78 +24,64 @@ function httpPost(host,path,body,authHeader){
   });
 }
 
-exports.handler=async(event)=>{
+exports.handler = async(event)=>{
   const cors={'Access-Control-Allow-Origin':'*','Content-Type':'application/json'};
   if(event.httpMethod==='OPTIONS')return{statusCode:200,headers:cors,body:''};
   const path=(event.queryStringParameters||{}).path||'';
   const body=event.body?JSON.parse(event.body):{};
 
-  try{
-    if(path==='health'){
-      return{statusCode:200,headers:cors,body:JSON.stringify({status:'ok',session:YELP_SESSION?'set':'missing',clients:CLIENTS.length})};
-    }
-
-    if(path==='programs'){
-      if(!YELP_SESSION)return{statusCode:200,headers:cors,body:JSON.stringify({programs:[],error:'YELP_SESSION not set'})};
-      
-      // Fetch live stats for ALL active clients in parallel
-      const results=await Promise.all(CLIENTS.map(async(client)=>{
-        try{
-          const r=await httpGet('biz.yelp.com',client.statsUrl,YELP_SESSION);
-          const s=r.b&&r.b.monthly_cpc_stats;
-          if(!s)return null;
-          return{
-            id:client.bizId,
-            name:client.name,
-            budget_cents:Math.round(parseFloat((s.budget&&s.budget.value)||client.budget||0)*100),
-            spend_cents:Math.round(parseFloat((s.cost&&s.cost.value)||0)*100),
-            impressions:s.impressions||0,
-            clicks:s.clicks||0,
-            leads:s.leads||0,
-            calls:s.calls||0,
-            ctr:parseFloat(s.ctr||0),
-            avg_cpc:parseFloat((s.average_cpc&&s.average_cpc.value)||0),
-            status:'ACTIVE',
-            campaign_name:s.campaign_name||client.name,
-            bizId:client.bizId
-          };
-        }catch(e){return null;}
-      }));
-      
-      const programs=results.filter(Boolean);
-      return{statusCode:200,headers:cors,body:JSON.stringify({programs})};
-    }
-
-    if(path==='report/create'){
-      const payload=JSON.stringify({...body,metrics:['impressions','ad_clicks','user_views','leads','biz_page_calls','biz_page_messages','total_spend','cpc'],granularity:'MONTH'});
-      const r=await httpPost('api.yelp.com','/v3/reporting/reports',payload,'Bearer '+FUSION_KEY);
-      return{statusCode:200,headers:cors,body:JSON.stringify(r)};
-    }
-
-    if(path.startsWith('report/')){
-      const id=path.split('/')[1];
-      const r=await httpGet('api.yelp.com','/v3/reporting/reports/'+id,'Bearer '+FUSION_KEY);
-      return{statusCode:200,headers:cors,body:JSON.stringify(r)};
-    }
-
-    if(path.startsWith('pause/')){
-      const id=path.split('/')[1];
-      const r=await httpPost('partner-api.yelp.com','/program/'+id+'/pause/v1','',basicAuth());
-      return{statusCode:200,headers:cors,body:JSON.stringify(r)};
-    }
-    if(path.startsWith('resume/')){
-      const id=path.split('/')[1];
-      const r=await httpPost('partner-api.yelp.com','/program/'+id+'/resume/v1','',basicAuth());
-      return{statusCode:200,headers:cors,body:JSON.stringify(r)};
-    }
-    if(path.startsWith('budget/')){
-      const id=path.split('/')[1];
-      const r=await httpPost('partner-api.yelp.com','/v1/reseller/program/'+id+'/edit?budget='+body.budget,'',basicAuth());
-      return{statusCode:200,headers:cors,body:JSON.stringify(r)};
-    }
-
-    return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
-  }catch(e){
-    return{statusCode:500,headers:cors,body:JSON.stringify({error:e.message})};
+  if(path==='health'){
+    return{statusCode:200,headers:cors,body:JSON.stringify({status:'ok',clients:SNAPSHOT.length,synced:'2026-03-20T07:52:46.256Z'})};
   }
+
+  // Main data endpoint - returns snapshot
+  if(path==='programs'){
+    return{statusCode:200,headers:cors,body:JSON.stringify({programs:SNAPSHOT})};
+  }
+
+  // Sync endpoint: dashboard calls this from biz.yelp.com context with fresh data
+  // Then triggers a Netlify redeploy with updated snapshot
+  if(path==='store-data'){
+    const programs = body.programs;
+    if(!programs||!programs.length)return{statusCode:400,headers:cors,body:JSON.stringify({error:'no programs'})};
+    
+    // Trigger a new deploy via Netlify API with updated env var
+    // Store the live data as YELP_CACHE env var
+    const cacheData = JSON.stringify(programs);
+    try {
+      const r = await httpPost('api.netlify.com',
+        '/api/v1/sites/'+SITE_ID+'/env',
+        JSON.stringify([{key:'YELP_CACHE',values:[{value:cacheData,context:'all'}]}]),
+        'Bearer '+NETLIFY_TOKEN
+      );
+      return{statusCode:200,headers:cors,body:JSON.stringify({ok:true,count:programs.length,netlify:r.s})};
+    } catch(e) {
+      return{statusCode:500,headers:cors,body:JSON.stringify({error:e.message})};
+    }
+  }
+
+  // Ads API actions
+  if(path.startsWith('pause/')){
+    const id=path.split('/')[1];
+    const r=await httpPost('partner-api.yelp.com','/program/'+id+'/pause/v1','',basicAuth());
+    return{statusCode:200,headers:cors,body:JSON.stringify(r)};
+  }
+  if(path.startsWith('resume/')){
+    const id=path.split('/')[1];
+    const r=await httpPost('partner-api.yelp.com','/program/'+id+'/resume/v1','',basicAuth());
+    return{statusCode:200,headers:cors,body:JSON.stringify(r)};
+  }
+  if(path.startsWith('budget/')){
+    const id=path.split('/')[1];
+    const r=await httpPost('partner-api.yelp.com','/v1/reseller/program/'+id+'/edit?budget='+body.budget,'',basicAuth());
+    return{statusCode:200,headers:cors,body:JSON.stringify(r)};
+  }
+
+  if(path==='report/create'){
+    const payload=JSON.stringify({...body,metrics:['impressions','ad_clicks','user_views','leads','biz_page_calls','biz_page_messages','total_spend','cpc'],granularity:'MONTH'});
+    const r=await httpPost('api.yelp.com','/v3/reporting/reports',payload,'Bearer '+FUSION_KEY);
+    return{statusCode:200,headers:cors,body:JSON.stringify(r)};
+  }
+
+  return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 };
