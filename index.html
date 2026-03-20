@@ -91,7 +91,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <!-- Config Modal -->
 <div class="config-modal" id="configModal">
   <div class="config-box">
-    <h3>â API Configuration</h3>
+    <h3>Ã¢ÂÂ API Configuration</h3>
     <div class="field">
       <label>Yelp Partner Username</label>
       <input id="cfg_user" type="text" placeholder="partner username">
@@ -109,7 +109,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
       <input id="cfg_anthropic" type="password" placeholder="sk-ant-...">
     </div>
     <div class="field">
-      <label>Proxy Server URL (optional â for CORS)</label>
+      <label>Proxy Server URL (optional Ã¢ÂÂ for CORS)</label>
       <input id="cfg_proxy" type="text" placeholder="http://your-server:3400 (leave blank for direct)">
     </div>
     <div class="config-actions">
@@ -123,24 +123,24 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:10px">
     <div class="status-dot" id="serverDot" style="background:#555"></div>
-    <h1>Shefa â Yelp Campaign Control Panel</h1>
+    <h1>Shefa Ã¢ÂÂ Yelp Campaign Control Panel</h1>
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn btn-gray btn-sm" onclick="loadDashboard()">â» Refresh</button>
+    <button class="btn btn-gray btn-sm" onclick="loadDashboard()">Ã¢ÂÂ» Refresh</button>
     <button class="btn btn-green btn-sm" id="syncBtn" onclick="syncFromYelp()" title="Sync live data from Yelp">&#8635; Sync from Yelp</button>
-    <button class="btn btn-gray btn-sm" onclick="openConfig()">â Config</button>
+    <button class="btn btn-gray btn-sm" onclick="openConfig()">Ã¢ÂÂ Config</button>
   </div>
 </div>
 
 <!-- KPI Strip -->
 <div class="kpi-strip">
-  <div class="kpi"><div class="kpi-val" id="kpi_clients">â</div><div class="kpi-lbl">Active Clients</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_spend">â</div><div class="kpi-lbl">Spend MTD</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_rebate">â</div><div class="kpi-lbl">Rebate (16%)</div><div class="kpi-sub">net earned</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_leads">â</div><div class="kpi-lbl">Total Leads</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_calls">â</div><div class="kpi-lbl">Total Calls</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_cpl">â</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_clients">Ã¢ÂÂ</div><div class="kpi-lbl">Active Clients</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_spend">Ã¢ÂÂ</div><div class="kpi-lbl">Spend MTD</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_rebate">Ã¢ÂÂ</div><div class="kpi-lbl">Rebate (16%)</div><div class="kpi-sub">net earned</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_leads">Ã¢ÂÂ</div><div class="kpi-lbl">Total Leads</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_calls">Ã¢ÂÂ</div><div class="kpi-lbl">Total Calls</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_cpl">Ã¢ÂÂ</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
 </div>
 
 <!-- Main -->
@@ -148,7 +148,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
   <!-- Clients -->
   <div class="clients-panel">
     <div class="clients-header">
-      <input class="search-box" id="searchBox" placeholder="Search clientsâ¦" oninput="filterClients()">
+      <input class="search-box" id="searchBox" placeholder="Search clientsÃ¢ÂÂ¦" oninput="filterClients()">
       <button class="btn btn-gray btn-sm" onclick="loadDashboard()">Load</button>
     </div>
     <div id="clientsList"></div>
@@ -157,7 +157,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
   <!-- AI Panel -->
   <div class="ai-panel">
     <div class="ai-header">
-      <h3>ð¤ AI Weekly Briefing</h3>
+      <h3>Ã°ÂÂ¤Â AI Weekly Briefing</h3>
       <button class="btn btn-green btn-sm" id="analyzeBtn" onclick="runAnalysis(false)">Generate</button>
     </div>
     <div class="ai-body">
@@ -171,14 +171,14 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 </div>
 
 <script>
-// âââ State ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ State Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let CFG = {};
 let clients = [];
 let filteredClients = [];
 let analysisCache = { text: null, ts: null };
 let currentMonth = null;
 
-// âââ Config âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Config Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function loadConfig() {
   try {
     const s = localStorage.getItem('shefa_cfg');
@@ -215,7 +215,7 @@ function closeConfig() {
   document.getElementById('configModal').classList.remove('open');
 }
 
-// âââ Month selector âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Month selector Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function buildMonthSelect() {
   const sel = document.getElementById('monthSel');
   sel.innerHTML = '';
@@ -237,7 +237,7 @@ function onMonthChange() {
   loadDashboard();
 }
 
-// âââ API helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ API helpers Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const YELP_FN='/.netlify/functions/yelp';
 async function yelpFn(path,method,body){const o={method:method||'GET',headers:{'Content-Type':'application/json'}};if(body)o.body=JSON.stringify(body);const r=await fetch(YELP_FN+'?path='+path,o);return r.json();}
 function yelpGet(path){return yelpFn('programs','GET');}
@@ -245,18 +245,18 @@ function yelpPost(path,body){let p=path;if(path.includes('/pause/'))p='pause/'+p
 function createReport(bizIds){const now=new Date();const[yr,mo]=currentMonth.split('-');const s=yr+'-'+mo+'-01';const e2=currentMonth===(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))?now.toISOString().slice(0,10):new Date(parseInt(yr),parseInt(mo),0).toISOString().slice(0,10);return yelpFn('report/create','POST',{business_ids:bizIds,start_date:s,end_date:e2});}
 async function pollReport(id,max){max=max||20;for(let i=0;i<max;i++){await new Promise(r=>setTimeout(r,3000));const d=await yelpFn('report/'+id,'GET');if(d.status==='COMPLETE'||d.data)return d;if(d.status==='FAILED')throw new Error('Report failed');}throw new Error('Report timed out');}
 
-// âââ Load dashboard âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Load dashboard Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function loadDashboard() {
   
   try {
-    toast('Loading campaignsâ¦', 'success');
+    toast('Loading campaignsÃ¢ÂÂ¦', 'success');
     // Get all programs under account
     const data = await yelpFn('programs', 'GET');
     const programs = data.programs || data.data || [];
 
     if (!programs.length) {
       document.getElementById('clientsList').innerHTML =
-        '<div class="empty-state">No programs found. Check your credentials in â Config.</div>';
+        '<div class="empty-state">No programs found. Check your credentials in Ã¢ÂÂ Config.</div>';
       return;
     }
 
@@ -304,7 +304,7 @@ async function loadReportingData() {
     const reportId = report.id || report.report_id;
     if (!reportId) return;
 
-    toast('â³ Fetching metrics (takes ~30s)â¦', 'success');
+    toast('Ã¢ÂÂ³ Fetching metrics (takes ~30s)Ã¢ÂÂ¦', 'success');
     const result = await pollReport(reportId);
 
     const rows = result.data || result.rows || [];
@@ -326,14 +326,14 @@ async function loadReportingData() {
 
     renderClients();
     updateKPIs();
-    toast('Metrics loaded â', 'success');
+    toast('Metrics loaded Ã¢ÂÂ', 'success');
   } catch(e) {
     console.warn('Reporting error:', e.message);
     toast('Reporting: ' + e.message, 'error');
   }
 }
 
-// âââ Demo data (when no credentials) âââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Demo data (when no credentials) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderDemoData() {
   const demos = [
     {id:'p1',name:'Pacific Roofing Co',category:'Roofing',status:'ACTIVE',budget_cents:500000,spend_cents:380000,impressions:24300,ad_clicks:412,ctr:'1.70',page_views:8800,leads:28,calls:42,messages:11,has_bot:true},
@@ -346,20 +346,20 @@ function renderDemoData() {
   clients = demos;
   renderClients();
   updateKPIs();
-  toast('Showing demo data â add credentials in â', 'error');
+  toast('Showing demo data Ã¢ÂÂ add credentials in Ã¢ÂÂ', 'error');
 }
 
 function renderNoConfig() {
   document.getElementById('clientsList').innerHTML =
     `<div class="empty-state">
-      <div style="font-size:24px;margin-bottom:12px">â</div>
+      <div style="font-size:24px;margin-bottom:12px">Ã¢ÂÂ</div>
       <div style="color:#ccc;margin-bottom:8px">No credentials configured</div>
       <button class="btn btn-green" onclick="openConfig()">Configure API Keys</button>
     </div>`;
   renderDemoData();
 }
 
-// âââ Render clients âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Render clients Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function filterClients() {
   const q = document.getElementById('searchBox').value.toLowerCase();
   filteredClients = q ? clients.filter(c => c.name.toLowerCase().includes(q) || (c.category||'').toLowerCase().includes(q)) : clients;
@@ -378,9 +378,9 @@ function renderClients() {
 
 function renderClientRow(c) {
   const totalConvs = (c.leads||0) + (c.calls||0) + (c.messages||0);
-  const cpl = totalConvs && c.spend_cents ? '$' + ((c.spend_cents/100)/totalConvs).toFixed(0) : 'â';
-  const spend = c.spend_cents ? '$' + (c.spend_cents/100).toLocaleString() : 'â';
-  const budget = c.budget_cents ? '$' + (c.budget_cents/100).toLocaleString() : 'â';
+  const cpl = totalConvs && c.spend_cents ? '$' + ((c.spend_cents/100)/totalConvs).toFixed(0) : 'Ã¢ÂÂ';
+  const spend = c.spend_cents ? '$' + (c.spend_cents/100).toLocaleString() : 'Ã¢ÂÂ';
+  const budget = c.budget_cents ? '$' + (c.budget_cents/100).toLocaleString() : 'Ã¢ÂÂ';
   const statusTag = c.status === 'ACTIVE'
     ? `<span class="tag tag-active">ACTIVE</span>`
     : c.status === 'PAUSED'
@@ -390,7 +390,7 @@ function renderClientRow(c) {
   return `
 <div class="client-row" id="row_${c.id}">
   <div class="client-main" onclick="toggleRow('${c.id}')">
-    <span class="expand-btn">â¶</span>
+    <span class="expand-btn">Ã¢ÂÂ¶</span>
     <div>
       <div class="client-name">${c.name}</div>
       <div class="client-cat">${c.category||''}${c.has_bot ? ' <span class="client-has-bot">BOT</span>' : ''}</div>
@@ -398,7 +398,7 @@ function renderClientRow(c) {
     <div class="metric-cell">${statusTag}</div>
     <div class="metric-cell"><div class="metric-val">${budget}</div><div class="metric-lbl">Budget</div></div>
     <div class="metric-cell"><div class="metric-val">${spend}</div><div class="metric-lbl">Spend</div></div>
-    <div class="metric-cell"><div class="metric-val">${totalConvs||'â'}</div><div class="metric-lbl">Convs</div></div>
+    <div class="metric-cell"><div class="metric-val">${totalConvs||'Ã¢ÂÂ'}</div><div class="metric-lbl">Convs</div></div>
     <div class="metric-cell"><div class="metric-val">${cpl}</div><div class="metric-lbl">Cost/Conv</div></div>
   </div>
   <div class="client-detail">
@@ -414,8 +414,8 @@ function renderClientRow(c) {
     </div>
     <div class="controls-row">
       ${c.status === 'ACTIVE'
-        ? `<button class="btn btn-red btn-sm" onclick="pauseCampaign('${c.id}', event)">â¸ Pause</button>`
-        : `<button class="btn btn-green btn-sm" onclick="resumeCampaign('${c.id}', event)">â¶ Resume</button>`}
+        ? `<button class="btn btn-red btn-sm" onclick="pauseCampaign('${c.id}', event)">Ã¢ÂÂ¸ Pause</button>`
+        : `<button class="btn btn-green btn-sm" onclick="resumeCampaign('${c.id}', event)">Ã¢ÂÂ¶ Resume</button>`}
       <input class="budget-input" id="bgt_${c.id}" type="number" value="${((c.budget_cents||0)/100).toFixed(0)}" placeholder="Budget $">
       <button class="btn btn-gray btn-sm" onclick="changeBudget('${c.id}', event)">Set Budget</button>
       <label style="font-size:11px;color:#666;margin-left:8px">
@@ -431,7 +431,7 @@ function toggleRow(id) {
   row.classList.toggle('expanded');
 }
 
-// âââ KPIs âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ KPIs Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function updateKPIs() {
   const active = clients.filter(c => c.status === 'ACTIVE');
   const spend  = clients.reduce((s,c) => s + (c.spend_cents||0), 0) / 100;
@@ -441,14 +441,14 @@ function updateKPIs() {
   const cpl    = convs ? (spend / convs).toFixed(0) : 0;
 
   document.getElementById('kpi_clients').textContent = active.length;
-  document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString() : 'â';
-  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend * 0.16).toLocaleString('en',{maximumFractionDigits:0}) : 'â';
-  document.getElementById('kpi_leads').textContent   = leads || 'â';
-  document.getElementById('kpi_calls').textContent   = (calls) || 'â';
-  document.getElementById('kpi_cpl').textContent     = cpl ? '$' + cpl : 'â';
+  document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString() : 'Ã¢ÂÂ';
+  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend * 0.16).toLocaleString('en',{maximumFractionDigits:0}) : 'Ã¢ÂÂ';
+  document.getElementById('kpi_leads').textContent   = leads || 'Ã¢ÂÂ';
+  document.getElementById('kpi_calls').textContent   = (calls) || 'Ã¢ÂÂ';
+  document.getElementById('kpi_cpl').textContent     = cpl ? '$' + cpl : 'Ã¢ÂÂ';
 }
 
-// âââ Campaign controls ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Campaign controls Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function pauseCampaign(id, e) {
   e.stopPropagation();
   if (!confirm('Pause this campaign?')) return;
@@ -502,10 +502,10 @@ function toggleBot(id, val) {
   if (c) { c.has_bot = val; updateKPIs(); }
 }
 
-// âââ AI Analysis ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ AI Analysis Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function runAnalysis(force) {
   if (!CFG.anthropic) {
-    toast('Add Anthropic API key in â Config', 'error');
+    toast('Add Anthropic API key in Ã¢ÂÂ Config', 'error');
     openConfig();
     return;
   }
@@ -520,9 +520,9 @@ async function runAnalysis(force) {
 
   const btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Analyzingâ¦';
+  btn.innerHTML = '<span class="spinner"></span>AnalyzingÃ¢ÂÂ¦';
 
-  document.getElementById('aiContent').innerHTML = '<div class="loading-bar"></div><div style="color:#555;font-size:12px">Claude is analyzing your portfolioâ¦</div>';
+  document.getElementById('aiContent').innerHTML = '<div class="loading-bar"></div><div style="color:#555;font-size:12px">Claude is analyzing your portfolioÃ¢ÂÂ¦</div>';
 
   try {
     const spend = clients.reduce((s,c) => s + (c.spend_cents||0), 0) / 100;
@@ -534,7 +534,7 @@ async function runAnalysis(force) {
   Leads: ${c.leads||0} | Calls: ${c.calls||0} | Messages: ${c.messages||0} | Total Convs: ${convs} | Cost/Conv: ${cpl} | Bot: ${c.has_bot?'Yes':'No'}`;
     }).join('\n\n');
 
-    const prompt = `Shefa Marketing Campaign Analysis â ${currentMonth}
+    const prompt = `Shefa Marketing Campaign Analysis Ã¢ÂÂ ${currentMonth}
 Total clients: ${clients.length} | Active: ${clients.filter(c=>c.status==='ACTIVE').length} | Spend MTD: $${spend.toLocaleString()} | Rebate (16% net): $${(spend*0.16).toFixed(0)}
 
 ${rows}
@@ -568,7 +568,7 @@ Sections: ## Portfolio Health | ## Top Performers | ## Needs Attention | ## Budg
     toast('Analysis failed: ' + err.message, 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = 'â» Refresh';
+    btn.innerHTML = 'Ã¢ÂÂ» Refresh';
   }
 }
 
@@ -583,19 +583,27 @@ function renderAnalysis(text, ts, cached) {
 
   const age = ts ? new Date(ts).toLocaleTimeString() : '';
   document.getElementById('aiContent').innerHTML =
-    `<div class="rebate-banner">ð° Portfolio rebate this month: $${(clients.reduce((s,c)=>s+(c.spend_cents||0),0)/100*0.16).toLocaleString('en',{maximumFractionDigits:0})}</div>
+    `<div class="rebate-banner">Ã°ÂÂÂ° Portfolio rebate this month: $${(clients.reduce((s,c)=>s+(c.spend_cents||0),0)/100*0.16).toLocaleString('en',{maximumFractionDigits:0})}</div>
      ${html}
      <div class="ai-ts">${cached?'Cached':'Generated'} at ${age}</div>`;
 }
 
-// âââ Health check âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Health check Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+async function syncFromYelp(){
+  const b=document.getElementById("syncBtn");
+  if(b){b.textContent="Syncing...";b.disabled=true;}
+  toast("Refreshing data...","success");
+  await loadDashboard();
+  if(b){b.textContent="Sync from Yelp";b.disabled=false;}
+}
+
 async function checkHealth(){const dot=document.getElementById('serverDot');try{const d=await yelpFn('health','GET');dot.style.background=d.status==='ok'?'#00e87a':'#ffc107';}catch(e){dot.style.background='#ff3b3b';}}
   } catch {
     dot.style.background = '#ff3b3b';
   }
 }
 
-// âââ Toast âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Toast Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function toast(msg, type='success') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
@@ -604,7 +612,7 @@ function toast(msg, type='success') {
   setTimeout(() => el.remove(), 3500);
 }
 
-// âââ Init ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Init Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 loadConfig();
 buildMonthSelect();
 checkHealth();
