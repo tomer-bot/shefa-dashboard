@@ -598,7 +598,7 @@ async function syncFromYelp(){
 }
 
 async function checkHealth(){const dot=document.getElementById('serverDot');try{const d=await yelpFn('health','GET');dot.style.background=d.status==='ok'?'#00e87a':'#ffc107';}catch(e){dot.style.background='#ff3b3b';}}
-  } catch {
+  } catch(e) {
     dot.style.background = '#ff3b3b';
   }
 }
