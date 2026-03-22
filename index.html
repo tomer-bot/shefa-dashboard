@@ -91,7 +91,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <!-- Config Modal -->
 <div class="config-modal" id="configModal">
   <div class="config-box">
-    <h3>ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ API Configuration</h3>
+    <h3>⚙ API Configuration</h3>
     <div class="field">
       <label>Yelp Partner Username</label>
       <input id="cfg_user" type="text" placeholder="partner username">
@@ -123,7 +123,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:10px">
     <div class="status-dot" id="serverDot" style="background:#555"></div>
-    <h1>Shefa ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Yelp Campaign Control Panel</h1>
+    <h1>Shefa — Yelp Campaign Control Panel</h1>
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
@@ -157,7 +157,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
   <!-- AI Panel -->
   <div class="ai-panel">
     <div class="ai-header">
-      <h3>ÃÂÃÂ°ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ AI Weekly Briefing</h3>
+      <h3>🤖 AI Weekly Briefing</h3>
       <button class="btn btn-green btn-sm" id="analyzeBtn" onclick="runAnalysis(false)">Generate</button>
     </div>
     <div class="ai-body">
@@ -171,14 +171,14 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 </div>
 
 <script>
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 let CFG = {};
 let clients = [];
 let filteredClients = [];
 let analysisCache = { text: null, ts: null };
 let currentMonth = null;
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 function loadConfig() {
   try {
     const s = localStorage.getItem('shefa_cfg');
@@ -215,7 +215,7 @@ function closeConfig() {
   document.getElementById('configModal').classList.remove('open');
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 function buildMonthSelect() {
   const sel = document.getElementById('monthSel');
   sel.innerHTML = '';
@@ -237,7 +237,7 @@ function onMonthChange() {
   loadDashboard();
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 const YELP_FN='/.netlify/functions/yelp';
 async function yelpFn(path,method,body){const o={method:method||'GET',headers:{'Content-Type':'application/json'}};if(body)o.body=JSON.stringify(body);const r=await fetch(YELP_FN+'?path='+path,o);return r.json();}
 function yelpGet(path){return yelpFn('programs','GET');}
@@ -245,7 +245,7 @@ function yelpPost(path,body){let p=path;if(path.includes('/pause/'))p='pause/'+p
 function createReport(bizIds){const now=new Date();const[yr,mo]=currentMonth.split('-');const s=yr+'-'+mo+'-01';const e2=currentMonth===(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))?now.toISOString().slice(0,10):new Date(parseInt(yr),parseInt(mo),0).toISOString().slice(0,10);return yelpFn('report/create','POST',{business_ids:bizIds,start_date:s,end_date:e2});}
 async function pollReport(id,max){max=max||20;for(let i=0;i<max;i++){await new Promise(r=>setTimeout(r,3000));const d=await yelpFn('report/'+id,'GET');if(d.status==='COMPLETE'||d.data)return d;if(d.status==='FAILED')throw new Error('Report failed');}throw new Error('Report timed out');}
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 async function loadDashboard() {
   
   try {
@@ -333,7 +333,7 @@ async function loadReportingData() {
   }
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 function renderDemoData() {
   const demos = [
     {id:'p1',name:'Pacific Roofing Co',category:'Roofing',status:'ACTIVE',budget_cents:500000,spend_cents:380000,impressions:24300,ad_clicks:412,ctr:'1.70',page_views:8800,leads:28,calls:42,messages:11,has_bot:true},
@@ -359,7 +359,7 @@ function renderNoConfig() {
   renderDemoData();
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 function filterClients() {
   const q = document.getElementById('searchBox').value.toLowerCase();
   filteredClients = q ? clients.filter(c => c.name.toLowerCase().includes(q) || (c.category||'').toLowerCase().includes(q)) : clients;
@@ -414,8 +414,8 @@ function renderClientRow(c) {
     </div>
     <div class="controls-row">
       ${c.status === 'ACTIVE'
-        ? `<button class="btn btn-red btn-sm" onclick="pauseCampaign('${c.id}', event)">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¸ Pause</button>`
-        : `<button class="btn btn-green btn-sm" onclick="resumeCampaign('${c.id}', event)">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¶ Resume</button>`}
+        ? `<button class="btn btn-red btn-sm" onclick="pauseCampaign('${c.id}', event)">⏸ Pause</button>`
+        : `<button class="btn btn-green btn-sm" onclick="resumeCampaign('${c.id}', event)">▶ Resume</button>`}
       <input class="budget-input" id="bgt_${c.id}" type="number" value="${((c.budget_cents||0)/100).toFixed(0)}" placeholder="Budget $">
       <button class="btn btn-gray btn-sm" onclick="changeBudget('${c.id}', event)">Set Budget</button>
       <label style="font-size:11px;color:#666;margin-left:8px">
@@ -431,7 +431,7 @@ function toggleRow(id) {
   row.classList.toggle('expanded');
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 function updateKPIs() {
   const active = clients.filter(c => c.status === 'ACTIVE');
   const spend  = clients.reduce((s,c) => s + (c.spend_cents||0), 0) / 100;
@@ -448,7 +448,7 @@ function updateKPIs() {
   document.getElementById('kpi_cpl').textContent     = cpl ? '$' + cpl : 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 async function pauseCampaign(id, e) {
   e.stopPropagation();
   if (!confirm('Pause this campaign?')) return;
@@ -502,7 +502,7 @@ function toggleBot(id, val) {
   if (c) { c.has_bot = val; updateKPIs(); }
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 async function runAnalysis(force) {
   if (!CFG.anthropic) {
     toast('Add Anthropic API key in ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Config', 'error');
@@ -588,7 +588,7 @@ function renderAnalysis(text, ts, cached) {
      <div class="ai-ts">${cached?'Cached':'Generated'} at ${age}</div>`;
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 async function syncFromYelp(){
   const b=document.getElementById("syncBtn");
   if(b){b.textContent="Syncing...";b.disabled=true;}
@@ -599,7 +599,7 @@ async function syncFromYelp(){
 
 async function checkHealth(){const dot=document.getElementById('serverDot');try{const d=await yelpFn('health','GET');dot.style.background=d.status==='ok'?'#00e87a':'#ffc107';}catch(e){dot.style.background='#ff3b3b';}}
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 function toast(msg, type='success') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
@@ -608,7 +608,7 @@ function toast(msg, type='success') {
   setTimeout(() => el.remove(), 3500);
 }
 
-// ─────────────────────────────────────────
+// ---  -------------------------------------------------------
 loadConfig();
 buildMonthSelect();
 checkHealth();
