@@ -280,7 +280,9 @@ async function loadDashboard() {
         calls:        p.calls || 0,
         messages:     p.messages || 0,
         cpc:          parseFloat(p.avg_cpc || p.cpc || 0).toFixed(2),
-        has_bot:      false,
+        campaign_type: p.campaign_type || 'main',
+        group_id:      p.group_id || null,
+        has_bot:       false,
       }));
 
     renderClients();
@@ -299,7 +301,7 @@ async function loadDashboard() {
 
 async function loadReportingData() {
   try {
-    // FIX: use id (not business_id) â that's what the API returns
+    // FIX: use id (not business_id) Ã¢ÂÂ that's what the API returns
     const bizIds = clients.map(c => c.id).filter(Boolean);
     if (!bizIds.length) return;
 
