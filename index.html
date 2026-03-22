@@ -137,7 +137,7 @@ select.month-sel{background:#1a1a1a;border:1px solid #333;color:#e8e8e8;padding:
 <div class="kpi-strip">
   <div class="kpi"><div class="kpi-val" id="kpi_clients">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Active Clients</div></div>
   <div class="kpi"><div class="kpi-val" id="kpi_spend">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Spend MTD</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_rebate">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Rebate (16%)</div><div class="kpi-sub">net earned</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_rebate">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Rebate (19.3%)</div><div class="kpi-sub">net earned</div></div>
   <div class="kpi"><div class="kpi-val" id="kpi_leads">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Total Leads</div></div>
   <div class="kpi"><div class="kpi-val" id="kpi_calls">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Total Calls</div></div>
   <div class="kpi"><div class="kpi-val" id="kpi_cpl">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
@@ -442,7 +442,7 @@ function updateKPIs() {
 
   document.getElementById('kpi_clients').textContent = active.length;
   document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString() : 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
-  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend * 0.16).toLocaleString('en',{maximumFractionDigits:0}) : 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
+  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend * 0.193).toLocaleString('en',{maximumFractionDigits:0}) : 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
   document.getElementById('kpi_leads').textContent   = leads || 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
   document.getElementById('kpi_calls').textContent   = (calls) || 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
   document.getElementById('kpi_cpl').textContent     = cpl ? '$' + cpl : 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
@@ -535,7 +535,7 @@ async function runAnalysis(force) {
     }).join('\n\n');
 
     const prompt = `Shefa Marketing Campaign Analysis ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ${currentMonth}
-Total clients: ${clients.length} | Active: ${clients.filter(c=>c.status==='ACTIVE').length} | Spend MTD: $${spend.toLocaleString()} | Rebate (16% net): $${(spend*0.16).toFixed(0)}
+Total clients: ${clients.length} | Active: ${clients.filter(c=>c.status==='ACTIVE').length} | Spend MTD: $${spend.toLocaleString()} | Rebate (19.3% net): $${(spend*0.16).toFixed(0)}
 
 ${rows}
 
@@ -583,7 +583,7 @@ function renderAnalysis(text, ts, cached) {
 
   const age = ts ? new Date(ts).toLocaleTimeString() : '';
   document.getElementById('aiContent').innerHTML =
-    `<div class="rebate-banner">ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ° Portfolio rebate this month: $${(clients.reduce((s,c)=>s+(c.spend_cents||0),0)/100*0.16).toLocaleString('en',{maximumFractionDigits:0})}</div>
+    `<div class="rebate-banner">ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ° Portfolio rebate this month: $${(clients.reduce((s,c)=>s+(c.spend_cents||0),0)/100*0.193).toLocaleString('en',{maximumFractionDigits:0})}</div>
      ${html}
      <div class="ai-ts">${cached?'Cached':'Generated'} at ${age}</div>`;
 }
