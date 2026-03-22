@@ -299,7 +299,7 @@ async function loadDashboard() {
 
 async function loadReportingData() {
   try {
-    // FIX: use id (not business_id) — that's what the API returns
+    // FIX: use id (not business_id) â that's what the API returns
     const bizIds = clients.map(c => c.id).filter(Boolean);
     if (!bizIds.length) return;
 
@@ -601,7 +601,7 @@ async function syncFromYelp(){
   if(b){b.textContent="Sync from Yelp";b.disabled=false;}
 }
 
-async function checkHealth(){const dot=document.getElementById('serverDot');try{const d=await yelpFn('health','GET');dot.style.background=d.status==='ok'?'#00e87a':'#ffc107';}catch(e){dot.style.background='#ff3b3b';}}
+async function checkHealth(){const dot=document.getElementById('serverDot');try{const d=await yelpFn('health','GET');dot.style.background=d.status==='ok'?'#34c98a':'#fbbf24';}catch(e){dot.style.background='#e53935';}}
 
 // ---  -------------------------------------------------------
 function toast(msg, type='success') {
