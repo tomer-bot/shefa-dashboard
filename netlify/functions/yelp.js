@@ -1,5 +1,29 @@
 const https = require('https');
 
+// Group metadata — maps bizId to group_id and campaign_type (main vs layered)
+// Rule: higher budget = main, lower budget = layered (for same-client campaigns)
+const GROUPS = {
+  '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
+  'g0aGLbA5PnpQXA9vzUetsg': { group_id: 'g_roof_tom',     campaign_type: 'main'    }, // $2001
+  'UVAoRCMIgEUuRWPBWQOhTg': { group_id: 'g_skybar',       campaign_type: 'layered' }, // $500
+  'zg-Tn4_mBR6CdCfyU9QtIw': { group_id: 'g_skybar',       campaign_type: 'main'    }, // $4480
+  'lM5K5vOIfgIrDEd_2hNKiQ': { group_id: 'g_jms',          campaign_type: 'layered' }, // $500
+  'IVQ0WGXnjp-MNJfYP47XDA': { group_id: 'g_jms',          campaign_type: 'main'    }, // $2490
+  '2uhrsdQTdbe9xi-M9PboFQ': { group_id: 'g_green_rodent', campaign_type: 'main'    }, // $4000
+  'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
+};
+
+// Clean display names — strip ": None", trailing ": ", newlines, etc.
+function cleanName(name) {
+  return name
+    .replace(/\n/g, ' ')
+    .replace(/\s*:\s*None\s*$/i, '')
+    .replace(/\s*:\s*$/, '')
+    .replace(/Green Rodent Layered Campaign.*/, 'Green Rodent Restoration')
+    .replace(/Quality Home Remodeling - Room Addition Contractor/, 'Quality Home Remodeling')
+    .trim();
+}
+
 // LIVE DATA - updated via sync
 // Last synced: 2026-03-20T07:52:46.256Z
 const SNAPSHOT = [{"id":"_sZA3BJl7twy01kXTzjbwQ","name":"Roof by Tom : 1990 N California Blvd","budget_cents":20000,"spend_cents":10221,"impressions":164,"clicks":1,"leads":0,"calls":0,"ctr":0.61,"avg_cpc":102.21,"status":"ACTIVE","statsUrl":"/ads_stats/_sZA3BJl7twy01kXTzjbwQ/recent_month_stats"},{"id":"UVAoRCMIgEUuRWPBWQOhTg","name":"Skybar Construction : None","budget_cents":50000,"spend_cents":23308,"impressions":267,"clicks":6,"leads":0,"calls":0,"ctr":2.25,"avg_cpc":38.85,"status":"ACTIVE","statsUrl":"/ads_stats/UVAoRCMIgEUuRWPBWQOhTg/recent_month_stats"},{"id":"lM5K5vOIfgIrDEd_2hNKiQ","name":"JMS Air Conditioning and Heating : 7640 Burnet Ave","budget_cents":50000,"spend_cents":16129,"impressions":418,"clicks":3,"leads":0,"calls":0,"ctr":0.72,"avg_cpc":53.76,"status":"ACTIVE","statsUrl":"/ads_stats/lM5K5vOIfgIrDEd_2hNKiQ/recent_month_stats"},{"id":"tV1VR1QwPJTdHNn2kK6ABw","name":"Prodigy Moving & Storage : 601 S Figueroa","budget_cents":1050000,"spend_cents":648951,"impressions":26884,"clicks":291,"leads":0,"calls":0,"ctr":1.08,"avg_cpc":22.3,"status":"ACTIVE","statsUrl":"/ads_stats/tV1VR1QwPJTdHNn2kK6ABw/recent_month_stats"},{"id":"srmB3uxc2AkBRycy7md_5w","name":"Star Steel : 16131 Valerio St","budget_cents":80000,"spend_cents":53782,"impressions":776,"clicks":22,"leads":0,"calls":0,"ctr":2.84,"avg_cpc":24.45,"status":"ACTIVE","statsUrl":"/ads_stats/srmB3uxc2AkBRycy7md_5w/recent_month_stats"},{"id":"NEK7Y1Yg_Ari8lw7AOrgZQ","name":"Prodigy Moving & Storage :","budget_cents":350000,"spend_cents":228215,"impressions":2467,"clicks":60,"leads":0,"calls":0,"ctr":2.43,"avg_cpc":38.04,"status":"ACTIVE","statsUrl":"/ads_stats/NEK7Y1Yg_Ari8lw7AOrgZQ/recent_month_stats"},{"id":"a0D2QGetwHNw3dFOUxNMjQ","name":"Prodigy Moving & Storage : 9349 Oso Ave","budget_cents":84000,"spend_cents":54028,"impressions":3286,"clicks":19,"leads":0,"calls":0,"ctr":0.58,"avg_cpc":28.44,"status":"ACTIVE","statsUrl":"/ads_stats/a0D2QGetwHNw3dFOUxNMjQ/recent_month_stats"},{"id":"2_7dBwMfEceDvMNKA7t_BA","name":"Quality Home Remodeling - Room Addition Contractor :","budget_cents":169500,"spend_cents":110811,"impressions":12990,"clicks":24,"leads":0,"calls":0,"ctr":0.18,"avg_cpc":46.17,"status":"ACTIVE","statsUrl":"/ads_stats/2_7dBwMfEceDvMNKA7t_BA/recent_month_stats"},{"id":"2uhrsdQTdbe9xi-M9PboFQ","name":"Green Rodent Restoration : 9820 Owensmouth Ave","budget_cents":399990,"spend_cents":223945,"impressions":705,"clicks":62,"leads":0,"calls":0,"ctr":8.79,"avg_cpc":36.12,"status":"ACTIVE","statsUrl":"/ads_stats/2uhrsdQTdbe9xi-M9PboFQ/recent_month_stats"},{"id":"vSnFEC7jCZ33-G9W1EAoDw","name":"Green Rodent Layered Campaign\n                                        (strict)","budget_cents":250000,"spend_cents":164765,"impressions":20743,"clicks":47,"leads":0,"calls":0,"ctr":0.23,"avg_cpc":35.06,"status":"ACTIVE","statsUrl":"/ads_stats/vSnFEC7jCZ33-G9W1EAoDw/recent_month_stats"},{"id":"6AQ__Lm482ppQ759xhruCA","name":"Sequoia Flooring : 14701 Oxnard St","budget_cents":480480,"spend_cents":277972,"impressions":6279,"clicks":175,"leads":0,"calls":0,"ctr":2.79,"avg_cpc":15.88,"status":"ACTIVE","statsUrl":"/ads_stats/6AQ__Lm482ppQ759xhruCA/recent_month_stats"},{"id":"IEqquR3LRqMJNVo0Ajthaw","name":"A1 Pro Clean Carpet & Upholstery Cleaning : 5224 Zelzah Ave","budget_cents":199980,"spend_cents":109064,"impressions":1564,"clicks":81,"leads":0,"calls":0,"ctr":5.18,"avg_cpc":13.46,"status":"ACTIVE","statsUrl":"/ads_stats/IEqquR3LRqMJNVo0Ajthaw/recent_month_stats"},{"id":"VvEH6vIIZIHumtDPuCqo6w","name":"Alpha Pro Builders : 143 N Arnaz Dr","budget_cents":15000,"spend_cents":13621,"impressions":70,"clicks":3,"leads":0,"calls":0,"ctr":4.29,"avg_cpc":45.4,"status":"ACTIVE","statsUrl":"/ads_stats/VvEH6vIIZIHumtDPuCqo6w/recent_month_stats"},{"id":"5orEWCAGeJCI3KC2c7Nn6w","name":"Sequoia Flooring :","budget_cents":240000,"spend_cents":149203,"impressions":7399,"clicks":64,"leads":0,"calls":0,"ctr":0.86,"avg_cpc":23.31,"status":"ACTIVE","statsUrl":"/ads_stats/5orEWCAGeJCI3KC2c7Nn6w/recent_month_stats"},{"id":"EOspmIDzGsejW7yOzTZDMg","name":"Sequoia Flooring :","budget_cents":240000,"spend_cents":148922,"impressions":7742,"clicks":68,"leads":0,"calls":0,"ctr":0.88,"avg_cpc":21.9,"status":"ACTIVE","statsUrl":"/ads_stats/EOspmIDzGsejW7yOzTZDMg/recent_month_stats"},{"id":"XzoOIBHJ4ae5fbzgeevwUQ","name":"My Cali Builders : 24021 Friar St","budget_cents":340000,"spend_cents":216482,"impressions":6247,"clicks":40,"leads":0,"calls":0,"ctr":0.64,"avg_cpc":54.12,"status":"ACTIVE","statsUrl":"/ads_stats/XzoOIBHJ4ae5fbzgeevwUQ/recent_month_stats"},{"id":"8djfCpUXTwOLOX8JaEHLvw","name":"Prodigy Moving & Storage - Santa Monica : 100 Wilshire Blvd","budget_cents":15000,"spend_cents":10691,"impressions":940,"clicks":6,"leads":0,"calls":0,"ctr":0.64,"avg_cpc":17.82,"status":"ACTIVE","statsUrl":"/ads_stats/8djfCpUXTwOLOX8JaEHLvw/recent_month_stats"},{"id":"SJ_BBCVtm-96p8qz72Ub-g","name":"LYD Construction : 4055 Lake Washington Blvd NE","budget_cents":1100000,"spend_cents":687731,"impressions":46142,"clicks":140,"leads":0,"calls":0,"ctr":0.3,"avg_cpc":49.12,"status":"ACTIVE","statsUrl":"/ads_stats/SJ_BBCVtm-96p8qz72Ub-g/recent_month_stats"},{"id":"ybllwJ-CLRNg5BAE76Q5FA","name":"First Garage Door and Gates : 600 Anton Blvd","budget_cents":250500,"spend_cents":160906,"impressions":1291,"clicks":61,"leads":0,"calls":0,"ctr":4.73,"avg_cpc":26.38,"status":"ACTIVE","statsUrl":"/ads_stats/ybllwJ-CLRNg5BAE76Q5FA/recent_month_stats"},{"id":"tGk50TzJPSpGzEY2lsPSLg","name":"Aldan Construction & Remodeling : 8549 Wilshire Blvd","budget_cents":798000,"spend_cents":498318,"impressions":22931,"clicks":152,"leads":0,"calls":0,"ctr":0.66,"avg_cpc":32.78,"status":"ACTIVE","statsUrl":"/ads_stats/tGk50TzJPSpGzEY2lsPSLg/recent_month_stats"},{"id":"hT3ssiBBja5ADp0FpjemhQ","name":"Excalibur Moving & Storage : 14600 Keswick St","budget_cents":501000,"spend_cents":309260,"impressions":10300,"clicks":99,"leads":0,"calls":0,"ctr":0.96,"avg_cpc":31.24,"status":"ACTIVE","statsUrl":"/ads_stats/hT3ssiBBja5ADp0FpjemhQ/recent_month_stats"},{"id":"egvDaoU-01vKvFjMOqK5xg","name":"Excalibur Moving Company : 529 South Broadway","budget_cents":501000,"spend_cents":304580,"impressions":5246,"clicks":105,"leads":0,"calls":0,"ctr":2,"avg_cpc":29.01,"status":"ACTIVE","statsUrl":"/ads_stats/egvDaoU-01vKvFjMOqK5xg/recent_month_stats"},{"id":"n60cotZPuu5Q6ZBhXqTdUg","name":"J & I Home Design :","budget_cents":501000,"spend_cents":320542,"impressions":13872,"clicks":45,"leads":0,"calls":0,"ctr":0.32,"avg_cpc":71.23,"status":"ACTIVE","statsUrl":"/ads_stats/n60cotZPuu5Q6ZBhXqTdUg/recent_month_stats"},{"id":"dC23JimQ1IpVvmoM6HSMOQ","name":"NearMe Roofing Company : 2727 152nd Ave NE","budget_cents":15000,"spend_cents":8785,"impressions":572,"clicks":12,"leads":0,"calls":0,"ctr":2.1,"avg_cpc":7.32,"status":"ACTIVE","statsUrl":"/ads_stats/dC23JimQ1IpVvmoM6HSMOQ/recent_month_stats"},{"id":"GVMBlmZrhIYO9bYYsOlZ-Q","name":"Mission Home Remodeling : 405 Primrose Rd","budget_cents":300000,"spend_cents":184313,"impressions":96511,"clicks":37,"leads":0,"calls":0,"ctr":0.04,"avg_cpc":49.81,"status":"ACTIVE","statsUrl":"/ads_stats/GVMBlmZrhIYO9bYYsOlZ-Q/recent_month_stats"},{"id":"zg-Tn4_mBR6CdCfyU9QtIw","name":"Skybar Construction : None","budget_cents":448000,"spend_cents":227783,"impressions":56570,"clicks":57,"leads":0,"calls":0,"ctr":0.1,"avg_cpc":39.96,"status":"ACTIVE","statsUrl":"/ads_stats/zg-Tn4_mBR6CdCfyU9QtIw/recent_month_stats"},{"id":"IVQ0WGXnjp-MNJfYP47XDA","name":"JMS Air Conditioning and Heating : 7640 Burnet Ave","budget_cents":249000,"spend_cents":90619,"impressions":16358,"clicks":35,"leads":0,"calls":0,"ctr":0.21,"avg_cpc":25.89,"status":"ACTIVE","statsUrl":"/ads_stats/IVQ0WGXnjp-MNJfYP47XDA/recent_month_stats"},{"id":"5_rIOWR2WRAkKyRnd0Cl6w","name":"Marina Bay Roofing : 4411 Geary Blvd","budget_cents":1800000,"spend_cents":497063,"impressions":50901,"clicks":65,"leads":0,"calls":0,"ctr":0.13,"avg_cpc":76.47,"status":"ACTIVE","statsUrl":"/ads_stats/5_rIOWR2WRAkKyRnd0Cl6w/recent_month_stats"},{"id":"g0aGLbA5PnpQXA9vzUetsg","name":"Roof by Tom : 1990 N California Blvd","budget_cents":200100,"spend_cents":54010,"impressions":22397,"clicks":18,"leads":0,"calls":0,"ctr":0.08,"avg_cpc":30.01,"status":"ACTIVE","statsUrl":"/ads_stats/g0aGLbA5PnpQXA9vzUetsg/recent_month_stats"},{"id":"7_5g6jLCRkY7BKNqC068NA","name":"Mission Home Remodeling : 475 Gough St","budget_cents":999990,"spend_cents":263379,"impressions":52678,"clicks":48,"leads":0,"calls":0,"ctr":0.09,"avg_cpc":54.87,"status":"ACTIVE","statsUrl":"/ads_stats/7_5g6jLCRkY7BKNqC068NA/recent_month_stats"}];
@@ -36,7 +60,13 @@ exports.handler = async(event)=>{
 
   // Main data endpoint - returns snapshot
   if(path==='programs'){
-    return{statusCode:200,headers:cors,body:JSON.stringify({programs:SNAPSHOT})};
+    const programs = SNAPSHOT.map(p => ({
+      ...p,
+      name: cleanName(p.name),
+      campaign_type: (GROUPS[p.id] || {}).campaign_type || 'main',
+      group_id:      (GROUPS[p.id] || {}).group_id      || null,
+    }));
+    return{statusCode:200,headers:cors,body:JSON.stringify({programs})};
   }
 
   // Sync endpoint: dashboard calls this from biz.yelp.com context with fresh data
@@ -83,5 +113,16 @@ exports.handler = async(event)=>{
     return{statusCode:200,headers:cors,body:JSON.stringify(r)};
   }
 
+  if(path.startsWith('report/')){
+    const id=path.split('/')[1];
+    return new Promise((resolve)=>{
+      const req=https.request({hostname:'api.yelp.com',path:'/v3/reporting/reports/'+id,method:'GET',headers:{'Authorization':'Bearer '+FUSION_KEY}},res=>{
+        let d='';res.on('data',c=>d+=c);
+        res.on('end',()=>{resolve({statusCode:200,headers:cors,body:d});});
+      });
+      req.on('error',e=>resolve({statusCode:500,headers:cors,body:JSON.stringify({error:e.message})}));
+      req.end();
+    });
+  }
   return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 };
