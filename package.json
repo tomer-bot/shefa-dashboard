@@ -1,0 +1,11 @@
+{
+  "name": "shefa-dashboard",
+  "version": "1.0.0",
+  "description": "Shefa Marketing Yelp Campaign Dashboard",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "node-fetch": "2.6.9"
+  }
+}
