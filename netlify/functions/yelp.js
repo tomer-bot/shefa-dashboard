@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata — maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata â maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names — strip ": None", trailing ": ", newlines, etc.
+// Clean display names â strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -47,6 +47,24 @@ function httpPost(host,path,body,auth){
     req.on('error',e=>resolve({s:0,r:e.message}));if(b)req.write(b);req.end();
   });
 }
+function httpGet(host, path, auth) {
+  return new Promise((resolve) => {
+    const req = https.request(
+      { hostname: host, path, method: 'GET', headers: { Authorization: auth || basicAuth() } },
+      res => {
+        let d = '';
+        res.on('data', c => d += c);
+        res.on('end', () => {
+          try { resolve({ s: res.statusCode, b: JSON.parse(d) }); }
+          catch(e) { resolve({ s: res.statusCode, r: d.substring(0, 500) }); }
+        });
+      }
+    );
+    req.on('error', e => resolve({ s: 0, r: e.message }));
+    req.end();
+  });
+}
+
 
 exports.handler = async(event)=>{
   const cors={'Access-Control-Allow-Origin':'*','Content-Type':'application/json'};
@@ -124,5 +142,27 @@ exports.handler = async(event)=>{
       req.end();
     });
   }
-  return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
+  
+  // --- ads_stats: single campaign stats from partner-api.yelp.com ---
+  // statsUrl in programs = /ads_stats/{id}/recent_month_stats
+  if (path.startsWith('ads_stats/')) {
+    const subpath = path; // already full path like "ads_stats/{id}/recent_month_stats"
+    const r = await httpGet('partner-api.yelp.com', '/' + subpath, basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
+  // --- ads_stats/batch: fetch stats for all programs in parallel ---
+  if (path === 'stats/batch') {
+    const ids = (body.ids || []);
+    if (!ids.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'no ids' }) };
+    const results = await Promise.all(
+      ids.map(id => httpGet('partner-api.yelp.com', '/ads_stats/' + id + '/recent_month_stats', basicAuth())
+        .then(r => ({ id, data: r.b || r.r, status: r.s }))
+        .catch(e => ({ id, error: e.message }))
+      )
+    );
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ results }) };
+  }
+
+return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 };
