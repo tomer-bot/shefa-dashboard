@@ -595,6 +595,7 @@ async function loadDashboard() {
     }));
     renderAll();
     updateKPIs();
+    loadReportingData(currentMonth);
     loadBotConfig();
     toast('Loaded ' + allPrograms.length + ' campaigns ✓', 'success');
   } catch(e) {
@@ -883,6 +884,98 @@ async function changeCpc(id) {
   } catch(e) {
     toast('CPC update failed: ' + e.message);
   }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  REPORTING API INTEGRATION
+// ═══════════════════════════════════════════════════════════════════
+
+async function loadReportingData(month) {
+  const mon = month || currentMonth || new Date().toISOString().slice(0,7);
+  const cfg = JSON.parse(localStorage.getItem('shefa_cfg') || '{}');
+  const fusionKey = cfg.fusion;
+  if (!fusionKey) { console.warn('No fusion key in config'); return; }
+
+  try {
+    // Step 1: Get program->bizId map from programs/list/all
+    const listData = await yelpFn('programs/list/all', 'GET');
+    const progs = listData.payment_programs || listData.b?.payment_programs || [];
+    const progToBiz = {};
+    const bizIds = new Set();
+    progs.forEach(p => {
+      const bizId = p.businesses?.[0]?.yelp_business_id;
+      if (bizId) { progToBiz[p.program_id] = bizId; bizIds.add(bizId); }
+    });
+    if (!bizIds.size) return;
+
+    // Step 2: Submit monthly report
+    const createRes = await yelpFn('reporting/monthly/create', 'POST', {
+      month: mon, ids: [...bizIds], fusion_key: fusionKey
+    });
+    const reportId = createRes.id || createRes.b?.id;
+    if (!reportId) { console.warn('No report ID returned', createRes); return; }
+
+    // Step 3: Poll until ready (max 35 attempts, 60s apart)
+    toast('Reporting data loading... (up to 30 min)');
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      const r = await yelpFn('reporting/monthly/poll/' + reportId + '?fusion_key=' + encodeURIComponent(fusionKey), 'GET');
+      const data = r.b || r;
+      if (data?.error?.code === 'JOB_NOT_COMPLETE') {
+        if (attempts < 40) setTimeout(poll, 60000); // retry in 60s
+        return;
+      }
+      // Step 4: Map results back to allPrograms
+      applyReportingData(data, progToBiz);
+    };
+    setTimeout(poll, 30000); // first poll after 30s
+
+  } catch(e) { console.error('Reporting API error:', e); }
+}
+
+function applyReportingData(reportData, progToBiz) {
+  // reportData.results is array of {business_id, metrics:[{name, value}]}
+  const results = reportData.results || reportData.b?.results || [];
+  if (!results.length) return;
+
+  // Build bizId -> metrics map
+  const bizMetrics = {};
+  results.forEach(r => {
+    const m = {};
+    (r.metrics || []).forEach(met => { m[met.name] = met.value; });
+    bizMetrics[r.business_id] = m;
+  });
+
+  // Build reverse map: bizId -> [programIds]
+  const bizToProgs = {};
+  Object.entries(progToBiz).forEach(([progId, bizId]) => {
+    if (!bizToProgs[bizId]) bizToProgs[bizId] = [];
+    bizToProgs[bizId].push(progId);
+  });
+
+  // Apply to allPrograms
+  allPrograms.forEach(prog => {
+    // Find bizId via reverse lookup through progToBiz
+    // progToBiz maps program_id from /programs/v1 to bizId
+    // prog.id may differ - find by name match or direct id match
+    const bizId = progToBiz[prog.id];
+    if (!bizId || !bizMetrics[bizId]) return;
+    const m = bizMetrics[bizId];
+    prog.leads    = m['ad_driven_total_leads']  || 0;
+    prog.calls    = m['ad_driven_calls']         || 0;
+    prog.messages = m['ad_driven_messages_to_business'] || 0;
+    prog.impressions = m['billed_impressions']   || prog.impressions || 0;
+    prog.clicks   = m['billed_clicks']           || prog.clicks || 0;
+    prog.avg_cpc  = m['average_cost_per_click']  ? (m['average_cost_per_click']/100).toFixed(2) : prog.avg_cpc;
+    prog.ctr      = m['ad_click_through_rate']   ? (m['ad_click_through_rate']*100).toFixed(2) : prog.ctr;
+    if (m['ad_cost']) prog.spend_cents = m['ad_cost']; // ad_cost in cents
+  });
+
+  renderAll();
+  updateKPIs();
+  toast('Reporting data loaded!');
 }
 </script>
 </body>
