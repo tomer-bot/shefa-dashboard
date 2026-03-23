@@ -62,6 +62,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .camp-name{font-size:12px;color:#1a2b45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .camp-type-main{font-size:9px;padding:1px 5px;border-radius:3px;background:#d1fae5;color:#065f46;font-weight:600;margin-left:5px}
 .camp-type-layered{font-size:9px;padding:1px 5px;border-radius:3px;background:#fef3c7;color:#92400e;font-weight:600;margin-left:5px}
+.bot-tag{display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;letter-spacing:.5px}
 
 /* ── Metric cells ── */
 .mc{text-align:right;padding:0 4px}
@@ -449,7 +450,7 @@ function renderCampaignRow(c, groupId) {
   return `
 <div class="camp-row" id="camp_${c.id}" onclick="toggleDetail('${c.id}')">
   <span style="font-size:10px;color:#b8d0e8;text-align:center">↳</span>
-  <div class="camp-name">${c.name.split(' : ').slice(-1)[0] || c.name}${typeTag}</div>
+  <div class="camp-name">${c.name.split(' : ').slice(-1)[0] || c.name}${typeTag}${c.has_bot ? '<span class="bot-tag">BOT</span>' : ''}</div>
   <div class="mc"><span class="tag ${c.status==='ACTIVE'?'tag-active':'tag-paused'}" style="font-size:9px">${c.status==='ACTIVE'?'ON':'OFF'}</span></div>
   <div class="mc"><div class="mc-val">${fmt$(c.budget_cents)}</div></div>
   <div class="spend-wrap">
@@ -562,6 +563,7 @@ async function loadDashboard() {
     }));
     renderAll();
     updateKPIs();
+    loadBotConfig();
     toast('Loaded ' + allPrograms.length + ' campaigns ✓', 'success');
   } catch(e) {
     console.error(e);
@@ -616,7 +618,52 @@ async function changeBudget(id, e) {
 
 function toggleBot(id, val) {
   const p = allPrograms.find(x => x.id === id);
-  if (p) { p.has_bot = val; updateKPIs(); }
+  if (p) {
+    p.has_bot = val;
+    updateKPIs();
+    renderAll();
+    saveBotConfig(id, val);
+  }
+}
+
+async function saveBotConfig(id, val) {
+  try {
+    const TOKEN = (JSON.parse(localStorage.getItem('shefa_cfg')||'{}').gh||'');
+    const REPO  = 'tomer-bot/shefa-dashboard';
+    // Fetch current config + SHA
+    const r = await fetch('https://api.github.com/repos/' + REPO + '/contents/bot-config.json', {
+      headers: { Authorization: 'token ' + TOKEN }
+    });
+    const meta = await r.json();
+    const current = JSON.parse(atob(meta.content.replace(/\n/g,'')));
+    if (val) current[id] = true; else delete current[id];
+    const bytes = new TextEncoder().encode(JSON.stringify(current, null, 2));
+    let bin = ''; for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    const b64 = btoa(bin);
+    await fetch('https://api.github.com/repos/' + REPO + '/contents/bot-config.json', {
+      method: 'PUT',
+      headers: { Authorization: 'token ' + TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Update bot config: ' + id + ' = ' + val, content: b64, sha: meta.sha })
+    });
+    toast('Bot status saved' + (val ? ' - BOT active' : ' - BOT removed'));
+  } catch(e) {
+    toast('Bot save failed: ' + e.message);
+  }
+}
+
+async function loadBotConfig() {
+  try {
+    const TOKEN = (JSON.parse(localStorage.getItem('shefa_cfg')||'{}').gh||'');
+    const r = await fetch('https://api.github.com/repos/tomer-bot/shefa-dashboard/contents/bot-config.json', {
+      headers: { Authorization: 'token ' + TOKEN }
+    });
+    if (!r.ok) return;
+    const meta = await r.json();
+    const config = JSON.parse(atob(meta.content.replace(/\n/g,'')));
+    // Apply to allPrograms
+    allPrograms.forEach(p => { if (config[p.id]) p.has_bot = true; });
+    renderAll();
+  } catch(e) { console.warn('loadBotConfig failed:', e); }
 }
 
 // ─── Health check ─────────────────────────────────────────────────────────────
