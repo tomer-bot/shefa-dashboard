@@ -264,5 +264,69 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
+
+  // ── Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} ──
+  if (path === 'reporting/monthly/create') {
+    const { month, ids, fusion_key } = body;
+    if (!fusion_key || !ids?.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing fusion_key or ids' }) };
+    const start = month || new Date().toISOString().slice(0,7);
+    const end = start;
+    const r = await httpPostJson('api.yelp.com', '/v3/reporting/businesses/monthly', {
+      start, end, ids,
+      metrics: ['billed_impressions','billed_clicks','ad_cost','ad_driven_calls',
+                'ad_driven_messages_to_business','ad_driven_total_leads',
+                'average_cost_per_click','ad_click_through_rate','ad_driven_biz_page_views']
+    }, 'Bearer ' + fusion_key);
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
+  // ── Reporting API: GET reporting/monthly/poll/{report_id}  ──────────────────
+  if (path.startsWith('reporting/monthly/poll/')) {
+    const reportId = path.split('/')[3];
+    const fusion_key = body?.fusion_key || req.headers?.['x-fusion-key'] || '';
+    // fusion_key passed as query param
+    const fk = event.queryStringParameters?.fusion_key || fusion_key;
+    if (!fk) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing fusion_key' }) };
+    const r = await httpGetAuth('api.yelp.com', '/v3/reporting/businesses/monthly/' + reportId, 'Bearer ' + fk);
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
+  // ── Programs list all (for biz encid mapping) ─────────────────────────────
+  if (path === 'programs/list/all') {
+    const r = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&program_status=CURRENT', basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
-};
+}
+async function httpPostJson(host, path, bodyObj, authHeader) {
+  const https = require('https');
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify(bodyObj);
+    const opts = { hostname: host, path, method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload),
+                 'Accept': 'application/json', 'Authorization': authHeader, 'User-Agent': 'ShefaDashboard/1.0' } };
+    const req = https.request(opts, res => {
+      let d = ''; res.on('data', c => d += c); res.on('end', () => {
+        try { resolve({ s: res.statusCode, b: JSON.parse(d) }); } catch(e) { resolve({ s: res.statusCode, r: d }); }
+      });
+    });
+    req.on('error', reject); req.write(payload); req.end();
+  });
+}
+
+async function httpGetAuth(host, path, authHeader) {
+  const https = require('https');
+  return new Promise((resolve, reject) => {
+    const opts = { hostname: host, path, method: 'GET',
+      headers: { 'Accept': 'application/json', 'Authorization': authHeader, 'User-Agent': 'ShefaDashboard/1.0' } };
+    const req = https.request(opts, res => {
+      let d = ''; res.on('data', c => d += c); res.on('end', () => {
+        try { resolve({ s: res.statusCode, b: JSON.parse(d) }); } catch(e) { resolve({ s: res.statusCode, r: d }); }
+      });
+    });
+    req.on('error', reject); req.end();
+  });
+}
+
+;
