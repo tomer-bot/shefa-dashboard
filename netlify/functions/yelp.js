@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata â maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata Ã¢ÂÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names â strip ": None", trailing ": ", newlines, etc.
+// Clean display names Ã¢ÂÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -162,6 +162,20 @@ exports.handler = async(event)=>{
       )
     );
     return { statusCode: 200, headers: cors, body: JSON.stringify({ results }) };
+  }
+
+
+  // Diagnostic probe: ?path=probe&host=X&ppath=Y&auth=basic|fusion|none
+  if (path === 'probe') {
+    const host  = body.host  || 'partner-api.yelp.com';
+    const ppath = body.path  || '/';
+    const authType = body.auth || 'basic';
+    let authHeader;
+    if (authType === 'basic')  authHeader = basicAuth();
+    if (authType === 'fusion') authHeader = 'Bearer ' + FUSION_KEY;
+    if (authType === 'none')   authHeader = '';
+    const r = await httpGet(host, ppath, authHeader);
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ host, ppath, authType, result: r }) };
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
