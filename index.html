@@ -404,7 +404,7 @@ function renderGroup(g) {
 
   const groupRow = `
 <div class="client-group" id="grp_${g.id}">
-  <div class="group-row${isOpen?' open':''}" onclick="toggleGroup('${g.id}')">
+  <div class="${g.isGroup ? 'group-row' : 'camp-row'}${isOpen?' open':''}" onclick="${g.isGroup ? `toggleGroup('${g.id}')` : `toggleDetail('${g.campaigns[0].id}')`}">
     <span class="expand-arrow">${g.isGroup ? '▶' : ''}</span>
     <div>
       <div class="group-name">${g.name}</div>
