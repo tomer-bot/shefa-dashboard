@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -121,7 +121,7 @@ exports.handler = async(event)=>{
   }
   if(path.startsWith('budget/')){
     const id=path.split('/')[1];
-    const r=await httpPost('partner-api.yelp.com','/v1/reseller/program/'+id+'/edit?budget='+body.budget,'',basicAuth());
+    const r=await httpPost('partner-api.yelp.com','/v1/reseller/program/'+id+'/edit?budget='+(body.budget*100),'',basicAuth());
     return{statusCode:200,headers:cors,body:JSON.stringify(r)};
   }
 
@@ -202,8 +202,8 @@ exports.handler = async(event)=>{
   }
 
   // --- Reporting API v3 (correct endpoints) ---
-  // POST reporting/daily  â create daily report
-  // POST reporting/monthly â create monthly report  
+  // POST reporting/daily  Ã¢ÂÂ create daily report
+  // POST reporting/monthly Ã¢ÂÂ create monthly report  
   if (path === 'reporting/daily' || path === 'reporting/monthly') {
     const endpoint = path === 'reporting/daily'
       ? '/v3/reporting/businesses/daily'
@@ -247,5 +247,22 @@ exports.handler = async(event)=>{
     const r = await httpPost('partner-api.yelp.com', '/program/' + id + '/features/v1', payload, basicAuth());
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
+
+  // --- Set CPC max bid: POST max_bid/{id}  body: { max_bid: dollars } ---
+  if (path.startsWith('max_bid/')) {
+    const id = path.split('/')[1];
+    const bidCents = Math.round((body.max_bid || 0) * 100);
+    if (bidCents < 50) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Min bid is $0.50' }) };
+    const r = await httpPost('partner-api.yelp.com', '/v1/reseller/program/' + id + '/edit?max_bid=' + bidCents, '', basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
+  // --- Job status: GET job_status/{job_id} ---
+  if (path.startsWith('job_status/')) {
+    const jobId = path.split('/')[1];
+    const r = await httpGet('partner-api.yelp.com', '/v1/reseller/status/' + jobId, basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 };
