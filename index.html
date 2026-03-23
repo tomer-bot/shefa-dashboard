@@ -408,7 +408,7 @@ function renderGroup(g) {
   <div class="${g.isGroup ? 'group-row' : 'camp-row'}${isOpen?' open':''}" onclick="${g.isGroup ? `toggleGroup('${g.id}')` : `toggleDetail('${g.campaigns[0].id}')`}">
     <span class="expand-arrow">${g.isGroup ? '▶' : ''}</span>
     <div>
-      <div class="group-name">${g.name}</div>
+      <div class="group-name">${g.name}${g.campaigns.some(c=>c.has_bot)?'<span class="bot-tag">BOT</span>':''}</div>
       ${g.isGroup ? `<div class="group-sub">${g.campaigns.length} campaigns</div>` : ''}
     </div>
     <div class="mc">${statusTag}</div>
