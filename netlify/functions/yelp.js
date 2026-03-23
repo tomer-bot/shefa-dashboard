@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata Ã¢ÂÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata ÃÂ¢ÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names Ã¢ÂÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names ÃÂ¢ÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -39,7 +39,7 @@ function basicAuth(){return 'Basic '+Buffer.from(YELP_USER+':'+YELP_PASS).toStri
 function httpPost(host,path,body,auth){
   return new Promise((resolve,reject)=>{
     const b=body||'';
-    const headers={'Authorization':auth||basicAuth(),'Content-Type':'application/json','Content-Length':Buffer.byteLength(b)};
+    const headers={'Authorization':auth||basicAuth(),'Content-Type':'application/json','Accept':'application/json','Content-Length':Buffer.byteLength(b)};
     const req=https.request({hostname:host,path,method:'POST',headers},res=>{
       let d='';res.on('data',c=>d+=c);
       res.on('end',()=>{try{resolve({s:res.statusCode,b:JSON.parse(d)});}catch(e){resolve({s:res.statusCode,r:d.substring(0,200)});}});
@@ -50,7 +50,7 @@ function httpPost(host,path,body,auth){
 function httpGet(host, path, auth) {
   return new Promise((resolve) => {
     const req = https.request(
-      { hostname: host, path, method: 'GET', headers: { Authorization: auth || basicAuth() } },
+      { hostname: host, path, method: 'GET', headers: { Authorization: auth || basicAuth(), Accept: 'application/json', 'Content-Type': 'application/json' } },
       res => {
         let d = '';
         res.on('data', c => d += c);
@@ -176,6 +176,66 @@ exports.handler = async(event)=>{
     if (authType === 'none')   authHeader = '';
     const r = await httpGet(host, ppath, authHeader);
     return { statusCode: 200, headers: cors, body: JSON.stringify({ host, ppath, authType, result: r }) };
+  }
+
+
+  // --- Program Feature API: GET /program/{id}/features/v1 ---
+  // Returns keywords, targeting, scheduling, and all program features
+  if (path.startsWith('features/')) {
+    const id = path.split('/')[1]; // features/{program_id}
+    const r = await httpGet('partner-api.yelp.com', '/program/' + id + '/features/v1', basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
+  // --- Batch fetch features for all programs ---
+  if (path === 'features/batch') {
+    const ids = body.ids || [];
+    if (!ids.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'no ids' }) };
+    const results = await Promise.all(
+      ids.map(id =>
+        httpGet('partner-api.yelp.com', '/program/' + id + '/features/v1', basicAuth())
+          .then(r => ({ id, features: r.b, status: r.s }))
+          .catch(e => ({ id, error: e.message }))
+      )
+    );
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ results }) };
+  }
+
+  // --- Reporting API v3 (correct endpoints) ---
+  // POST reporting/daily  → create daily report
+  // POST reporting/monthly → create monthly report  
+  if (path === 'reporting/daily' || path === 'reporting/monthly') {
+    const endpoint = path === 'reporting/daily'
+      ? '/v3/reporting/businesses/daily'
+      : '/v3/reporting/businesses/monthly';
+    const payload = JSON.stringify({
+      ...body,
+      metrics: body.metrics || [
+        'billed_impressions','billed_clicks','ad_cost',
+        'ad_driven_calls','ad_driven_messages_to_business',
+        'ad_driven_biz_page_views','ad_driven_total_leads',
+        'ad_click_through_rate','average_cost_per_click',
+        'num_calls','total_leads'
+      ]
+    });
+    const r = await httpPost('api.yelp.com', endpoint, payload, 'Bearer ' + FUSION_KEY);
+    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  }
+
+  // GET reporting/daily/{id} or reporting/monthly/{id}
+  if (path.startsWith('reporting/daily/') || path.startsWith('reporting/monthly/')) {
+    const parts = path.split('/');
+    const type = parts[1]; // daily or monthly
+    const reportId = parts[2];
+    return new Promise((resolve) => {
+      const req = https.request(
+        { hostname: 'api.yelp.com', path: '/v3/reporting/businesses/' + type + '/' + reportId,
+          method: 'GET', headers: { Authorization: 'Bearer ' + FUSION_KEY, Accept: 'application/json' } },
+        res => { let d = ''; res.on('data', c => d += c); res.on('end', () => resolve({ statusCode: 200, headers: cors, body: d })); }
+      );
+      req.on('error', e => resolve({ statusCode: 500, headers: cors, body: JSON.stringify({ error: e.message }) }));
+      req.end();
+    });
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
