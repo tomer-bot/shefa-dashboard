@@ -430,7 +430,7 @@ function renderGroup(g) {
   <div class="campaign-rows" id="rows_${g.id}" style="display:${isOpen?'block':'none'}">
     ${g.isGroup ? g.campaigns.map(c => renderCampaignRow(c, g.id)).join('') : ''}
   </div>
-</div>`;
+</div>${!g.isGroup ? renderDetail(g.campaigns[0], false) : ''}`;
 
   return groupRow;
 }
