@@ -211,10 +211,7 @@ exports.handler = async(event)=>{
     const payload = JSON.stringify({
       ...body,
       metrics: body.metrics || [
-        'billed_impressions','billed_clicks','ad_cost',
-        'ad_driven_calls','ad_driven_messages_to_business',
-        'ad_driven_biz_page_views','ad_driven_total_leads',
-        'ad_click_through_rate','average_cost_per_click',
+        'billed_impressions','billed_clicks','ad_cost','ad_driven_calls','ad_driven_messages_to_business',
         'num_calls','total_leads'
       ]
     });
@@ -274,8 +271,7 @@ exports.handler = async(event)=>{
     const r = await httpPostJson('api.yelp.com', '/v3/reporting/businesses/monthly', {
       start, end, ids,
       metrics: ['billed_impressions','billed_clicks','ad_cost','ad_driven_calls',
-                'ad_driven_messages_to_business','ad_driven_total_leads',
-                'average_cost_per_click','ad_click_through_rate','ad_driven_biz_page_views']
+                'ad_driven_messages_to_business']
     }, 'Bearer ' + fusion_key);
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
