@@ -895,52 +895,76 @@ async function loadReportingData(month) {
   const mon = month || currentMonth || new Date().toISOString().slice(0,7);
   const cfg = JSON.parse(localStorage.getItem('shefa_cfg') || '{}');
   const fusionKey = cfg.fusion;
-  if (!fusionKey) { console.warn('No fusion key in config'); return; }
+  if (!fusionKey) return;
+
+  const CACHE_KEY = 'reporting_cache_' + mon;
+  const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+  const now = Date.now();
+  const TWENTY_FOUR_H = 86400000;
 
   try {
-    // Step 1: Get program->bizId map from programs/list/all
+    // Step 1: If we have a cached ready report from today, use it immediately
+    if (cached && cached.reportId && cached.bizInfoList && (now - cached.ts) < TWENTY_FOUR_H) {
+      toast('Loading cached reporting data...');
+      const pollRes = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly/' + cached.reportId, {
+        headers: { Authorization: 'Bearer ' + fusionKey }
+      });
+      if (pollRes.status === 200) {
+        const data = await pollRes.json();
+        if (data.data) {
+          applyReportingData(data, cached.bizInfoList);
+          return;
+        }
+      }
+    }
+
+    // Step 2: Get biz IDs from programs/list/all
     const listData = await yelpFn('programs/list/all', 'GET');
     const progs = listData.payment_programs || listData.b?.payment_programs || [];
-    const progToBiz = {};
-    const bizIds = new Set();
-    progs.forEach(p => {
-      const bizId = p.businesses?.[0]?.yelp_business_id;
-      if (bizId) { progToBiz[p.program_id] = bizId; bizIds.add(bizId); }
-    });
-    if (!bizIds.size) return;
+    const bizIds = [...new Set(progs.map(p => p.businesses?.[0]?.yelp_business_id).filter(Boolean))];
+    if (!bizIds.length) return;
 
-    // Step 2: Submit monthly report
+    // Step 3: Fetch bizInfo now (fast, needed for apply)
+    const bizInfoRes = await fetch('/api/yelp?path=probe', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ host: 'partner-api.yelp.com', path: '/v1/business_info/' + bizIds.join(','), auth: 'basic' })
+    }).then(r=>r.json());
+    const bizInfoList = bizInfoRes?.result?.b?.businesses || [];
+
+    // Step 4: Submit new report
     const createRes = await yelpFn('reporting/monthly/create', 'POST', {
-      month: mon, ids: [...bizIds], fusion_key: fusionKey
+      month: mon, ids: bizIds, fusion_key: fusionKey
     });
     const reportId = createRes.id || createRes.b?.id;
-    if (!reportId) { console.warn('No report ID returned', createRes); return; }
+    if (!reportId) return;
 
-    // Step 3: Poll until ready (max 35 attempts, 60s apart)
-    toast('Reporting data loading... (up to 30 min)');
+    // Save partial cache (without data yet)
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
+    toast('Reporting data loading... (ready in ~30 min)');
+
+    // Step 5: Poll with backoff — try immediately first, then every 5 min
     let attempts = 0;
     const poll = async () => {
       attempts++;
-      const r = await yelpFn('reporting/monthly/poll/' + reportId + '?fusion_key=' + encodeURIComponent(fusionKey), 'GET');
-      const data = r.b || r;
-      if (data?.error?.code === 'JOB_NOT_COMPLETE') {
-        if (attempts < 8) setTimeout(poll, 300000); // retry every 5 min
-        return;
+      const r = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly/' + reportId, {
+        headers: { Authorization: 'Bearer ' + fusionKey }
+      });
+      if (r.status === 200) {
+        const data = await r.json();
+        if (data.data) {
+          // Cache the result
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
+          applyReportingData(data, bizInfoList);
+          return;
+        }
       }
-      // Step 4: Map results back to allPrograms
-      // Fetch bizInfo to build the ID bridge
-    const bizInfoRes = await yelpFn('probe', 'POST', {
-      host: 'partner-api.yelp.com',
-      path: '/v1/business_info/' + [...bizIds].join(','),
-      auth: 'basic'
-    });
-    const bizInfoList = bizInfoRes?.b?.businesses || bizInfoRes?.businesses || [];
-    applyReportingData(data, bizInfoList);
+      if (attempts < 8) setTimeout(poll, 300000); // retry every 5 min
     };
     setTimeout(poll, 90000); // first poll after 90s
 
-  } catch(e) { console.error('Reporting API error:', e); }
+  } catch(e) { console.error('Reporting error:', e); }
 }
+
 
 function applyReportingData(reportData, bizInfoList) {
   // Bridge: report.data[].business_id -> bizInfoList[].yelp_business_id -> allPrograms (by address)
