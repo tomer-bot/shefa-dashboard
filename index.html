@@ -1,8 +1,13 @@
 <!DOCTYPE html>
-const aiRunTs = Date.now(); localStorage.setItem('shefa_ai_last_run', aiRunTs);
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  const aiRunTs = Date.now();
+  localStorage.setItem('shefa_ai_last_run', aiRunTs);
+  const aiCacheEl = document.getElementById('aiContent');
+  if (aiCacheEl) localStorage.setItem('shefa_ai_briefing_cache', aiCacheEl.innerHTML);
+  const metaEl2 = document.getElementById('aiBriefMeta');
+  if (metaEl2) metaEl2.textContent = 'Last generated: ' + new Date(aiRunTs).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Shefa Campaign Control Panel</title>
 <style>
