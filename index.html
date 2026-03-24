@@ -928,50 +928,84 @@ async function loadReportingData(month) {
         return;
       }
       // Step 4: Map results back to allPrograms
-      applyReportingData(data);
+      // Fetch bizInfo to build the ID bridge
+    const bizInfoRes = await yelpFn('probe', 'POST', {
+      host: 'partner-api.yelp.com',
+      path: '/v1/business_info/' + [...bizIds].join(','),
+      auth: 'basic'
+    });
+    const bizInfoList = bizInfoRes?.b?.businesses || bizInfoRes?.businesses || [];
+    applyReportingData(data, bizInfoList);
     };
     setTimeout(poll, 30000); // first poll after 30s
 
   } catch(e) { console.error('Reporting API error:', e); }
 }
 
-function applyReportingData(reportData) {
-  // Structure from Yelp: {data:[{business_id, metrics:[{date, programs:[{program_id, billed_clicks,...}]}]}]}
+function applyReportingData(reportData, bizInfoList) {
+  // Bridge: report.data[].business_id -> bizInfoList[].yelp_business_id -> allPrograms (by address)
   const bizData = reportData.data || [];
   if (!bizData.length) { toast('No reporting data returned'); return; }
 
-  // Build program_id -> metrics map (direct match to allPrograms by prog.id)
-  const progMetrics = {};
-  bizData.forEach(biz => {
-    (biz.metrics || []).forEach(monthData => {
-      (monthData.programs || []).forEach(p => { progMetrics[p.program_id] = p; });
-    });
+  // Build yelp_biz_id -> allPrograms entry via address matching
+  const addrToAllProg = {};
+  allPrograms.forEach(p => {
+    const parts = p.name.split(' : ');
+    if (parts.length >= 2) {
+      const addr = parts[parts.length-1].trim().toLowerCase();
+      if (addr) addrToAllProg[addr] = p;
+    }
+  });
+  const nameToAllProg = {};
+  allPrograms.forEach(p => {
+    const n = p.name.split(' : ')[0].trim().toLowerCase();
+    nameToAllProg[n] = p;
   });
 
+  const bizIdToAllProg = {};
+  (bizInfoList || []).forEach(biz => {
+    const addr = (biz.address1 || '').trim().toLowerCase();
+    let match = addr ? addrToAllProg[addr] : null;
+    if (!match) {
+      const n = (biz.name || '').toLowerCase();
+      match = nameToAllProg[n] || Object.values(nameToAllProg).find(p =>
+        p.name.toLowerCase().startsWith(n) || n.startsWith(p.name.split(' : ')[0].toLowerCase())
+      );
+    }
+    if (match) bizIdToAllProg[biz.yelp_business_id] = match;
+  });
+
+  // Apply report metrics
   let updated = 0;
-  allPrograms.forEach(prog => {
-    const m = progMetrics[prog.id];
-    if (!m) return;
+  bizData.forEach(biz => {
+    const prog = bizIdToAllProg[biz.business_id];
+    if (!prog) return;
+    let impressions = 0, clicks = 0, calls = 0, messages = 0, adCost = 0;
+    biz.metrics?.forEach(m => {
+      m.programs?.forEach(p => {
+        impressions += p.billed_impressions || 0;
+        clicks      += p.billed_clicks || 0;
+        calls       += p.ad_driven_calls || 0;
+        messages    += p.ad_driven_messages_to_business || 0;
+        adCost      += p.ad_cost?.cost || 0;
+      });
+    });
+    prog.impressions = impressions || prog.impressions || 0;
+    prog.clicks      = clicks      || prog.clicks || 0;
+    prog.calls       = calls;
+    prog.messages    = messages;
+    prog.leads       = calls + messages;
+    if (adCost)                     prog.spend_cents = adCost;
+    if (clicks && adCost)           prog.avg_cpc = (adCost / clicks / 100).toFixed(2);
+    if (clicks && impressions)      prog.ctr = ((clicks / impressions) * 100).toFixed(2);
     updated++;
-    prog.impressions = m.billed_impressions || prog.impressions || 0;
-    prog.clicks      = m.billed_clicks      || prog.clicks || 0;
-    prog.calls       = m.ad_driven_calls    || 0;
-    prog.messages    = m.ad_driven_messages_to_business || 0;
-    prog.leads       = prog.calls + prog.messages;
-    const adCostCents = m.ad_cost?.cost || 0;
-    if (adCostCents) prog.spend_cents = adCostCents;
-    if (prog.clicks && adCostCents) {
-      prog.avg_cpc = (adCostCents / prog.clicks / 100).toFixed(2);
-    }
-    if (prog.clicks && prog.impressions) {
-      prog.ctr = ((prog.clicks / prog.impressions) * 100).toFixed(2);
-    }
   });
 
   renderAll();
   updateKPIs();
   toast('Reporting data loaded: ' + updated + ' campaigns updated');
 }
+
 </script>
 </body>
 </html>
