@@ -168,7 +168,6 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">↻ Refresh</button>
     <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">↻ Sync</button>
     <button class="btn btn-ghost btn-sm" onclick="openConfig()">⚙ Config</button>
   </div>
@@ -599,7 +598,20 @@ async function loadDashboard() {
     }));
     renderAll();
     updateKPIs();
+    // Auto-pull: trigger fresh report if it's 7am–10am PST (15:00–18:00 UTC) and cache is from yesterday
+  (function() {
+    const nowUtc = new Date();
+    const utcHour = nowUtc.getUTCHours();
+    const mon = currentMonth || nowUtc.toISOString().slice(0,7);
+    const cached = JSON.parse(localStorage.getItem('reporting_cache_' + mon) || 'null');
+    const cacheAgeH = cached?.ts ? (Date.now() - cached.ts) / 3600000 : 999;
+    // 15:00–18:00 UTC = 7am–10am PST. Force refresh if cache is >20h old (yesterday's data)
+    if (utcHour >= 15 && utcHour < 18 && cacheAgeH > 20) {
+      localStorage.removeItem('reporting_cache_' + mon);
+      toast('🌅 Morning auto-refresh: fetching today\'s reporting data...');
+    }
     loadReportingData(currentMonth);
+  })();
     loadBotConfig();
     toast('Loaded ' + allPrograms.length + ' campaigns ✓', 'success');
   } catch(e) {
@@ -907,46 +919,48 @@ async function loadReportingData(month) {
   const TWENTY_FOUR_H = 86400000;
 
   try {
-    // Step 1: If we have a cached ready report from today, use it immediately
-    if (cached && cached.reportId && cached.bizInfoList && (now - cached.ts) < TWENTY_FOUR_H) {
-      toast('Loading cached reporting data...');
-      const pollRes = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly/' + cached.reportId, {
+    // Use cache if < 24h old
+    if (cached && cached.reportId && cached.bizInfoList?.length && (now - cached.ts) < TWENTY_FOUR_H) {
+      const r = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly/' + cached.reportId, {
         headers: { Authorization: 'Bearer ' + fusionKey }
       });
-      if (pollRes.status === 200) {
-        const data = await pollRes.json();
-        if (data.data) {
-          applyReportingData(data, cached.bizInfoList);
-          return;
-        }
+      if (r.status === 200) {
+        const data = await r.json();
+        if (data.data?.length) { applyReportingData(data); return; }
       }
     }
 
-    // Step 2: Get biz IDs from programs/list/all
-    const listData = await yelpFn('programs/list/all', 'GET');
-    const progs = listData.b?.payment_programs || listData.payment_programs || [];
+    // Get biz IDs from programs/list/all
+    const listRes = await yelpFn('programs/list/all', 'GET');
+    const progs = listRes.b?.payment_programs || [];
     const bizIds = [...new Set(progs.map(p => p.businesses?.[0]?.yelp_business_id).filter(Boolean))];
     if (!bizIds.length) return;
 
-    // Step 3: Fetch bizInfo now (fast, needed for apply)
+    // Fetch bizInfo for bridge
     const bizInfoRes = await fetch('/api/yelp?path=probe', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ host: 'partner-api.yelp.com', path: '/v1/business_info/' + bizIds.join(','), auth: 'basic' })
-    }).then(r=>r.json());
+    }).then(r => r.json());
     const bizInfoList = bizInfoRes?.result?.b?.businesses || [];
 
-    // Step 4: Submit new report
-    const createRes = await yelpFn('reporting/monthly/create', 'POST', {
-      month: mon, ids: bizIds, fusion_key: fusionKey
+    // Submit report DIRECTLY to Yelp (bypasses backend - backend route was broken)
+    const createR = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + fusionKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        start: mon, end: mon, ids: bizIds,
+        metrics: ['billed_impressions','billed_clicks','ad_cost','ad_driven_calls','ad_driven_messages_to_business']
+      })
     });
-    const reportId = createRes.id || createRes.b?.id;
-    if (!reportId) return;
+    const createBody = await createR.json();
+    const reportId = createBody.id;
+    if (!reportId) { console.warn('No report ID:', createBody); return; }
 
-    // Save partial cache (without data yet)
+    // Cache immediately with bizInfoList
     localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
-    toast('Reporting data loading... (ready in ~30 min)');
+    toast('📊 Reporting data loading... (~30 min)');
 
-    // Step 5: Poll with backoff — try immediately first, then every 5 min
+    // Poll: first at 90s, then every 5 min, max 8 attempts
     let attempts = 0;
     const poll = async () => {
       attempts++;
@@ -955,16 +969,15 @@ async function loadReportingData(month) {
       });
       if (r.status === 200) {
         const data = await r.json();
-        if (data.data) {
-          // Cache the result
+        if (data.data?.length) {
           localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
-          applyReportingData(data, bizInfoList);
+          applyReportingData(data);
           return;
         }
       }
-      if (attempts < 8) setTimeout(poll, 300000); // retry every 5 min
+      if (attempts < 8) setTimeout(poll, 300000);
     };
-    setTimeout(poll, 90000); // first poll after 90s
+    setTimeout(poll, 90000);
 
   } catch(e) { console.error('Reporting error:', e); }
 }
