@@ -168,7 +168,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn btn-ghost btn-sm" onclick="refreshData()">↻ Refresh</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">↻ Refresh</button>
     <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">↻ Sync</button>
     <button class="btn btn-ghost btn-sm" onclick="openConfig()">⚙ Config</button>
   </div>
@@ -290,14 +290,6 @@ function buildMonthSelect() {
   }
   currentMonth = sel.value;
 }
-function refreshData() {
-  // Clear reporting cache for current month so fresh data is fetched
-  const mon = currentMonth || new Date().toISOString().slice(0,7);
-  localStorage.removeItem('reporting_cache_' + mon);
-  toast('Refreshing data...');
-  loadDashboard();
-}
-
 function onMonthChange() {
   currentMonth = document.getElementById('monthSel').value;
   const now = new Date();
