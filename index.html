@@ -162,9 +162,9 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .company-card .metric .lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.3px}
 .company-card .trend{margin-top:8px;font-size:11px;display:flex;align-items:center;gap:4px}
 .trend-up{color:#16a34a}.trend-dn{color:#dc2626}.trend-flat{color:#94a3b8}
-.analytics-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.summary-card{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #e0ecff;text-align:center}
-.summary-card .big{font-size:22px;font-weight:800;color:#0d2d5e}
+.analytics-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.summary-card{background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e0ecff;text-align:center}
+.summary-card .big{font-size:20px;font-weight:800;color:#0d2d5e}
 .summary-card .sm{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
 
 /* Company modal */
@@ -1220,7 +1220,13 @@ function showReportTab(tab) {
     const meta = document.getElementById('aiBriefMeta');
     if (meta) {
       const lastRun = localStorage.getItem('shefa_ai_last_run');
-      meta.textContent = lastRun ? 'Last generated: ' + new Date(+lastRun).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Load campaigns then generate your briefing.';
+      meta.textContent = lastRun ? 'Last generated: ' + new Date(+lastRun).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Load campaigns then generate your briefing.';
+    }
+    // Restore cached briefing if available
+    const cached = localStorage.getItem('shefa_ai_briefing_cache');
+    const aiEl = document.getElementById('aiContent');
+    if (cached && aiEl && aiEl.querySelector('.ai-placeholder')) {
+      aiEl.innerHTML = cached;
     }
   }
 }
@@ -1281,7 +1287,7 @@ function renderAnalytics() {
       <div class="summary-card"><div class="big">${totalLeads.toLocaleString()}</div><div class="sm">Total Leads</div></div>
       <div class="summary-card"><div class="big">${totalCalls.toLocaleString()}</div><div class="sm">Total Calls</div></div>
       <div class="summary-card"><div class="big">${avgCPL}</div><div class="sm">Avg CPL</div></div>
-      <div class="summary-card"><div class="big">${cur.reduce((s,p)=>s+(p.messages||0),0).toLocaleString()}</div><div class="sm">Messages</div></div>
+      <div class="summary-card"><div class="big">${cur.reduce((s,p)=>s+(p.messages||0),0).toLocaleString()}</div><div class="sm">Chat Leads</div></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:13px;font-weight:700;color:#0d2d5e">📈 Performance by Client — ${(([yr,mo]) => new Date(+yr, +mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(curMon.split('-'))}</div>
@@ -1306,6 +1312,7 @@ function renderAnalytics() {
             <div class="metric"><div class="val">${p.calls||'—'}</div><div class="lbl">Calls</div></div>
             <div class="metric"><div class="val">${spend}</div><div class="lbl">Spend</div></div>
             <div class="metric"><div class="val">${cpl}</div><div class="lbl">CPL</div></div>
+            <div class="metric" style="grid-column:span 2"><div class="val" style="font-size:12px">${p.impressions?(p.impressions/1000).toFixed(1)+'K':'—'}</div><div class="lbl">Impr</div></div>
           </div>
           <div class="trend">${trendHtml}</div>
         </div>`;
@@ -1544,6 +1551,7 @@ function generateClientReport() {
         <th style="padding:8px;text-align:right">CPL</th>
         <th style="padding:8px;text-align:right">Impr</th>
         <th style="padding:8px;text-align:right">Clicks</th>
+        <th style="padding:8px;text-align:right">CTR</th>
       </tr></thead>
       <tbody>
         ${camps.map(p => {
@@ -1559,6 +1567,7 @@ function generateClientReport() {
             <td style="padding:7px 8px;text-align:right">${cl}</td>
             <td style="padding:7px 8px;text-align:right">${(p.impressions||0).toLocaleString()}</td>
             <td style="padding:7px 8px;text-align:right">${p.clicks||'—'}</td>
+            <td style="padding:7px 8px;text-align:right">${p.clicks&&p.impressions?((p.clicks/p.impressions)*100).toFixed(2)+'%':'—'}</td>
           </tr>`;
         }).join('')}
       </tbody>
