@@ -141,6 +141,75 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .btn-ok-mod{padding:7px 18px;border-radius:7px;border:none;background:#1a73e8;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
 .btn-ok-mod:hover{background:#1557b0}
 .btn-ok-mod.danger{background:#d32f2f}.btn-ok-mod.danger:hover{background:#b71c1c}
+
+/* ── Reports & Analytics Section ─────────────────────────── */
+.reports-section{width:100%;background:#f0f4f9;border-top:2px solid #d0e4f7;margin-top:0}
+.reports-tabs{display:flex;gap:0;background:#0d2d5e;padding:0 16px}
+.tab-btn{padding:10px 18px;border:none;background:transparent;color:#8ab3d4;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:.2s}
+.tab-btn:hover{color:#fff}
+.tab-btn.active{color:#fff;border-bottom-color:#3b9eff}
+.tab-content{display:none;padding:20px 16px}
+.tab-content.active{display:block}
+
+/* Analytics cards */
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:14px}
+.company-card{background:#fff;border-radius:10px;padding:14px;border:1px solid #e0ecff;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.company-card:hover{border-color:#3b9eff;box-shadow:0 3px 10px rgba(59,158,255,.15);transform:translateY(-1px)}
+.company-card h4{font-size:12px;font-weight:700;color:#0d2d5e;margin:0 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.company-card .metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.company-card .metric{text-align:center}
+.company-card .metric .val{font-size:15px;font-weight:800;color:#1a56db}
+.company-card .metric .lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.3px}
+.company-card .trend{margin-top:8px;font-size:11px;display:flex;align-items:center;gap:4px}
+.trend-up{color:#16a34a}.trend-dn{color:#dc2626}.trend-flat{color:#94a3b8}
+.analytics-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.summary-card{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #e0ecff;text-align:center}
+.summary-card .big{font-size:22px;font-weight:800;color:#0d2d5e}
+.summary-card .sm{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+
+/* Company modal */
+.company-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center}
+.company-modal{background:#fff;border-radius:14px;width:780px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.company-modal-header{padding:18px 22px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
+.company-modal-header h2{font-size:16px;font-weight:800;color:#0d2d5e;margin:0}
+.company-modal-body{padding:20px 22px}
+.history-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+.history-table th{background:#f0f4f9;padding:8px 10px;text-align:right;font-weight:700;color:#0d2d5e;font-size:11px}
+.history-table th:first-child{text-align:left}
+.history-table td{padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9}
+.history-table td:first-child{text-align:left;font-weight:600}
+.history-table tr:hover td{background:#f8faff}
+
+/* Keywords tab */
+.kw-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}
+.kw-table th{background:#0d2d5e;color:#fff;padding:9px 12px;text-align:right;font-size:11px;font-weight:700}
+.kw-table th:first-child{text-align:left}
+.kw-table td{padding:8px 12px;text-align:right;border-bottom:1px solid #e5e7eb}
+.kw-table tr:hover td{background:#f8faff}
+.kw-connect{background:#fff;border-radius:10px;padding:20px;border:1px solid #e0ecff;text-align:center;max-width:500px;margin:20px auto}
+.kw-connect h3{color:#0d2d5e;margin:0 0 10px;font-size:15px}
+.kw-connect p{color:#64748b;font-size:13px;margin:0 0 16px;line-height:1.5}
+
+/* AI tab */
+.ai-tab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ai-tab-header h3{font-size:15px;font-weight:700;color:#0d2d5e;margin:0}
+.ai-tab-meta{font-size:11px;color:#94a3b8;margin-top:3px}
+
+/* Monthly Report */
+.report-builder{background:#fff;border-radius:10px;padding:20px;border:1px solid #e0ecff;max-width:700px}
+.report-builder h3{font-size:15px;font-weight:700;color:#0d2d5e;margin:0 0 16px}
+.report-controls{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px}
+.report-controls label{font-size:12px;font-weight:600;color:#374151;display:flex;flex-direction:column;gap:4px}
+.report-controls select,.report-controls input{padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;min-width:160px}
+.report-output{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:24px;margin-top:16px;font-size:13px;line-height:1.6}
+.report-output h1{font-size:20px;color:#0d2d5e;border-bottom:2px solid #3b9eff;padding-bottom:8px;margin-bottom:16px}
+.report-output h2{font-size:14px;color:#0d2d5e;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.report-metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.report-metric{background:#f0f4f9;border-radius:8px;padding:10px;text-align:center}
+.report-metric .rv{font-size:18px;font-weight:800;color:#1a56db}
+.report-metric .rl{font-size:10px;color:#64748b;text-transform:uppercase}
+@media print{.reports-tabs,.tab-btn,.btn{display:none!important}.report-output{border:none;padding:0}}
+
 </style>
 </head>
 <body>
@@ -213,19 +282,86 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
     <div id="campaignList"></div>
   </div>
 
-  <!-- AI Panel -->
-  <div class="ai-panel">
-    <div class="ai-header">
-      <h3>🤖 AI Weekly Briefing</h3>
-      <button class="btn btn-blue btn-sm" id="analyzeBtn" onclick="runAnalysis(false)">Generate</button>
-    </div>
-    <div class="ai-body">
-      <div id="aiContent" class="ai-content">
-        <div class="ai-placeholder">Load campaigns then click <strong>Generate</strong> for your weekly briefing.</div>
-      </div>
+</div>
+
+<!-- ── Reports & Analytics ───────────────────────────────────────── -->
+<div class="reports-section" id="reportsSection">
+  <div class="reports-tabs">
+    <button class="tab-btn active" id="rtab-analytics" onclick="showReportTab('analytics')">📊 Analytics</button>
+    <button class="tab-btn" id="rtab-keywords" onclick="showReportTab('keywords')">🔑 Keywords</button>
+    <button class="tab-btn" id="rtab-ai" onclick="showReportTab('ai')">🤖 AI Briefing</button>
+    <button class="tab-btn" id="rtab-reports" onclick="showReportTab('reports')">📋 Monthly Reports</button>
+  </div>
+
+  <!-- Analytics Tab -->
+  <div class="tab-content active" id="rtab-analytics-content">
+    <div id="analyticsContent">
+      <p style="color:#94a3b8;font-size:13px;text-align:center;padding:40px">Load campaigns to see analytics.</p>
     </div>
   </div>
 
+  <!-- Keywords Tab -->
+  <div class="tab-content" id="rtab-keywords-content">
+    <div id="keywordsContent">
+      <div class="kw-connect">
+        <h3>🔑 Keyword Performance</h3>
+        <p>Yelp doesn't expose keyword data via API. Download the keyword CSV from Yelp Partner Hub and upload it here, or paste a session token for auto-pull.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-blue btn-sm" onclick="window.open('https://biz.yelp.com/partner_hub/QBSzxALbkHE3wi5z0-w5BQ/reports','_blank')">Open Yelp Reports</button>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+            Upload CSV <input type="file" accept=".csv" style="display:none" onchange="handleKeywordCSV(event)">
+          </label>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">Or paste Yelp session token for auto-pull (from biz.yelp.com cookies: <code>biz_session</code>)</div>
+          <div style="display:flex;gap:8px">
+            <input id="yelpSessionToken" type="password" placeholder="Paste session token..." style="flex:1;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px">
+            <button class="btn btn-blue btn-sm" onclick="pullKeywordsWithSession()">Pull Data</button>
+          </div>
+        </div>
+      </div>
+      <div id="keywordTableWrap" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- AI Briefing Tab -->
+  <div class="tab-content" id="rtab-ai-content">
+    <div class="ai-tab-header">
+      <div>
+        <h3>🤖 AI Weekly Briefing</h3>
+        <div class="ai-tab-meta" id="aiBriefMeta">Load campaigns then generate your briefing.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="font-size:12px;color:#64748b;display:flex;align-items:center;gap:5px">
+          <input type="checkbox" id="autoWeeklyCheck" onchange="toggleAutoWeekly(this.checked)"> Auto Monday
+        </label>
+        <button class="btn btn-blue btn-sm" id="analyzeBtn" onclick="runAnalysis(false)">Generate</button>
+      </div>
+    </div>
+    <div id="aiContent" class="ai-content" style="background:#fff;border-radius:10px;padding:16px;border:1px solid #e0ecff;min-height:120px">
+      <div class="ai-placeholder" style="color:#94a3b8;text-align:center;padding:30px">Load campaigns then click <strong>Generate</strong> for your weekly briefing.</div>
+    </div>
+  </div>
+
+  <!-- Monthly Reports Tab -->
+  <div class="tab-content" id="rtab-reports-content">
+    <div class="report-builder">
+      <h3>📋 Monthly Client Report</h3>
+      <div class="report-controls">
+        <label>Client
+          <select id="reportClient">
+            <option value="">— Select client —</option>
+          </select>
+        </label>
+        <label>Month
+          <input type="month" id="reportMonth" value="2026-03">
+        </label>
+        <button class="btn btn-blue btn-sm" onclick="generateClientReport()" style="margin-bottom:1px">Generate Report</button>
+        <button class="btn btn-ghost btn-sm" onclick="window.print()" style="margin-bottom:1px">🖨 Print</button>
+      </div>
+      <div id="reportOutput" class="report-output" style="display:none"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Confirmation Modal -->
@@ -611,6 +747,7 @@ async function loadDashboard() {
       toast('🌅 Morning auto-refresh: fetching today\'s reporting data...');
     }
     loadReportingData(currentMonth);
+    initReportsSection();
   })();
     loadBotConfig();
     toast('Loaded ' + allPrograms.length + ' campaigns ✓', 'success');
@@ -1063,6 +1200,400 @@ function applyReportingData(reportData) {
   }
 }
 
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  REPORTS & ANALYTICS
+// ═══════════════════════════════════════════════════════════════════
+
+function showReportTab(tab) {
+  ['analytics','keywords','ai','reports'].forEach(t => {
+    document.getElementById('rtab-' + t)?.classList.remove('active');
+    document.getElementById('rtab-' + t + '-content')?.classList.remove('active');
+  });
+  document.getElementById('rtab-' + tab)?.classList.add('active');
+  document.getElementById('rtab-' + tab + '-content')?.classList.add('active');
+  if (tab === 'analytics') renderAnalytics();
+  if (tab === 'reports')   populateReportClients();
+}
+
+// ── History snapshot saved on every reporting data load ───────────────────────
+function saveHistorySnapshot() {
+  if (!allPrograms?.length) return;
+  const mon = currentMonth || new Date().toISOString().slice(0,7);
+  const history = JSON.parse(localStorage.getItem('shefa_history') || '{}');
+  history[mon] = allPrograms.map(p => ({
+    id: p.id, name: p.name, campaign_type: p.campaign_type, group_id: p.group_id,
+    spend: p.spend_cents, budget: p.budget_cents,
+    impressions: p.impressions, clicks: p.clicks,
+    leads: p.leads, calls: p.calls, messages: p.messages, ctr: p.ctr, avg_cpc: p.avg_cpc
+  }));
+  localStorage.setItem('shefa_history', JSON.stringify(history));
+}
+
+function loadHistory() {
+  return JSON.parse(localStorage.getItem('shefa_history') || '{}');
+}
+
+// ── Analytics Tab ─────────────────────────────────────────────────────────────
+function renderAnalytics() {
+  if (!allPrograms?.length) return;
+  saveHistorySnapshot();
+  const history = loadHistory();
+  const months = Object.keys(history).sort().reverse();
+  const curMon = currentMonth || new Date().toISOString().slice(0,7);
+  const cur = history[curMon] || allPrograms.map(p => ({
+    id:p.id, name:p.name, campaign_type:p.campaign_type, group_id:p.group_id,
+    spend:p.spend_cents, budget:p.budget_cents,
+    impressions:p.impressions, clicks:p.clicks,
+    leads:p.leads, calls:p.calls, messages:p.messages
+  }));
+
+  const totalSpend  = cur.reduce((s,p) => s + (p.spend||0), 0);
+  const totalLeads  = cur.reduce((s,p) => s + (p.leads||0), 0);
+  const totalCalls  = cur.reduce((s,p) => s + (p.calls||0), 0);
+  const avgCPL      = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : '—';
+  const topPerf     = [...cur].filter(p=>p.campaign_type!=='boost').sort((a,b)=>(b.leads||0)-(a.leads||0))[0];
+
+  // Group by company (main campaigns only, exclude boost sub-rows)
+  const companies = cur.filter(p => p.campaign_type !== 'boost' && !p.group_id || p.group_id);
+  // Deduplicate by name prefix for grouped ones
+  const seen = new Set();
+  const uniqueCompanies = cur.filter(p => {
+    const key = p.group_id || p.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).filter(p => p.campaign_type !== 'boost');
+
+  const html = `
+    <div class="analytics-summary">
+      <div class="summary-card"><div class="big">$${(totalSpend/100).toLocaleString('en-US',{maximumFractionDigits:0})}</div><div class="sm">Spend MTD</div></div>
+      <div class="summary-card"><div class="big">${totalLeads.toLocaleString()}</div><div class="sm">Total Leads</div></div>
+      <div class="summary-card"><div class="big">${totalCalls.toLocaleString()}</div><div class="sm">Total Calls</div></div>
+      <div class="summary-card"><div class="big">$${avgCPL}</div><div class="sm">Avg CPL</div></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:700;color:#0d2d5e">📈 Performance by Client — ${new Date(curMon+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</div>
+      <div style="font-size:11px;color:#94a3b8">${months.length} months of history · Click card for full details</div>
+    </div>
+    <div class="analytics-grid">
+      ${uniqueCompanies.sort((a,b)=>(b.spend||0)-(a.spend||0)).map(p => {
+        const biz = p.name?.split(' : ')[0] || p.name;
+        const spend = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
+        const cpl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : '—';
+        // Get prev month for trend
+        const prevMon = months.find(m => m < curMon);
+        const prevData = prevMon ? history[prevMon]?.find(x=>x.id===p.id) : null;
+        const trendLeads = prevData?.leads ? (p.leads||0) - prevData.leads : null;
+        const trendHtml = trendLeads !== null 
+          ? `<span class="${trendLeads>0?'trend-up':trendLeads<0?'trend-dn':'trend-flat'}">${trendLeads>0?'▲':'▼'} ${Math.abs(trendLeads)} leads vs last month</span>`
+          : '<span class="trend-flat">No comparison data</span>';
+        return `<div class="company-card" onclick="openCompanyModal('${p.id}')">
+          <h4>${biz}</h4>
+          <div class="metrics">
+            <div class="metric"><div class="val">${p.leads||'—'}</div><div class="lbl">Leads</div></div>
+            <div class="metric"><div class="val">${p.calls||'—'}</div><div class="lbl">Calls</div></div>
+            <div class="metric"><div class="val">${spend}</div><div class="lbl">Spend</div></div>
+            <div class="metric"><div class="val">${cpl}</div><div class="lbl">CPL</div></div>
+          </div>
+          <div class="trend">${trendHtml}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  document.getElementById('analyticsContent').innerHTML = html;
+}
+
+// ── Company Modal ─────────────────────────────────────────────────────────────
+function openCompanyModal(progId) {
+  const history = loadHistory();
+  const months = Object.keys(history).sort().reverse();
+  const prog = allPrograms.find(p=>p.id===progId);
+  if (!prog) return;
+  const biz = prog.name?.split(' : ')[0] || prog.name;
+
+  const rows = months.map(mon => {
+    const d = history[mon]?.find(p=>p.id===progId);
+    if (!d) return '';
+    const spend = d.spend ? '$'+(d.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
+    const cpl = d.leads && d.spend ? '$'+(d.spend/d.leads/100).toFixed(0) : '—';
+    const ctr = d.clicks && d.impressions ? ((d.clicks/d.impressions)*100).toFixed(2)+'%' : d.ctr ? d.ctr+'%' : '—';
+    const cpc = d.avg_cpc ? '$'+d.avg_cpc : (d.clicks && d.spend ? '$'+(d.spend/d.clicks/100).toFixed(2) : '—');
+    const label = new Date(mon+'-01').toLocaleDateString('en-US',{month:'short',year:'numeric'});
+    return `<tr><td>${label}</td><td>${spend}</td><td>${(d.impressions||0).toLocaleString()}</td><td>${d.clicks||'—'}</td><td>${ctr}</td><td>${cpc}</td><td><strong>${d.leads||'—'}</strong></td><td>${d.calls||'—'}</td><td>${cpl}</td></tr>`;
+  }).join('');
+
+  const modal = document.createElement('div');
+  modal.className = 'company-modal-overlay';
+  modal.onclick = e => { if(e.target===modal) modal.remove(); };
+  modal.innerHTML = `
+    <div class="company-modal">
+      <div class="company-modal-header">
+        <h2>📊 ${biz}</h2>
+        <button onclick="this.closest('.company-modal-overlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748b">✕</button>
+      </div>
+      <div class="company-modal-body">
+        <p style="font-size:12px;color:#64748b;margin:0 0 12px">${prog.name} · ${prog.campaign_type?.toUpperCase()} · Budget $${prog.budget_cents?(prog.budget_cents/100).toLocaleString():'N/A'}</p>
+        ${rows ? `<table class="history-table">
+          <thead><tr><th>Month</th><th>Spend</th><th>Impr</th><th>Clicks</th><th>CTR</th><th>Avg CPC</th><th>Leads</th><th>Calls</th><th>CPL</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>` : '<p style="color:#94a3b8;text-align:center;padding:30px">No historical data yet. Data accumulates as you use the dashboard each month.</p>'}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+// ── Keywords Tab ──────────────────────────────────────────────────────────────
+function handleKeywordCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => parseAndDisplayKeywords(e.target.result);
+  reader.readAsText(file);
+}
+
+function parseAndDisplayKeywords(csvText) {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) return;
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,''));
+  const rows = lines.slice(1).map(line => {
+    const cols = line.match(/(".*?"|[^,]+)/g) || [];
+    return cols.map(c => c.replace(/^"|"$/g,'').trim());
+  }).filter(r => r.length > 1);
+
+  // Store in localStorage
+  localStorage.setItem('shefa_keywords_' + (currentMonth||new Date().toISOString().slice(0,7)), JSON.stringify({headers, rows, ts: Date.now()}));
+  renderKeywordTable(headers, rows);
+}
+
+function renderKeywordTable(headers, rows) {
+  const wrap = document.getElementById('keywordTableWrap');
+  if (!wrap) return;
+  wrap.style.display = 'block';
+  // Sort by clicks desc
+  const clickIdx = headers.findIndex(h => h.toLowerCase().includes('click'));
+  if (clickIdx > 0) rows.sort((a,b) => parseInt(b[clickIdx]||0) - parseInt(a[clickIdx]||0));
+  wrap.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:#0d2d5e">🔑 Keyword Performance · ${rows.length} keywords</div>
+      <input placeholder="Search keywords..." oninput="filterKeywords(this.value)" style="padding:5px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;width:200px">
+    </div>
+    <table class="kw-table" id="kwTable">
+      <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table>
+  `;
+}
+
+function filterKeywords(q) {
+  const rows = document.querySelectorAll('#kwTable tbody tr');
+  rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'; });
+}
+
+function pullKeywordsWithSession() {
+  const token = document.getElementById('yelpSessionToken')?.value?.trim();
+  if (!token) { toast('Paste a session token first'); return; }
+  // Try fetching the reports CSV via session token
+  toast('Attempting to pull keyword data...');
+  fetch('https://biz.yelp.com/ads_stats/all_recent_month_stats', {
+    headers: { Cookie: 'biz_session=' + token }
+  }).then(r => r.json()).then(data => {
+    toast('Got response — parsing keywords...');
+    console.log('Yelp keyword response:', data);
+  }).catch(e => {
+    toast('Session pull failed (CORS) — please use CSV upload instead');
+  });
+}
+
+// ── Auto Weekly Briefing toggle ───────────────────────────────────────────────
+function toggleAutoWeekly(enabled) {
+  localStorage.setItem('shefa_auto_weekly', enabled ? '1' : '0');
+  if (enabled) toast('Auto briefing enabled — generates every Monday');
+}
+
+// Check on load if auto Monday briefing should run
+function checkAutoWeekly() {
+  const enabled = localStorage.getItem('shefa_auto_weekly') === '1';
+  const el = document.getElementById('autoWeeklyCheck');
+  if (el) el.checked = enabled;
+  if (!enabled) return;
+  const today = new Date();
+  if (today.getDay() !== 1) return; // only Monday
+  const lastRun = localStorage.getItem('shefa_auto_weekly_last');
+  const todayStr = today.toISOString().slice(0,10);
+  if (lastRun === todayStr) return;
+  localStorage.setItem('shefa_auto_weekly_last', todayStr);
+  setTimeout(() => runAnalysis(true), 3000); // auto-run after campaigns load
+}
+
+// ── Monthly Client Report ─────────────────────────────────────────────────────
+function populateReportClients() {
+  const sel = document.getElementById('reportClient');
+  if (!sel || !allPrograms?.length) return;
+  // Get unique client names (first part of campaign name)
+  const clients = [...new Set(allPrograms
+    .filter(p => p.campaign_type !== 'boost')
+    .map(p => p.name?.split(' : ')[0]?.trim())
+    .filter(Boolean)
+  )].sort();
+  sel.innerHTML = '<option value="">— Select client —</option>' + clients.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+function generateClientReport() {
+  const client = document.getElementById('reportClient')?.value;
+  const month  = document.getElementById('reportMonth')?.value;
+  if (!client) { toast('Please select a client'); return; }
+
+  const history = loadHistory();
+  const mon = month || currentMonth || new Date().toISOString().slice(0,7);
+  const data = history[mon] || allPrograms.map(p => ({
+    id:p.id,name:p.name,campaign_type:p.campaign_type,
+    spend:p.spend_cents,budget:p.budget_cents,
+    impressions:p.impressions,clicks:p.clicks,
+    leads:p.leads,calls:p.calls,messages:p.messages
+  }));
+
+  // Filter to this client's campaigns
+  const camps = data.filter(p => p.name?.startsWith(client));
+  if (!camps.length) { toast('No data found for ' + client); return; }
+
+  const totalSpend = camps.reduce((s,p)=>s+(p.spend||0),0);
+  const totalLeads = camps.reduce((s,p)=>s+(p.leads||0),0);
+  const totalCalls = camps.reduce((s,p)=>s+(p.calls||0),0);
+  const totalImpr  = camps.reduce((s,p)=>s+(p.impressions||0),0);
+  const totalClks  = camps.reduce((s,p)=>s+(p.clicks||0),0);
+  const cpl = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : '—';
+  const ctr = totalClks && totalImpr ? ((totalClks/totalImpr)*100).toFixed(2) : '—';
+  const avgCpc = totalClks && totalSpend ? (totalSpend/totalClks/100).toFixed(2) : '—';
+  const monthLabel = new Date(mon+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const budget = camps[0]?.budget_cents ? '$'+(camps[0].budget_cents/100).toLocaleString() : '—';
+
+  // Get prev month comparison
+  const allMonths = Object.keys(history).sort();
+  const prevMon = allMonths[allMonths.indexOf(mon) - 1];
+  const prevData = prevMon ? history[prevMon]?.filter(p=>p.name?.startsWith(client)) : null;
+  const prevLeads = prevData?.reduce((s,p)=>s+(p.leads||0),0);
+  const prevSpend = prevData?.reduce((s,p)=>s+(p.spend||0),0);
+  const leadsDelta = prevLeads !== undefined ? totalLeads - prevLeads : null;
+  const spendDelta = prevSpend !== undefined ? totalSpend - prevSpend : null;
+
+  const compRow = (label, cur, prev, fmt) => {
+    if (prev === undefined || prev === null) return '';
+    const delta = cur - prev;
+    const sign = delta >= 0 ? '+' : '';
+    return `<tr><td>${label}</td><td>${fmt(cur)}</td><td>${fmt(prev)}</td><td style="color:${delta>=0?'#16a34a':'#dc2626'}">${sign}${fmt(delta)}</td></tr>`;
+  };
+  const fmtN = n => (n||0).toLocaleString();
+  const fmtD = n => '$'+(Math.abs(n)/100).toLocaleString('en-US',{maximumFractionDigits:0})+(n<0?' (saved)':'');
+
+  const report = `
+    <h1>📊 Monthly Campaign Report</h1>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:20px">
+      <div><strong>Client:</strong> ${client}</div>
+      <div><strong>Period:</strong> ${monthLabel}</div>
+      <div><strong>Prepared by:</strong> Shefa Marketing</div>
+      <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+    </div>
+
+    <h2>Performance Summary</h2>
+    <div class="report-metric-grid">
+      <div class="report-metric"><div class="rv">$${(totalSpend/100).toLocaleString('en-US',{maximumFractionDigits:0})}</div><div class="rl">Total Spend</div></div>
+      <div class="report-metric"><div class="rv">${totalLeads.toLocaleString()}</div><div class="rl">Total Leads</div></div>
+      <div class="report-metric"><div class="rv">${totalCalls.toLocaleString()}</div><div class="rl">Phone Calls</div></div>
+      <div class="report-metric"><div class="rv">$${cpl}</div><div class="rl">Cost Per Lead</div></div>
+      <div class="report-metric"><div class="rv">${totalImpr.toLocaleString()}</div><div class="rl">Impressions</div></div>
+      <div class="report-metric"><div class="rv">${totalClks.toLocaleString()}</div><div class="rl">Ad Clicks</div></div>
+    </div>
+
+    ${(prevData && prevData.length) ? `
+    <h2>Month-over-Month Comparison</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:#f0f4f9">
+        <th style="padding:8px;text-align:left">Metric</th>
+        <th style="padding:8px;text-align:right">${monthLabel}</th>
+        <th style="padding:8px;text-align:right">${new Date(prevMon+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</th>
+        <th style="padding:8px;text-align:right">Change</th>
+      </tr></thead>
+      <tbody>
+        ${compRow('Total Leads', totalLeads, prevLeads, fmtN)}
+        ${compRow('Total Spend', totalSpend, prevSpend, fmtD)}
+        ${compRow('Phone Calls', totalCalls, prevData.reduce((s,p)=>s+(p.calls||0),0), fmtN)}
+      </tbody>
+    </table>` : '<p style="color:#94a3b8;font-size:12px"><em>Month-over-month comparison will appear once you have 2+ months of data.</em></p>'}
+
+    <h2>Campaign Details</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:#f0f4f9">
+        <th style="padding:8px;text-align:left">Campaign</th>
+        <th style="padding:8px;text-align:right">Budget</th>
+        <th style="padding:8px;text-align:right">Spend</th>
+        <th style="padding:8px;text-align:right">Leads</th>
+        <th style="padding:8px;text-align:right">Calls</th>
+        <th style="padding:8px;text-align:right">CPL</th>
+        <th style="padding:8px;text-align:right">Impr</th>
+        <th style="padding:8px;text-align:right">Clicks</th>
+      </tr></thead>
+      <tbody>
+        ${camps.map(p => {
+          const sp = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
+          const bg = p.budget_cents ? '$'+(p.budget_cents/100).toLocaleString() : '—';
+          const cl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : '—';
+          return `<tr style="border-bottom:1px solid #f1f5f9">
+            <td style="padding:7px 8px;font-weight:600">${p.name?.split(' : ').slice(1).join(' : ') || p.name} ${p.campaign_type==='boost'?'<span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">BOOST</span>':''}</td>
+            <td style="padding:7px 8px;text-align:right">${bg}</td>
+            <td style="padding:7px 8px;text-align:right">${sp}</td>
+            <td style="padding:7px 8px;text-align:right;font-weight:700">${p.leads||'—'}</td>
+            <td style="padding:7px 8px;text-align:right">${p.calls||'—'}</td>
+            <td style="padding:7px 8px;text-align:right">${cl}</td>
+            <td style="padding:7px 8px;text-align:right">${(p.impressions||0).toLocaleString()}</td>
+            <td style="padding:7px 8px;text-align:right">${p.clicks||'—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+
+    <div style="margin-top:24px;padding:14px;background:#f0f9ff;border-radius:8px;border-left:4px solid #3b9eff">
+      <div style="font-size:11px;font-weight:700;color:#0d2d5e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Key Takeaways</div>
+      <ul style="margin:0;padding-left:18px;font-size:12px;color:#374151;line-height:1.8">
+        <li>Generated <strong>${totalLeads}</strong> total leads at an average cost of <strong>$${cpl}</strong> per lead</li>
+        <li>Ad spend was <strong>$${(totalSpend/100).toLocaleString('en-US',{maximumFractionDigits:0})}</strong> out of a <strong>${budget}</strong> monthly budget</li>
+        <li>Ads were seen <strong>${totalImpr.toLocaleString()}</strong> times with a <strong>${ctr}%</strong> click-through rate</li>
+        ${leadsDelta !== null ? `<li>Lead volume ${leadsDelta >= 0 ? '<strong style="color:#16a34a">increased by ' + leadsDelta + '</strong>' : '<strong style="color:#dc2626">decreased by ' + Math.abs(leadsDelta) + '</strong>'} compared to last month</li>` : ''}
+      </ul>
+    </div>
+    <div style="margin-top:20px;font-size:11px;color:#94a3b8;text-align:center;border-top:1px solid #f1f5f9;padding-top:12px">
+      Report generated by Shefa Marketing Dashboard · ${new Date().toLocaleDateString()} · Data source: Yelp Advertising Platform
+    </div>
+  `;
+
+  const out = document.getElementById('reportOutput');
+  out.innerHTML = report;
+  out.style.display = 'block';
+}
+
+// ── Hook into applyReportingData to save history ──────────────────────────────
+const _origApply = applyReportingData;
+window.applyReportingData = function(data) {
+  _origApply(data);
+  saveHistorySnapshot();
+  // Also refresh analytics if tab is visible
+  const analyticsTab = document.getElementById('rtab-analytics-content');
+  if (analyticsTab?.classList.contains('active')) renderAnalytics();
+};
+
+// Run checks on load
+function initReportsSection() {
+  
+  const lastKw = Object.keys(localStorage).find(k => k.startsWith('shefa_keywords_'));
+  if (lastKw) {
+    const kd = JSON.parse(localStorage.getItem(lastKw));
+    if (kd?.headers && kd?.rows) {
+      document.getElementById('keywordTableWrap') && renderKeywordTable(kd.headers, kd.rows);
+    }
+  }
+}
 </script>
 </body>
 </html>
