@@ -433,7 +433,7 @@ function onMonthChange() {
   if (currentMonth !== thisMon) {
     // Past month selected - Reporting API not yet enabled
     const [yr, mo] = currentMonth.split('-');
-    const label = new Date(yr, mo-1).toLocaleDateString('en-US', {month:'long', year:'numeric'});
+    const label = new Date(+yr, +mo-1).toLocaleDateString('en-US', {month:'long', year:'numeric'});
     showHistoricalBanner(label, currentMonth);
   } else {
     hideHistoricalBanner();
@@ -1216,6 +1216,13 @@ function showReportTab(tab) {
   document.getElementById('rtab-' + tab + '-content')?.classList.add('active');
   if (tab === 'analytics') renderAnalytics();
   if (tab === 'reports')   populateReportClients();
+  if (tab === 'ai') {
+    const meta = document.getElementById('aiBriefMeta');
+    if (meta) {
+      const lastRun = localStorage.getItem('shefa_ai_last_run');
+      meta.textContent = lastRun ? 'Last generated: ' + new Date(+lastRun).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Load campaigns then generate your briefing.';
+    }
+  }
 }
 
 // ── History snapshot saved on every reporting data load ───────────────────────
@@ -1273,14 +1280,15 @@ function renderAnalytics() {
       <div class="summary-card"><div class="big">$${(totalSpend/100).toLocaleString('en-US',{maximumFractionDigits:0})}</div><div class="sm">Spend MTD</div></div>
       <div class="summary-card"><div class="big">${totalLeads.toLocaleString()}</div><div class="sm">Total Leads</div></div>
       <div class="summary-card"><div class="big">${totalCalls.toLocaleString()}</div><div class="sm">Total Calls</div></div>
-      <div class="summary-card"><div class="big">$${avgCPL}</div><div class="sm">Avg CPL</div></div>
+      <div class="summary-card"><div class="big">${avgCPL}</div><div class="sm">Avg CPL</div></div>
+      <div class="summary-card"><div class="big">${cur.reduce((s,p)=>s+(p.messages||0),0).toLocaleString()}</div><div class="sm">Messages</div></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:13px;font-weight:700;color:#0d2d5e">📈 Performance by Client — ${new Date(curMon+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</div>
+      <div style="font-size:13px;font-weight:700;color:#0d2d5e">📈 Performance by Client — ${(([yr,mo]) => new Date(+yr, +mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(curMon.split('-'))}</div>
       <div style="font-size:11px;color:#94a3b8">${months.length} months of history · Click card for full details</div>
     </div>
     <div class="analytics-grid">
-      ${uniqueCompanies.sort((a,b)=>(b.spend||0)-(a.spend||0)).map(p => {
+      ${uniqueCompanies.sort((a,b)=>(b.leads||0)-(a.leads||0)||(b.spend||0)-(a.spend||0)).map(p => {
         const biz = p.name?.split(' : ')[0] || p.name;
         const spend = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
         const cpl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : '—';
@@ -1322,7 +1330,7 @@ function openCompanyModal(progId) {
     const cpl = d.leads && d.spend ? '$'+(d.spend/d.leads/100).toFixed(0) : '—';
     const ctr = d.clicks && d.impressions ? ((d.clicks/d.impressions)*100).toFixed(2)+'%' : d.ctr ? d.ctr+'%' : '—';
     const cpc = d.avg_cpc ? '$'+d.avg_cpc : (d.clicks && d.spend ? '$'+(d.spend/d.clicks/100).toFixed(2) : '—');
-    const label = new Date(mon+'-01').toLocaleDateString('en-US',{month:'short',year:'numeric'});
+    const label = (([yr,mo]) => new Date(+yr,+mo-1).toLocaleDateString('en-US',{month:'short',year:'numeric'}))(mon.split('-'));
     return `<tr><td>${label}</td><td>${spend}</td><td>${(d.impressions||0).toLocaleString()}</td><td>${d.clicks||'—'}</td><td>${ctr}</td><td>${cpc}</td><td><strong>${d.leads||'—'}</strong></td><td>${d.calls||'—'}</td><td>${cpl}</td></tr>`;
   }).join('');
 
@@ -1469,7 +1477,7 @@ function generateClientReport() {
   const cpl = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : '—';
   const ctr = totalClks && totalImpr ? ((totalClks/totalImpr)*100).toFixed(2) : '—';
   const avgCpc = totalClks && totalSpend ? (totalSpend/totalClks/100).toFixed(2) : '—';
-  const monthLabel = new Date(mon+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const monthLabel = (([yr,mo]) => new Date(+yr,+mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(mon.split('-'));
   const budget = camps[0]?.budget_cents ? '$'+(camps[0].budget_cents/100).toLocaleString() : '—';
 
   // Get prev month comparison
@@ -1515,7 +1523,7 @@ function generateClientReport() {
       <thead><tr style="background:#f0f4f9">
         <th style="padding:8px;text-align:left">Metric</th>
         <th style="padding:8px;text-align:right">${monthLabel}</th>
-        <th style="padding:8px;text-align:right">${new Date(prevMon+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</th>
+        <th style="padding:8px;text-align:right">${(([yr,mo]) => new Date(+yr,+mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(prevMon.split('-'))}</th>
         <th style="padding:8px;text-align:right">Change</th>
       </tr></thead>
       <tbody>
