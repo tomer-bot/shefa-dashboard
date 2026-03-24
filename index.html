@@ -920,7 +920,7 @@ async function loadReportingData(month) {
 
     // Step 2: Get biz IDs from programs/list/all
     const listData = await yelpFn('programs/list/all', 'GET');
-    const progs = listData.payment_programs || listData.b?.payment_programs || [];
+    const progs = listData.b?.payment_programs || listData.payment_programs || [];
     const bizIds = [...new Set(progs.map(p => p.businesses?.[0]?.yelp_business_id).filter(Boolean))];
     if (!bizIds.length) return;
 
