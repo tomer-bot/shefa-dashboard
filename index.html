@@ -168,7 +168,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">↻ Refresh</button>
+    <button class="btn btn-ghost btn-sm" onclick="refreshData()">↻ Refresh</button>
     <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">↻ Sync</button>
     <button class="btn btn-ghost btn-sm" onclick="openConfig()">⚙ Config</button>
   </div>
@@ -290,6 +290,14 @@ function buildMonthSelect() {
   }
   currentMonth = sel.value;
 }
+function refreshData() {
+  // Clear reporting cache for current month so fresh data is fetched
+  const mon = currentMonth || new Date().toISOString().slice(0,7);
+  localStorage.removeItem('reporting_cache_' + mon);
+  toast('Refreshing data...');
+  loadDashboard();
+}
+
 function onMonthChange() {
   currentMonth = document.getElementById('monthSel').value;
   const now = new Date();
@@ -298,14 +306,14 @@ function onMonthChange() {
     // Past month selected - Reporting API not yet enabled
     const [yr, mo] = currentMonth.split('-');
     const label = new Date(yr, mo-1).toLocaleDateString('en-US', {month:'long', year:'numeric'});
-    showHistoricalBanner(label);
+    showHistoricalBanner(label, currentMonth);
   } else {
     hideHistoricalBanner();
     loadDashboard();
   }
 }
 
-function showHistoricalBanner(monthLabel) {
+function showHistoricalBanner(monthLabel, month) {
   let banner = document.getElementById('historicalBanner');
   if (!banner) {
     banner = document.createElement('div');
@@ -314,10 +322,14 @@ function showHistoricalBanner(monthLabel) {
     const list = document.getElementById('campaignList');
     if (list) list.parentNode.insertBefore(banner, list);
   }
-  banner.innerHTML = '<span style="font-size:18px">📅</span><div><strong>' + monthLabel + '</strong> — Historical data will be available once the Reporting API is enabled. <span style="color:#b45309">Showing current live campaign data.</span></div>';
+  banner.innerHTML = '<span style="font-size:18px">📅</span><div><strong>' + monthLabel + '</strong> — Loading historical data from Reporting API...</div>';
   banner.style.display = 'flex';
+  // Load campaigns with historical reporting data for this month
   loadDashboard();
+  // After campaigns load, trigger reporting for the selected month
+  setTimeout(() => loadReportingData(month), 1500);
 }
+
 
 function hideHistoricalBanner() {
   const banner = document.getElementById('historicalBanner');
@@ -1033,6 +1045,17 @@ function applyReportingData(reportData) {
   renderAll();
   updateKPIs();
   toast('Reporting data loaded: ' + updated + ' campaigns updated');
+  // Update banner if showing historical month
+  const banner = document.getElementById('historicalBanner');
+  if (banner && banner.style.display !== 'none') {
+    const now = new Date();
+    const thisMon = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    if (currentMonth !== thisMon) {
+      const [yr, mo] = currentMonth.split('-');
+      const label = new Date(yr, mo-1).toLocaleDateString('en-US', {month:'long', year:'numeric'});
+      banner.innerHTML = '<span style="font-size:18px">📅</span><div><strong>' + label + '</strong> — Showing historical Reporting API data. Spend, impressions, clicks, leads and calls reflect the full month.</div>';
+    }
+  }
 }
 
 </script>
