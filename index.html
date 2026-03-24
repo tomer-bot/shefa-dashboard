@@ -1,3 +1,4 @@
+const aiRunTs = Date.now(); localStorage.setItem('shefa_ai_last_run', aiRunTs);
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,12 +144,12 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .btn-ok-mod.danger{background:#d32f2f}.btn-ok-mod.danger:hover{background:#b71c1c}
 
 /* ── Reports & Analytics Section ─────────────────────────── */
-.reports-section{width:100%;background:#f0f4f9;border-top:2px solid #d0e4f7;margin-top:0;clear:both}
+.reports-section{width:100%;background:#f0f4f9;border-top:2px solid #d0e4f7;margin-top:0;clear:both;position:relative}
 .reports-tabs{display:flex;gap:0;background:#0d2d5e;padding:0 16px}
 .tab-btn{padding:10px 18px;border:none;background:transparent;color:#8ab3d4;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:.2s}
 .tab-btn:hover{color:#fff}
 .tab-btn.active{color:#fff;border-bottom-color:#3b9eff}
-.tab-content{display:none;padding:20px 16px}
+.tab-content{display:none;padding:20px 16px;min-height:420px;max-height:600px;overflow-y:auto}
 .tab-content.active{display:block}
 
 /* Analytics cards */
@@ -339,7 +340,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
         <button class="btn btn-blue btn-sm" id="analyzeBtn" onclick="runAnalysis(false)">Generate</button>
       </div>
     </div>
-    <div id="aiContent" class="ai-content" style="background:#fff;border-radius:10px;padding:16px;border:1px solid #e0ecff;min-height:120px">
+    <div id="aiContent" class="ai-content" style="background:#fff;border-radius:10px;padding:16px;border:1px solid #e0ecff;min-height:120px;max-height:480px;overflow-y:auto">
       <div class="ai-placeholder" style="color:#94a3b8;text-align:center;padding:30px">Load campaigns then click <strong>Generate</strong> for your weekly briefing.</div>
     </div>
   </div>
@@ -452,10 +453,12 @@ function showHistoricalBanner(monthLabel, month) {
   }
   banner.innerHTML = '<span style="font-size:18px">📅</span><div><strong>' + monthLabel + '</strong> — Loading historical data from Reporting API...</div>';
   banner.style.display = 'flex';
-  // Load campaigns with historical reporting data for this month
+  // Load campaigns then trigger reporting for the selected month
   loadDashboard();
-  // After campaigns load, trigger reporting for the selected month
-  setTimeout(() => loadReportingData(month), 1500);
+  setTimeout(() => {
+    toast('📅 Fetching ' + monthLabel + ' reporting data...');
+    loadReportingData(month);
+  }, 1500);
 }
 
 
