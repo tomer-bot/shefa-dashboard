@@ -966,78 +966,68 @@ async function loadReportingData(month) {
 }
 
 
-function applyReportingData(reportData, bizInfoList) {
-  // Bridge: report.data[].business_id -> bizInfoList[].yelp_business_id -> allPrograms (by address)
+function applyReportingData(reportData) {
+  // ── Definitive per-program map: allPrograms.id → Reporting API program_id ──
+  // 29/30 matched. Mission 475 Gough (7_5g6jLCRkY7) = different Yelp biz, no data.
+  const ALLPROG_TO_REPORT = {
+    '_sZA3BJl7twy01kXTzjbwQ': '21LYbVh_2gSwDcRJKTbP0g', // Roof by Tom : 1990 N Californi (boost)
+    'UVAoRCMIgEUuRWPBWQOhTg': 'qUxDn9r0_Z5i0g4CUrkOeQ', // Skybar Construction (boost)
+    'lM5K5vOIfgIrDEd_2hNKiQ': '8J0ZqsL8Pfiqi2YArlcMXA', // JMS Air Conditioning and Heati (boost)
+    'tV1VR1QwPJTdHNn2kK6ABw': 'IKLardM2G2JKrE8lFRJ5BQ', // Prodigy Moving & Storage : 601 (main)
+    'srmB3uxc2AkBRycy7md_5w': 'oVGbY1NF-M79tW1WDrHIeQ', // Star Steel : 16131 Valerio St (main)
+    'a0D2QGetwHNw3dFOUxNMjQ': 'yHu3hDmBjfj85oejb7aJnQ', // Prodigy Moving & Storage : 934 (main)
+    '2_7dBwMfEceDvMNKA7t_BA': 'GDGhpCQc0Bp_8GeKP45fPA', // Quality Home Remodeling (main)
+    '2uhrsdQTdbe9xi-M9PboFQ': '9ypuDOnVfs_2whJWwVV6Wg', // Green Rodent Restoration : 982 (main)
+    '6AQ__Lm482ppQ759xhruCA': '8T4_MoW-GkTkfvpO3yJmGw', // Sequoia Flooring : 14701 Oxnar (main)
+    'IEqquR3LRqMJNVo0Ajthaw': 'ZUwsnL2r0bibdzFxieSI7A', // A1 Pro Clean Carpet & Upholste (main)
+    'VvEH6vIIZIHumtDPuCqo6w': 'rcHHhJtBB0PLrpP4J318ag', // Alpha Pro Builders : 143 N Arn (main)
+    '5orEWCAGeJCI3KC2c7Nn6w': '5w5D-HMBytsHp2__nTal1A', // Sequoia Flooring (main)
+    'EOspmIDzGsejW7yOzTZDMg': '3iCSTWhsY2vug625bTT0TA', // Sequoia Flooring (main)
+    'XzoOIBHJ4ae5fbzgeevwUQ': 'AnGs5q_ElDY6CMb2uplbEw', // My Cali Builders : 24021 Friar (main)
+    '8djfCpUXTwOLOX8JaEHLvw': 'LCSMx90o8cx0glZw3Sc4Gw', // Prodigy Moving & Storage - San (main)
+    'SJ_BBCVtm-96p8qz72Ub-g': 'cW1wWaoJi52u573SpPXFWw', // LYD Construction : 4055 Lake W (main)
+    'ybllwJ-CLRNg5BAE76Q5FA': 'oySUD0b2BCwbheQGLUMDnA', // First Garage Door and Gates :  (main)
+    'tGk50TzJPSpGzEY2lsPSLg': 'yVGd_JetoOHx7FOU1196jg', // Aldan Construction & Remodelin (main)
+    'hT3ssiBBja5ADp0FpjemhQ': 'clrB1NquYLeYkHmpFAD6mA', // Excalibur Moving & Storage : 1 (main)
+    'egvDaoU-01vKvFjMOqK5xg': 'O-pD0H_SsQ5omqAT0Pz2Bg', // Excalibur Moving Company : 529 (main)
+    'n60cotZPuu5Q6ZBhXqTdUg': 'nORg9rvIuQ8NncZmEH0MiQ', // J & I Home Design (main)
+    'dC23JimQ1IpVvmoM6HSMOQ': 'LUDcPewDoWEjzM-KxUjwsQ', // NearMe Roofing Company : 2727  (main)
+    'GVMBlmZrhIYO9bYYsOlZ-Q': 'ipSFVVUqMwK0LyzEkXKD1Q', // Mission Home Remodeling : 405  (main)
+    'zg-Tn4_mBR6CdCfyU9QtIw': 'tpTk_IdFBsMExQc6iGMImA', // Skybar Construction (main)
+    'IVQ0WGXnjp-MNJfYP47XDA': '91T5pz_m0W5JugKRn8J_6A', // JMS Air Conditioning and Heati (main)
+    '5_rIOWR2WRAkKyRnd0Cl6w': '-oP9KUWepruL3RjONSsWnw', // Marina Bay Roofing : 4411 Gear (main)
+    'g0aGLbA5PnpQXA9vzUetsg': 'Gkowd9GgpA22QhL9YQe7KQ', // Roof by Tom : 1990 N Californi (main)
+    'NEK7Y1Yg_Ari8lw7AOrgZQ': 'yHu3hDmBjfj85oejb7aJnQ', // Prodigy Moving & Storage (main)
+    'vSnFEC7jCZ33-G9W1EAoDw': '8oAyz9XfJJTsOBbnblbW_A', // Green Rodent Restoration (boost)
+  };
+
   const bizData = reportData.data || [];
   if (!bizData.length) { toast('No reporting data returned'); return; }
 
-  // Manual yelp_biz_id -> allPrograms.id overrides for unresolvable name/address mismatches
-  const MANUAL_BIZ_TO_PROG = {
-    '7Qn8pUzqA5pa_-8mBz7pnQ': 'NEK7Y1Yg_Ari8lw7AOrgZQ', // Prodigy Oso Ave -> Prodigy Moving & Storage
-    'OKTDIp5pVd9GoFn-0aqn9g': '7_5g6jLCRkY7BKNqC068NA', // Mission Home Remodeling 405 Primrose -> 475 Gough
-    'EJwXV2feVgad1LqQ5sHbEw': '6AQ__Lm482ppQ759xhruCA', // Sequoia Flooring 14701 Oxnard -> Sequoia Flooring
-  };
-
-  // Build yelp_biz_id -> allPrograms entry via address matching
-  const addrToAllProg = {};
-  allPrograms.forEach(p => {
-    const parts = p.name.split(' : ');
-    if (parts.length >= 2) {
-      const addr = parts[parts.length-1].trim().toLowerCase();
-      if (addr) addrToAllProg[addr] = p;
-    }
-  });
-  const nameToAllProg = {};
-  allPrograms.forEach(p => {
-    const n = p.name.split(' : ')[0].trim().toLowerCase();
-    nameToAllProg[n] = p;
-  });
-
-  const bizIdToAllProg = {};
-  (bizInfoList || []).forEach(biz => {
-    const addr = (biz.address1 || '').trim().toLowerCase();
-    let match = addr ? addrToAllProg[addr] : null;
-    if (!match) {
-      const n = (biz.name || '').toLowerCase();
-      match = nameToAllProg[n] || Object.values(nameToAllProg).find(p => {
-        const pn = p.name.split(' : ')[0].toLowerCase();
-        return p.name.toLowerCase().startsWith(n) || n.startsWith(pn) ||
-               pn.includes(n.split(' ')[0]) || n.includes(pn.split(' ')[0]);
-      });
-    }
-    if (match) bizIdToAllProg[biz.yelp_business_id] = match;
-  });
-
-  // Apply manual overrides
-  Object.entries(MANUAL_BIZ_TO_PROG).forEach(([bizId, progId]) => {
-    const prog = allPrograms.find(p => p.id === progId);
-    if (prog) bizIdToAllProg[bizId] = prog;
-  });
-
-  // Apply report metrics
-  let updated = 0;
+  // Build reporting_prog_id → metrics map
+  const progMetrics = {};
   bizData.forEach(biz => {
-    const prog = bizIdToAllProg[biz.business_id];
-    if (!prog) return;
-    let impressions = 0, clicks = 0, calls = 0, messages = 0, adCost = 0;
-    biz.metrics?.forEach(m => {
-      m.programs?.forEach(p => {
-        impressions += p.billed_impressions || 0;
-        clicks      += p.billed_clicks || 0;
-        calls       += p.ad_driven_calls || 0;
-        messages    += p.ad_driven_messages_to_business || 0;
-        adCost      += p.ad_cost?.cost || 0;
-      });
+    (biz.metrics || []).forEach(m => {
+      (m.programs || []).forEach(p => { progMetrics[p.program_id] = p; });
     });
-    prog.impressions = impressions || prog.impressions || 0;
-    prog.clicks      = clicks      || prog.clicks || 0;
-    prog.calls       = calls;
-    prog.messages    = messages;
-    prog.leads       = calls + messages;
-    if (adCost)                     prog.spend_cents = adCost;
-    if (clicks && adCost)           prog.avg_cpc = (adCost / clicks / 100).toFixed(2);
-    if (clicks && impressions)      prog.ctr = ((clicks / impressions) * 100).toFixed(2);
+  });
+
+  let updated = 0;
+  allPrograms.forEach(prog => {
+    const reportProgId = ALLPROG_TO_REPORT[prog.id];
+    const m = reportProgId ? progMetrics[reportProgId] : null;
+    if (!m) return;
     updated++;
+    prog.impressions = m.billed_impressions  || prog.impressions || 0;
+    prog.clicks      = m.billed_clicks       || prog.clicks || 0;
+    prog.calls       = m.ad_driven_calls     || 0;
+    prog.messages    = m.ad_driven_messages_to_business || 0;
+    prog.leads       = prog.calls + prog.messages;
+    const cost = m.ad_cost?.cost || 0;
+    if (cost) prog.spend_cents = cost;
+    if (prog.clicks && cost)             prog.avg_cpc = (cost / prog.clicks / 100).toFixed(2);
+    if (prog.clicks && prog.impressions) prog.ctr     = ((prog.clicks / prog.impressions) * 100).toFixed(2);
+    if (prog.campaign_type === 'layered') prog.campaign_type = 'boost';
   });
 
   renderAll();
