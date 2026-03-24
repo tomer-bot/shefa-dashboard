@@ -568,7 +568,7 @@ function updateKPIs() {
   const active = allPrograms.filter(p => p.status === 'ACTIVE');
   const spend  = allPrograms.reduce((s,p) => s + (p.spend_cents||0), 0) / 100;
   const leads  = allPrograms.reduce((s,p) => s + (p.leads||0), 0);
-  const calls  = allPrograms.reduce((s,p) => s + (p.calls||0) + (p.messages||0), 0);
+  const calls  = allPrograms.reduce((s,p) => s + (p.calls||0), 0);
   const convs  = leads + calls;
   document.getElementById('kpi_clients').textContent = active.length;
   document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString('en',{maximumFractionDigits:0}) : '—';
@@ -924,7 +924,7 @@ async function loadReportingData(month) {
       const r = await yelpFn('reporting/monthly/poll/' + reportId + '?fusion_key=' + encodeURIComponent(fusionKey), 'GET');
       const data = r.b || r;
       if (data?.error?.code === 'JOB_NOT_COMPLETE') {
-        if (attempts < 40) setTimeout(poll, 60000); // retry in 60s
+        if (attempts < 8) setTimeout(poll, 300000); // retry every 5 min
         return;
       }
       // Step 4: Map results back to allPrograms
@@ -937,7 +937,7 @@ async function loadReportingData(month) {
     const bizInfoList = bizInfoRes?.b?.businesses || bizInfoRes?.businesses || [];
     applyReportingData(data, bizInfoList);
     };
-    setTimeout(poll, 30000); // first poll after 30s
+    setTimeout(poll, 90000); // first poll after 90s
 
   } catch(e) { console.error('Reporting API error:', e); }
 }
@@ -968,9 +968,11 @@ function applyReportingData(reportData, bizInfoList) {
     let match = addr ? addrToAllProg[addr] : null;
     if (!match) {
       const n = (biz.name || '').toLowerCase();
-      match = nameToAllProg[n] || Object.values(nameToAllProg).find(p =>
-        p.name.toLowerCase().startsWith(n) || n.startsWith(p.name.split(' : ')[0].toLowerCase())
-      );
+      match = nameToAllProg[n] || Object.values(nameToAllProg).find(p => {
+        const pn = p.name.split(' : ')[0].toLowerCase();
+        return p.name.toLowerCase().startsWith(n) || n.startsWith(pn) ||
+               pn.includes(n.split(' ')[0]) || n.includes(pn.split(' ')[0]);
+      });
     }
     if (match) bizIdToAllProg[biz.yelp_business_id] = match;
   });
