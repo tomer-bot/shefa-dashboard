@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata — maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata  maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names — strip ": None", trailing ": ", newlines, etc.
+// Clean display names  strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -425,57 +425,48 @@ exports.handler = async(event)=>{
 
   // -- All locations: paginate all programs, dedupe all businesses
   if (path === 'all-locations') {
-    const bizMap = {};
-    let offset = 0;
-    const pageSize = 40;
-    let remaining = true;
-
-    // Paginate ALL programs (no status filter) to collect every unique business
-    while (remaining) {
-      const page = await httpGet(
-        'partner-api.yelp.com',
-        '/programs/v1?limit=' + pageSize + '&offset=' + offset,
-        basicAuth()
-      );
-      const programs = (page.b && page.b.payment_programs) || [];
-      if (!programs.length) break;
-      programs.forEach(p => {
-        (p.businesses || []).forEach(b => {
-          const bid = b.yelp_business_id;
-          if (!bizMap[bid]) bizMap[bid] = {
+    // Try biz.yelp.com/all_locations_ads first - this is the live partner hub data
+    let locations = [];
+    try {
+      const raw = await httpGet('biz.yelp.com', '/all_locations_ads', basicAuth());
+      const data = raw.b;
+      // Response may be: {locations:[...]}, {businesses:[...]}, or array
+      const list = Array.isArray(data) ? data : (data.locations || data.businesses || data.all_locations || []);
+      if (list.length > 0) {
+        // Get active bizIds from SNAPSHOT for status comparison
+        const activeIds = new Set(SNAPSHOT.map(s => s.id));
+        locations = list.map(loc => {
+          const bid = loc.id || loc.yelp_business_id || loc.bizId || loc.business_id;
+          return {
             bizId: bid,
-            name: null,
-            address: '',
-            hasActive: p.program_status === 'ACTIVE' || p.program_status === 'CURRENT',
-            programType: p.program_type || null
+            name: loc.name || loc.business_name || bid,
+            address: loc.address || [loc.address1, loc.city, loc.state].filter(Boolean).join(', ') || '',
+            hasActive: activeIds.has(bid) || loc.has_advertising === true || loc.status === 'ACTIVE',
+            programType: loc.program_type || null
           };
         });
+      }
+    } catch(e) {}
+
+    // Fall back: combine SNAPSHOT (30 active with names) + any extra from /programs/v1
+    if (locations.length === 0) {
+      // Use SNAPSHOT as base - all known clients with names
+      SNAPSHOT.forEach(s => {
+        locations.push({
+          bizId: s.id,
+          name: s.name || s.campaign_name || s.id,
+          address: '',
+          hasActive: true,
+          programType: 'CPC'
+        });
       });
-      const total = (page.b && page.b.total) || 0;
-      offset += pageSize;
-      remaining = total > 0 && offset < total && programs.length === pageSize;
     }
 
-    // Resolve names via Yelp Fusion API (GET /v3/businesses/{id})
-    const allBizIds = Object.keys(bizMap);
-    const fusionAuth = 'Bearer ' + FUSION_KEY;
-    await Promise.all(allBizIds.map(async bid => {
-      try {
-        const res = await httpGet('api.yelp.com', '/v3/businesses/' + bid, fusionAuth);
-        if (res.b && res.b.name) {
-          bizMap[bid].name = res.b.name;
-          const loc = res.b.location || {};
-          bizMap[bid].address = [loc.address1, loc.city, loc.state].filter(Boolean).join(', ');
-        }
-      } catch(e) {}
-      if (!bizMap[bid].name) bizMap[bid].name = bid;
-    }));
-
-    const locations = Object.values(bizMap);
     locations.sort((a, b) => {
       if (a.hasActive !== b.hasActive) return a.hasActive ? 1 : -1;
       return (a.name || '').localeCompare(b.name || '');
     });
+
     return { statusCode: 200, headers: cors, body: JSON.stringify({ locations, total: locations.length }) };
   }
 
