@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -202,8 +202,8 @@ exports.handler = async(event)=>{
   }
 
   // --- Reporting API v3 (correct endpoints) ---
-  // POST reporting/daily  Ã¢ÂÂ create daily report
-  // POST reporting/monthly Ã¢ÂÂ create monthly report  
+  // POST reporting/daily  â create daily report
+  // POST reporting/monthly â create monthly report  
   if (path === 'reporting/daily' || path === 'reporting/monthly') {
     const endpoint = path === 'reporting/daily'
       ? '/v3/reporting/businesses/daily'
@@ -262,7 +262,7 @@ exports.handler = async(event)=>{
   }
 
 
-  // ── Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} ──
+  //  Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} 
   if (path === 'reporting/monthly/create') {
     const { month, ids, fusion_key } = body;
     if (!fusion_key || !ids?.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing fusion_key or ids' }) };
@@ -276,7 +276,7 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // ── Reporting API: GET reporting/monthly/poll/{report_id}  ──────────────────
+  //  Reporting API: GET reporting/monthly/poll/{report_id}  
   if (path.startsWith('reporting/monthly/poll/')) {
     const reportId = path.split('/')[3];
     const fusion_key = body?.fusion_key || req.headers?.['x-fusion-key'] || '';
@@ -287,7 +287,7 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // ── Programs list all (for biz encid mapping) ─────────────────────────────
+  //  Programs list all (for biz encid mapping) 
   if (path === 'programs/list/all') {
     const r = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&program_status=CURRENT', basicAuth());
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
@@ -431,8 +431,8 @@ exports.handler = async(event)=>{
     let total = 9999;
     while (offset < total) {
       const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit='+pageSize+'&offset='+offset+'&program_status=CURRENT', basicAuth());
-      const programs = page.programs || page.payment_programs || [];
-      if (typeof page.total === 'number') total = page.total;
+      const programs = (page.b && page.b.payment_programs) || [];
+      if (page.b && typeof page.b.total === 'number') total = page.b.total;
       if (!programs.length) break;
       programs.forEach(p => {
         (p.businesses || []).forEach(b => {
