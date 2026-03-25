@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -202,8 +202,8 @@ exports.handler = async(event)=>{
   }
 
   // --- Reporting API v3 (correct endpoints) ---
-  // POST reporting/daily  ÃÂ¢ÃÂÃÂ create daily report
-  // POST reporting/monthly ÃÂ¢ÃÂÃÂ create monthly report  
+  // POST reporting/daily  ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ create daily report
+  // POST reporting/monthly ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ create monthly report  
   if (path === 'reporting/daily' || path === 'reporting/monthly') {
     const endpoint = path === 'reporting/daily'
       ? '/v3/reporting/businesses/daily'
@@ -262,7 +262,7 @@ exports.handler = async(event)=>{
   }
 
 
-  // ââ Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} ââ
+  // Ã¢ÂÂÃ¢ÂÂ Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} Ã¢ÂÂÃ¢ÂÂ
   if (path === 'reporting/monthly/create') {
     const { month, ids, fusion_key } = body;
     if (!fusion_key || !ids?.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing fusion_key or ids' }) };
@@ -276,7 +276,7 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // ââ Reporting API: GET reporting/monthly/poll/{report_id}  ââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ Reporting API: GET reporting/monthly/poll/{report_id}  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   if (path.startsWith('reporting/monthly/poll/')) {
     const reportId = path.split('/')[3];
     const fusion_key = body?.fusion_key || req.headers?.['x-fusion-key'] || '';
@@ -287,14 +287,14 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // ââ Programs list all (for biz encid mapping) âââââââââââââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ Programs list all (for biz encid mapping) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   if (path === 'programs/list/all') {
     const r = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&program_status=CURRENT', basicAuth());
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
 
-  // ── Program Feature API routes ──────────────────────────────────
+  // ââ Program Feature API routes ââââââââââââââââââââââââââââââââââ
   if (path.startsWith('features/')) {
     const parts = path.split('/');
     const action = parts[1];
@@ -370,6 +370,45 @@ exports.handler = async(event)=>{
       const d = await r.json();
       return {statusCode:200,headers:cors,body:JSON.stringify(d)};
     }
+  }
+
+
+  // ── Create Program (CPC / EP / BP / Layered) ──────────────────
+  if (path === 'create' && method === 'POST') {
+    const body = JSON.parse(event.body || '{}');
+    const { bizId, programType, budget, maxBid, isAutobid, start, end } = body;
+    if (!bizId || !programType) return {statusCode:400,headers:cors,body:JSON.stringify({error:'bizId and programType required'})};
+
+    const auth = 'Basic ' + btoa(user + ':' + pass);
+    const baseUrl = 'https://partner-api.yelp.com/v1/reseller/program/create';
+    const results = [];
+
+    // Helper: build query string for a single program
+    async function createProgram(pType, bgt, mbid, autobid) {
+      let url = baseUrl + '?business_id=' + encodeURIComponent(bizId) + '&program_name=' + pType;
+      if (start) url += '&start=' + start;
+      if (end)   url += '&end='   + end;
+      if (pType === 'CPC') {
+        url += '&budget=' + Math.round((bgt||0)*100);
+        url += '&is_autobid=' + (autobid ? 'true' : 'false');
+        if (!autobid && mbid) url += '&max_bid=' + Math.round((mbid||0)*100);
+      }
+      const r = await fetch(url, { method:'POST', headers:{ Authorization: auth, Accept:'application/json' } });
+      return await r.json();
+    }
+
+    if (programType === 'LAYERED') {
+      // Layered = CPC + EP together
+      const cpcRes = await createProgram('CPC', budget, maxBid, isAutobid);
+      const epRes  = await createProgram('EP');
+      results.push({ type:'CPC', result: cpcRes });
+      results.push({ type:'EP',  result: epRes });
+    } else {
+      const res = await createProgram(programType, budget, maxBid, isAutobid);
+      results.push({ type: programType, result: res });
+    }
+
+    return {statusCode:200, headers:cors, body:JSON.stringify({success:true, results})};
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
