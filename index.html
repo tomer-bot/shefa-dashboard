@@ -1806,19 +1806,38 @@ function openLaunch() {
   document.getElementById('launchResult').className='launch-result';
   document.getElementById('launchStart').value = new Date().toISOString().split('T')[0];
   const sel = document.getElementById('launchBizSelect');
-  sel.innerHTML = '<option value="">Loading...</option>';
-  const list = window.allPrograms || [];
-  if(list.length) { _fillLaunchBiz(sel, list); }
-  else { yelpFn('programs','GET').then(res=>_fillLaunchBiz(sel,Array.isArray(res)?res:(res.programs||[]))).catch(()=>{sel.innerHTML='<option value="">Error - try again</option>';}); }
+  sel.innerHTML = '<option value="">Loading all locations...</option>';
+  yelpFn('all-locations','GET')
+    .then(res => _fillLaunchBiz(sel, res.locations||[]))
+    .catch(()=>{ sel.innerHTML='<option value="">Error loading locations</option>'; });
 }
-function _fillLaunchBiz(sel, list) {
-  sel.innerHTML = '<option value="">-- Select a business --</option>';
-  list.filter(c=>!c.status||c.status==='ACTIVE').forEach(c=>{
-    const opt = document.createElement('option');
-    opt.value = c.id || c.bizId;
-    opt.textContent = c.name + ' ($'+((c.budget_cents||0)/100).toLocaleString()+'/mo)';
-    sel.appendChild(opt);
-  });
+function _fillLaunchBiz(sel, locs) {
+  sel.innerHTML = '<option value="">-- Select a location (' + locs.length + ' total) --</option>';
+  // Group: no active program first (available to launch), then those with active
+  const available = locs.filter(l=>!l.hasActive);
+  const active    = locs.filter(l=>l.hasActive);
+  if(available.length) {
+    const grp1 = document.createElement('optgroup');
+    grp1.label = 'Available to Launch (' + available.length + ')';
+    available.forEach(l=>{
+      const o=document.createElement('option');
+      o.value=l.bizId;
+      o.textContent=l.name + (l.address?' - '+l.address:'');
+      grp1.appendChild(o);
+    });
+    sel.appendChild(grp1);
+  }
+  if(active.length) {
+    const grp2 = document.createElement('optgroup');
+    grp2.label = 'Already Active (' + active.length + ') - Add-on only';
+    active.forEach(l=>{
+      const o=document.createElement('option');
+      o.value=l.bizId;
+      o.textContent=l.name + ' ['+l.programType+']' + (l.address?' - '+l.address:'');
+      grp2.appendChild(o);
+    });
+    sel.appendChild(grp2);
+  }
 }
 function closeLaunch() {
   document.getElementById('launchModal').classList.remove('open');
@@ -1889,7 +1908,7 @@ async function submitLaunch() {
     <div class="launch-field">
       <label>Business (select from active clients)</label>
       <select id="launchBizSelect" onchange="onLaunchBizChange()">
-        <option value="">-- Select a business --</option>
+        <option value="">-- Select a location --</option>
       </select>
     </div>
     <div class="launch-type-grid">
