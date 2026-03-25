@@ -1812,31 +1812,40 @@ function openLaunch() {
     .catch(()=>{ sel.innerHTML='<option value="">Error loading locations</option>'; });
 }
 function _fillLaunchBiz(sel, locs) {
-  sel.innerHTML = '<option value="">-- Select a location (' + locs.length + ' total) --</option>';
-  // Group: no active program first (available to launch), then those with active
+  sel.innerHTML = '';
   const available = locs.filter(l=>!l.hasActive);
   const active    = locs.filter(l=>l.hasActive);
+
   if(available.length) {
-    const grp1 = document.createElement('optgroup');
-    grp1.label = 'Available to Launch (' + available.length + ')';
+    const grp = document.createElement('optgroup');
+    grp.label = 'Available to Launch ('+available.length+')';
     available.forEach(l=>{
       const o=document.createElement('option');
-      o.value=l.bizId;
-      o.textContent=l.name + (l.address?' - '+l.address:'');
-      grp1.appendChild(o);
+      o.value=l.bizId; o.textContent=l.name+(l.address?' - '+l.address.substring(0,30):'');
+      grp.appendChild(o);
     });
-    sel.appendChild(grp1);
+    sel.appendChild(grp);
   }
+
   if(active.length) {
     const grp2 = document.createElement('optgroup');
-    grp2.label = 'Already Active (' + active.length + ') - Add-on only';
+    grp2.label = 'Already Active ('+active.length+') - Add-on or upgrade';
     active.forEach(l=>{
       const o=document.createElement('option');
-      o.value=l.bizId;
-      o.textContent=l.name + ' ['+l.programType+']' + (l.address?' - '+l.address:'');
+      o.value=l.bizId; o.textContent=l.name+(l.programType?' ['+l.programType+']':'');
       grp2.appendChild(o);
     });
     sel.appendChild(grp2);
+  }
+
+  if(!locs.length) {
+    const o=document.createElement('option');
+    o.value=''; o.textContent='-- No locations found --';
+    sel.appendChild(o);
+  } else {
+    const placeholder = document.createElement('option');
+    placeholder.value=''; placeholder.textContent='-- Select a location ('+locs.length+' total) --';
+    sel.insertBefore(placeholder, sel.firstChild);
   }
 }
 function closeLaunch() {
@@ -1854,7 +1863,7 @@ function selectLaunchType(type, el) {
 function onLaunchBizChange() {}
 
 async function submitLaunch() {
-  const bizId  = document.getElementById('launchBizSelect').value;
+  const manualBiz = document.getElementById('launchManualBiz'); const bizId = (manualBiz && manualBiz.closest('div').style.display!=='none' && manualBiz.value.trim()) ? manualBiz.value.trim() : document.getElementById('launchBizSelect').value;
   const budget = parseFloat(document.getElementById('launchBudget').value)||0;
   const maxBid = parseFloat(document.getElementById('launchMaxBid').value)||0;
   const start  = document.getElementById('launchStart').value;
@@ -1951,7 +1960,15 @@ async function submitLaunch() {
         <input type="date" id="launchEnd">
       </div>
     </div>
-    <div id="launchResult" class="launch-result"></div>
+    <div class="launch-field" id="launchManualField" style="display:none">
+      <label>Or enter Business ID manually</label>
+      <input type="text" id="launchManualBiz" class="adv-input" placeholder="Paste Yelp Business ID (e.g. _sZA3BJl7twy01kXTzjbwQ)">
+      <div class="launch-hint">Find it in your Yelp Partner Hub or from an existing campaign URL</div>
+    </div>
+    <label style="font-size:11px;color:#8aa5c0;cursor:pointer;margin-bottom:8px;display:block">
+      <input type="checkbox" onchange="document.getElementById('launchManualField').style.display=this.checked?'block':'none';document.getElementById('launchBizSelect').style.display=this.checked?'none':'block'">
+      Enter Business ID manually instead
+    </label><div id="launchResult" class="launch-result"></div>
     <div class="launch-actions">
       <button class="launch-btn-cancel" onclick="closeLaunch()">Cancel</button>
       <button class="launch-btn-go" id="launchGoBtn" onclick="submitLaunch()">&#128640; Launch</button>
