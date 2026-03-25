@@ -8,7 +8,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#eef4fc;color:#1a2b45;font-size:13px;min-height:100vh}
 
-/* ── Topbar ── */
+/* ââ Topbar ââ */
 .topbar{background:#0d2d5e;border-bottom:2px solid #0a2348;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .topbar h1{font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px}
 .topbar-right{display:flex;gap:8px;align-items:center}
@@ -21,28 +21,28 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .btn-sm{padding:3px 8px;font-size:11px}
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
 
-/* ── KPI strip ── */
+/* ââ KPI strip ââ */
 .kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:14px 20px;background:#fff;border-bottom:1px solid #d0e4f7}
 .kpi{background:#f5f9ff;border:1px solid #d0e4f7;border-radius:8px;padding:12px;text-align:center}
 .kpi-val{font-size:22px;font-weight:800;color:#0d2d5e;line-height:1}
 .kpi-lbl{font-size:10px;color:#5a7a9a;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 .kpi-sub{font-size:10px;color:#1a73e8;margin-top:2px}
 
-/* ── Layout ── */
+/* ââ Layout ââ */
 .main{display:grid;grid-template-columns:1fr 340px;height:calc(100vh - 162px)}
 .campaigns-panel{max-height:calc(100vh - 320px);overflow-y:auto;border-right:1px solid #d0e4f7}
 .panel-header{padding:10px 20px;border-bottom:1px solid #d0e4f7;display:flex;align-items:center;gap:8px;background:#f5f9ff;position:sticky;top:0;z-index:10}
 .search-box{flex:1;background:#fff;border:1px solid #c8dcf0;border-radius:6px;padding:5px 10px;color:#1a2b45;font-size:12px}
 .search-box::placeholder{color:#8aa5c0}
 
-/* ── Campaign table columns ── */
+/* ââ Campaign table columns ââ */
 /* expand | name | status | budget | spend+bar | impr | clicks | CTR | CPC | leads | calls | CPL | actions */
 .tbl-head{display:grid;grid-template-columns:28px 1fr 64px 76px 110px 60px 56px 52px 60px 50px 50px 58px 90px;gap:0;padding:6px 20px;background:#edf4fc;border-bottom:1px solid #c8dcf0;position:sticky;top:41px;z-index:9}
 .tbl-head span{font-size:9px;font-weight:600;color:#5a7a9a;text-transform:uppercase;letter-spacing:.5px;text-align:right}
 .tbl-head span:nth-child(2){text-align:left}
 .tbl-head span:nth-child(1){text-align:center}
 
-/* ── Client group (parent row) ── */
+/* ââ Client group (parent row) ââ */
 .client-group{border-bottom:2px solid #d0e4f7}
 .group-row{display:grid;grid-template-columns:28px 1fr 64px 76px 110px 60px 56px 52px 60px 50px 50px 58px 90px;gap:0;padding:9px 20px;align-items:center;cursor:pointer;background:#fff;transition:background .12s}
 .group-row:hover{background:#f0f7ff}
@@ -54,7 +54,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .group-aggregate{font-size:11px;font-weight:600;color:#2a4a6a;text-align:right}
 .group-agg-lbl{font-size:9px;color:#8aa5c0}
 
-/* ── Campaign child rows ── */
+/* ââ Campaign child rows ââ */
 .campaign-rows{display:none}
 .group-row.open ~ .campaign-rows{display:block}
 .camp-row{display:grid;grid-template-columns:28px 1fr 64px 76px 110px 60px 56px 52px 60px 50px 50px 58px 90px;gap:0;padding:7px 20px 7px 36px;align-items:center;background:#f8fbff;border-top:1px solid #e8f1fc;transition:background .1s}
@@ -64,24 +64,24 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .camp-type-layered{font-size:9px;padding:1px 5px;border-radius:3px;background:#fef3c7;color:#92400e;font-weight:600;margin-left:5px}
 .bot-tag{display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle;letter-spacing:.5px}
 
-/* ── Metric cells ── */
+/* ââ Metric cells ââ */
 .mc{text-align:right;padding:0 4px}
 .mc-val{font-size:12px;font-weight:600;color:#1a2b45}
 .mc-dim{font-size:12px;color:#8aa5c0}
 
-/* ── Spend bar ── */
+/* ââ Spend bar ââ */
 .spend-wrap{padding:0 4px}
 .spend-val{font-size:12px;font-weight:600;color:#1a2b45;text-align:right}
 .spend-bar-bg{height:3px;background:#e0eaf8;border-radius:2px;margin-top:3px}
 .spend-bar-fill{height:3px;border-radius:2px;background:#1a73e8;transition:width .3s}
 .spend-bar-fill.over{background:#e53935}
 
-/* ── Status tags ── */
+/* ââ Status tags ââ */
 .tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700;display:inline-block}
 .tag-active{background:#d1fae5;color:#065f46}
 .tag-paused{background:#fee3c0;color:#92400e}
 
-/* ── Detail panel (expanded) ── */
+/* ââ Detail panel (expanded) ââ */
 .camp-detail{background:#f0f7ff;border-top:1px solid #d0e4f7;padding:12px 20px 12px 36px;display:none}
 .camp-detail.open{display:block}
 .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
@@ -91,7 +91,36 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .controls-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .budget-input{background:#fff;border:1px solid #c8dcf0;color:#1a2b45;padding:4px 8px;border-radius:6px;font-size:12px;width:90px}
 
-/* ── AI panel ── */
+/* ââ AI panel ââ */
+
+.adv-toggle{background:#e8f0fb;border:1px solid #b8d0f0;color:#0d2d5e;font-size:11px;padding:3px 10px;border-radius:5px;cursor:pointer;margin-left:4px}
+.adv-toggle:hover{background:#d0e4fb}
+.adv-panel{display:none;background:#f8fbff;border:1px solid #c8dcf0;border-radius:8px;padding:12px;margin-top:8px}
+.adv-panel.open{display:block}
+.adv-tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.adv-tab{padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;border:1px solid #c8dcf0;background:#fff;color:#4a6a8a}
+.adv-tab.active{background:#0d2d5e;color:#fff;border-color:#0d2d5e}
+.adv-section{display:none}.adv-section.active{display:block}
+.adv-label{font-size:11px;font-weight:600;color:#0d2d5e;margin-bottom:4px;display:block}
+.adv-hint{font-size:10px;color:#8aa5c0;margin-bottom:6px;margin-top:0}
+.adv-input{width:100%;background:#fff;border:1px solid #c8dcf0;color:#1a2b45;padding:5px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;margin-bottom:6px}
+.adv-btn{background:#0d2d5e;color:#fff;border:none;padding:5px 14px;border-radius:6px;font-size:11px;cursor:pointer;margin-right:4px;margin-bottom:4px}
+.adv-btn:hover{background:#1a4a8a}.adv-btn.red{background:#c0392b}.adv-btn.red:hover{background:#a93226}
+.adv-tag-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;min-height:10px}
+.adv-tag{background:#ddeeff;color:#0d2d5e;font-size:11px;padding:2px 8px;border-radius:10px;display:flex;align-items:center;gap:4px}
+.adv-tag span{cursor:pointer;color:#c0392b;font-weight:700}
+.adv-grid-day{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px}
+.adv-day{text-align:center;font-size:10px;padding:4px 2px;border-radius:4px;cursor:pointer;border:1px solid #c8dcf0;background:#fff;color:#4a6a8a}
+.adv-day.on{background:#0d2d5e;color:#fff;border-color:#0d2d5e}
+.adv-hours{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin-top:4px}
+.adv-hour{text-align:center;font-size:9px;padding:3px 1px;border-radius:3px;cursor:pointer;border:1px solid #c8dcf0;background:#fff;color:#4a6a8a}
+.adv-hour.on{background:#0d2d5e;color:#fff;border-color:#0d2d5e}
+.toggle-switch{position:relative;display:inline-block;width:38px;height:20px;vertical-align:middle;margin-right:8px}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:#c8dcf0;border-radius:20px;transition:.3s}
+.toggle-slider:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+input:checked+.toggle-slider{background:#0d2d5e}
+input:checked+.toggle-slider:before{transform:translateX(18px)}
 .ai-panel{display:flex;flex-direction:column;background:#f5f9ff;overflow:hidden}
 .ai-header{padding:12px 16px;border-bottom:1px solid #d0e4f7;display:flex;align-items:center;justify-content:space-between}
 .ai-header h3{font-size:13px;font-weight:700;color:#0d2d5e}
@@ -108,7 +137,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .loading-bar{height:3px;background:linear-gradient(90deg,#1a73e8,#4a9ef8,#1a73e8);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:2px;margin-bottom:10px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-/* ── Utilities ── */
+/* ââ Utilities ââ */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid #c8dcf0;border-top-color:#1a73e8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:20px;right:20px;background:#fff;border:1px solid #c8dcf0;border-radius:8px;padding:10px 16px;font-size:12px;z-index:9999;animation:fadeIn .3s;max-width:320px;color:#1a2b45;box-shadow:0 4px 16px rgba(0,45,94,.1)}
@@ -117,7 +146,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .empty-state{padding:60px;text-align:center;color:#8aa5c0;font-size:13px}
 
-/* ── Config modal ── */
+/* ââ Config modal ââ */
 .config-modal{position:fixed;inset:0;background:rgba(0,20,60,.55);z-index:1000;display:none;align-items:center;justify-content:center}
 .config-modal.open{display:flex}
 .config-box{background:#fff;border:1px solid #c8dcf0;border-radius:12px;padding:24px;width:420px;max-width:95vw}
@@ -142,7 +171,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .btn-ok-mod:hover{background:#1557b0}
 .btn-ok-mod.danger{background:#d32f2f}.btn-ok-mod.danger:hover{background:#b71c1c}
 
-/* ── Reports & Analytics Section ─────────────────────────── */
+/* ââ Reports & Analytics Section âââââââââââââââââââââââââââ */
 .reports-section{width:100%;background:#f0f4f9;border-top:2px solid #d0e4f7;margin-top:0;clear:both;position:relative}
 .reports-tabs{display:flex;gap:0;background:#0d2d5e;padding:0 16px}
 .tab-btn{padding:10px 18px;border:none;background:transparent;color:#8ab3d4;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:.2s}
@@ -217,7 +246,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 <!-- Config Modal -->
 <div class="config-modal" id="configModal">
   <div class="config-box">
-    <h3>⚙ API Configuration</h3>
+    <h3>â API Configuration</h3>
     <div class="field"><label>Yelp Partner Username</label><input id="cfg_user" type="text" placeholder="partner username"></div>
     <div class="field"><label>Yelp Partner Password</label><input id="cfg_pass" type="password" placeholder="partner password"></div>
     <div class="field"><label>Yelp Fusion API Key</label><input id="cfg_fusion" type="text" placeholder="Bearer key for Reporting API"></div>
@@ -237,20 +266,20 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   </div>
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
-    <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">↻ Sync</button>
-    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('reportsSection').scrollIntoView({behavior:'smooth'});showReportTab('analytics')">📊 Reports</button>
-    <button class="btn btn-ghost btn-sm" onclick="openConfig()">⚙ Config</button>
+    <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">â» Sync</button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('reportsSection').scrollIntoView({behavior:'smooth'});showReportTab('analytics')">ð Reports</button>
+    <button class="btn btn-ghost btn-sm" onclick="openConfig()">â Config</button>
   </div>
 </div>
 
 <!-- KPI Strip -->
 <div class="kpi-strip">
-  <div class="kpi"><div class="kpi-val" id="kpi_clients">—</div><div class="kpi-lbl">Active Clients</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_spend">—</div><div class="kpi-lbl">Spend MTD</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_rebate">—</div><div class="kpi-lbl">Rebate (19.3%)</div><div class="kpi-sub">net earned</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_leads">—</div><div class="kpi-lbl">Total Leads</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_calls">—</div><div class="kpi-lbl">Total Calls</div></div>
-  <div class="kpi"><div class="kpi-val" id="kpi_cpl">—</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_clients">â</div><div class="kpi-lbl">Active Clients</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_spend">â</div><div class="kpi-lbl">Spend MTD</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_rebate">â</div><div class="kpi-lbl">Rebate (19.3%)</div><div class="kpi-sub">net earned</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_leads">â</div><div class="kpi-lbl">Total Leads</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_calls">â</div><div class="kpi-lbl">Total Calls</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpi_cpl">â</div><div class="kpi-lbl">Avg Cost/Lead</div></div>
 </div>
 
 <!-- Main -->
@@ -259,7 +288,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   <!-- Campaigns panel -->
   <div class="campaigns-panel">
     <div class="panel-header">
-      <input class="search-box" id="searchBox" placeholder="Search campaigns…" oninput="renderAll()">
+      <input class="search-box" id="searchBox" placeholder="Search campaignsâ¦" oninput="renderAll()">
       <button class="btn btn-blue btn-sm" onclick="loadDashboard()">Load</button>
     </div>
 
@@ -285,13 +314,13 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 
 </div>
 
-<!-- ── Reports & Analytics ───────────────────────────────────────── -->
+<!-- ââ Reports & Analytics âââââââââââââââââââââââââââââââââââââââââ -->
 <div class="reports-section" id="reportsSection">
   <div class="reports-tabs">
-    <button class="tab-btn active" id="rtab-analytics" onclick="showReportTab('analytics')">📊 Analytics</button>
-    <button class="tab-btn" id="rtab-keywords" onclick="showReportTab('keywords')">🔑 Keywords</button>
-    <button class="tab-btn" id="rtab-ai" onclick="showReportTab('ai')">🤖 AI Briefing</button>
-    <button class="tab-btn" id="rtab-reports" onclick="showReportTab('reports')">📋 Monthly Reports</button>
+    <button class="tab-btn active" id="rtab-analytics" onclick="showReportTab('analytics')">ð Analytics</button>
+    <button class="tab-btn" id="rtab-keywords" onclick="showReportTab('keywords')">ð Keywords</button>
+    <button class="tab-btn" id="rtab-ai" onclick="showReportTab('ai')">ð¤ AI Briefing</button>
+    <button class="tab-btn" id="rtab-reports" onclick="showReportTab('reports')">ð Monthly Reports</button>
   </div>
 
   <!-- Analytics Tab -->
@@ -305,7 +334,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   <div class="tab-content" id="rtab-keywords-content">
     <div id="keywordsContent">
       <div class="kw-connect">
-        <h3>🔑 Keyword Performance</h3>
+        <h3>ð Keyword Performance</h3>
         <p>Yelp doesn't expose keyword data via API. Download the keyword CSV from Yelp Partner Hub and upload it here, or paste a session token for auto-pull.</p>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
           <button class="btn btn-blue btn-sm" onclick="window.open('https://biz.yelp.com/partner_hub/QBSzxALbkHE3wi5z0-w5BQ/reports','_blank')">Open Yelp Reports</button>
@@ -329,7 +358,7 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   <div class="tab-content" id="rtab-ai-content">
     <div class="ai-tab-header">
       <div>
-        <h3>🤖 AI Weekly Briefing</h3>
+        <h3>ð¤ AI Weekly Briefing</h3>
         <div class="ai-tab-meta" id="aiBriefMeta">Load campaigns then generate your briefing.</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -347,18 +376,18 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
   <!-- Monthly Reports Tab -->
   <div class="tab-content" id="rtab-reports-content">
     <div class="report-builder">
-      <h3>📋 Monthly Client Report</h3>
+      <h3>ð Monthly Client Report</h3>
       <div class="report-controls">
         <label>Client
           <select id="reportClient">
-            <option value="">— Select client —</option>
+            <option value="">â Select client â</option>
           </select>
         </label>
         <label>Month
           <input type="month" id="reportMonth" value="2026-03">
         </label>
         <button class="btn btn-blue btn-sm" onclick="generateClientReport()" style="margin-bottom:1px">Generate Report</button>
-        <button class="btn btn-ghost btn-sm" onclick="window.print()" style="margin-bottom:1px">🖨 Print</button>
+        <button class="btn btn-ghost btn-sm" onclick="window.print()" style="margin-bottom:1px">ð¨ Print</button>
       </div>
       <div id="reportOutput" class="report-output" style="display:none"></div>
     </div>
@@ -380,15 +409,15 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 </div>
 
 <script>
-// ─── State ────────────────────────────────────────────────────────────────────
+// âââ State ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let CFG = {};
-let allPrograms = [];   // raw from API — each is one campaign
+let allPrograms = [];   // raw from API â each is one campaign
 let analysisCache = { text: null, ts: null };
 let currentMonth = null;
 let openGroups = new Set();
 let openDetails = new Set();
 
-// ─── Config ───────────────────────────────────────────────────────────────────
+// âââ Config âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function loadConfig()  { try { const s = localStorage.getItem('shefa_cfg'); if (s) CFG = JSON.parse(s); } catch(e){} }
 function saveConfig()  {
   CFG = {
@@ -410,7 +439,7 @@ function openConfig()  {
 }
 function closeConfig() { document.getElementById('configModal').classList.remove('open'); }
 
-// ─── Month selector ───────────────────────────────────────────────────────────
+// âââ Month selector âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function buildMonthSelect() {
   const sel = document.getElementById('monthSel');
   sel.innerHTML = '';
@@ -450,12 +479,12 @@ function showHistoricalBanner(monthLabel, month) {
     const list = document.getElementById('campaignList');
     if (list) list.parentNode.insertBefore(banner, list);
   }
-  banner.innerHTML = '<span style="font-size:18px">📅</span><div><strong>' + monthLabel + '</strong> — Loading historical data from Reporting API...</div>';
+  banner.innerHTML = '<span style="font-size:18px">ð</span><div><strong>' + monthLabel + '</strong> â Loading historical data from Reporting API...</div>';
   banner.style.display = 'flex';
   // Load campaigns then trigger reporting for the selected month
   loadDashboard();
   setTimeout(() => {
-    toast('📅 Fetching ' + monthLabel + ' reporting data...');
+    toast('ð Fetching ' + monthLabel + ' reporting data...');
     loadReportingData(month);
   }, 1500);
 }
@@ -466,7 +495,7 @@ function hideHistoricalBanner() {
   if (banner) banner.style.display = 'none';
 }
 
-// ─── API helpers ──────────────────────────────────────────────────────────────
+// âââ API helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function yelpFn(path, method, body) {
   const o = { method: method || 'GET', headers: {'Content-Type':'application/json'} };
   if (body) o.body = JSON.stringify(body);
@@ -474,11 +503,11 @@ async function yelpFn(path, method, body) {
   return r.json();
 }
 
-// ─── Grouping logic ───────────────────────────────────────────────────────────
+// âââ Grouping logic âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 // Build display groups from flat programs list.
 // A "group" is either:
-//   - Multiple campaigns sharing the same group_id  → parent row + children
-//   - A single campaign with no group_id            → standalone row (no children)
+//   - Multiple campaigns sharing the same group_id  â parent row + children
+//   - A single campaign with no group_id            â standalone row (no children)
 function buildGroups(programs) {
   const grouped = {};
   const standalone = [];
@@ -494,7 +523,7 @@ function buildGroups(programs) {
 
   const groups = [];
 
-  // Multi-campaign groups — sort so main comes first
+  // Multi-campaign groups â sort so main comes first
   Object.values(grouped).forEach(campaigns => {
     campaigns.sort((a,b) => (b.budget_cents||0) - (a.budget_cents||0));
     const main = campaigns[0];
@@ -514,7 +543,7 @@ function buildGroups(programs) {
     });
   });
 
-  // Standalone campaigns — each is its own "group"
+  // Standalone campaigns â each is its own "group"
   standalone.forEach(p => {
     groups.push({
       id:        p.id,
@@ -536,12 +565,12 @@ function buildGroups(programs) {
   return groups;
 }
 
-// ─── Render ───────────────────────────────────────────────────────────────────
-function fmt$(cents) { return cents ? '$' + (cents/100).toLocaleString('en', {maximumFractionDigits:0}) : '—'; }
-function fmtN(n)    { return n ? n.toLocaleString() : '—'; }
-function fmtPct(a,b){ return b ? (a/b*100).toFixed(1)+'%' : '—'; }
+// âââ Render âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function fmt$(cents) { return cents ? '$' + (cents/100).toLocaleString('en', {maximumFractionDigits:0}) : 'â'; }
+function fmtN(n)    { return n ? n.toLocaleString() : 'â'; }
+function fmtPct(a,b){ return b ? (a/b*100).toFixed(1)+'%' : 'â'; }
 function fmtCPL(spend_cents, convs) {
-  return (convs && spend_cents) ? '$' + ((spend_cents/100)/convs).toFixed(0) : '—';
+  return (convs && spend_cents) ? '$' + ((spend_cents/100)/convs).toFixed(0) : 'â';
 }
 function spendPct(spend, budget) {
   if (!budget) return 0;
@@ -572,7 +601,7 @@ function renderGroup(g) {
   const cpl       = fmtCPL(g.spend, convs);
   const pct       = spendPct(g.spend, g.budget);
   const ctr       = fmtPct(g.clicks, g.impr);
-  const avgCpc    = (g.clicks && g.spend) ? '$' + (g.spend/100/g.clicks).toFixed(2) : '—';
+  const avgCpc    = (g.clicks && g.spend) ? '$' + (g.spend/100/g.clicks).toFixed(2) : 'â';
   const statusTag = g.status === 'ACTIVE'
     ? '<span class="tag tag-active">ACTIVE</span>'
     : '<span class="tag tag-paused">PAUSED</span>';
@@ -580,7 +609,7 @@ function renderGroup(g) {
   const groupRow = `
 <div class="client-group" id="grp_${g.id}">
   <div class="${g.isGroup ? 'group-row' : 'camp-row'}${isOpen?' open':''}" onclick="${g.isGroup ? `toggleGroup('${g.id}')` : `toggleDetail('${g.campaigns[0].id}')`}">
-    <span class="expand-arrow">${g.isGroup ? '▶' : ''}</span>
+    <span class="expand-arrow">${g.isGroup ? 'â¶' : ''}</span>
     <div>
       <div class="group-name">${g.name}${g.campaigns.some(c=>c.has_bot)?'<span class="bot-tag">BOT</span>':''}</div>
       ${g.isGroup ? `<div class="group-sub">${g.campaigns.length} campaigns</div>` : ''}
@@ -595,8 +624,8 @@ function renderGroup(g) {
     <div class="mc"><div class="mc-val">${fmtN(g.clicks)}</div></div>
     <div class="mc"><div class="mc-val">${ctr}</div></div>
     <div class="mc"><div class="mc-val">${avgCpc}</div></div>
-    <div class="mc"><div class="mc-val">${g.leads||'—'}</div></div>
-    <div class="mc"><div class="mc-val">${g.calls||'—'}</div></div>
+    <div class="mc"><div class="mc-val">${g.leads||'â'}</div></div>
+    <div class="mc"><div class="mc-val">${g.calls||'â'}</div></div>
     <div class="mc"><div class="mc-val">${cpl}</div></div>
     <div class="mc" onclick="event.stopPropagation()">
       ${!g.isGroup ? renderActions(g.campaigns[0]) : ''}
@@ -616,14 +645,14 @@ function renderCampaignRow(c, groupId) {
   const cpl     = fmtCPL(c.spend_cents, convs);
   const pct     = spendPct(c.spend_cents, c.budget_cents);
   const ctr     = fmtPct(c.clicks, c.impressions);
-  const avgCpc  = c.avg_cpc ? '$' + parseFloat(c.avg_cpc).toFixed(2) : (c.clicks && c.spend_cents ? '$' + (c.spend_cents/100/c.clicks).toFixed(2) : '—');
+  const avgCpc  = c.avg_cpc ? '$' + parseFloat(c.avg_cpc).toFixed(2) : (c.clicks && c.spend_cents ? '$' + (c.spend_cents/100/c.clicks).toFixed(2) : 'â');
   const typeTag = c.campaign_type === 'layered'
     ? '<span class="camp-type-layered">layered</span>'
     : '<span class="camp-type-main">main</span>';
 
   return `
 <div class="camp-row" id="camp_${c.id}" onclick="toggleDetail('${c.id}')">
-  <span style="font-size:10px;color:#b8d0e8;text-align:center">↳</span>
+  <span style="font-size:10px;color:#b8d0e8;text-align:center">â³</span>
   <div class="camp-name">${c.name.split(' : ').slice(-1)[0] || c.name}${typeTag}${c.has_bot ? '<span class="bot-tag">BOT</span>' : ''}</div>
   <div class="mc"><span class="tag ${c.status==='ACTIVE'?'tag-active':'tag-paused'}" style="font-size:9px">${c.status==='ACTIVE'?'ON':'OFF'}</span></div>
   <div class="mc"><div class="mc-val">${fmt$(c.budget_cents)}</div></div>
@@ -635,8 +664,8 @@ function renderCampaignRow(c, groupId) {
   <div class="mc"><div class="mc-dim">${fmtN(c.clicks)}</div></div>
   <div class="mc"><div class="mc-dim">${ctr}</div></div>
   <div class="mc"><div class="mc-dim">${avgCpc}</div></div>
-  <div class="mc"><div class="mc-dim">${c.leads||'—'}</div></div>
-  <div class="mc"><div class="mc-dim">${c.calls||'—'}</div></div>
+  <div class="mc"><div class="mc-dim">${c.leads||'â'}</div></div>
+  <div class="mc"><div class="mc-dim">${c.calls||'â'}</div></div>
   <div class="mc"><div class="mc-dim">${cpl}</div></div>
   <div class="mc" onclick="event.stopPropagation()">${renderActions(c)}</div>
 </div>
@@ -645,8 +674,8 @@ ${renderDetail(c, isOpen)}`;
 
 function renderActions(c) {
   return c.status === 'ACTIVE'
-    ? `<button class="btn btn-red btn-sm" onclick="confirmPause('${c.id}',event)">⏸ Pause</button>`
-    : `<button class="btn btn-blue btn-sm" onclick="confirmResume('${c.id}',event)">▶ Resume</button>`;
+    ? `<button class="btn btn-red btn-sm" onclick="confirmPause('${c.id}',event)">â¸ Pause</button>`
+    : `<button class="btn btn-blue btn-sm" onclick="confirmResume('${c.id}',event)">â¶ Resume</button>`;
 }
 
 function renderDetail(c, isOpen) {
@@ -656,7 +685,7 @@ function renderDetail(c, isOpen) {
     <div class="detail-box"><div class="dv">${(c.impressions||0).toLocaleString()}</div><div class="dl">Impressions</div></div>
     <div class="detail-box"><div class="dv">${(c.clicks||0).toLocaleString()}</div><div class="dl">Clicks</div></div>
     <div class="detail-box"><div class="dv">${c.ctr||0}%</div><div class="dl">CTR</div></div>
-    <div class="detail-box"><div class="dv">${c.avg_cpc ? '$'+parseFloat(c.avg_cpc).toFixed(2) : '—'}</div><div class="dl">Avg CPC</div></div>
+    <div class="detail-box"><div class="dv">${c.avg_cpc ? '$'+parseFloat(c.avg_cpc).toFixed(2) : 'â'}</div><div class="dl">Avg CPC</div></div>
     <div class="detail-box"><div class="dv">${c.leads||0}</div><div class="dl">Leads</div></div>
     <div class="detail-box"><div class="dv">${c.calls||0}</div><div class="dl">Calls</div></div>
     <div class="detail-box"><div class="dv">${c.messages||0}</div><div class="dl">Messages</div></div>
@@ -664,8 +693,8 @@ function renderDetail(c, isOpen) {
   </div>
   <div class="controls-row">
     ${c.status === 'ACTIVE'
-      ? `<button class="btn btn-red btn-sm" onclick="confirmPause('${c.id}',event)">⏸ Pause</button>`
-      : `<button class="btn btn-blue btn-sm" onclick="confirmResume('${c.id}',event)">▶ Resume</button>`}
+      ? `<button class="btn btn-red btn-sm" onclick="confirmPause('${c.id}',event)">â¸ Pause</button>`
+      : `<button class="btn btn-blue btn-sm" onclick="confirmResume('${c.id}',event)">â¶ Resume</button>`}
     <input class="budget-input" id="bgt_${c.id}" type="number" value="${((c.budget_cents||0)/100).toFixed(0)}" placeholder="Budget $">
     <button class="btn btn-light btn-sm" onclick="confirmBudget('${c.id}',event)">Set Budget</button>
     <input class="budget-input" id="cpc_${c.id}" type="number" step="0.5" min="0.5" value="${c.max_bid_dollars||''}" placeholder="Max CPC $" style="width:90px">
@@ -673,11 +702,69 @@ function renderDetail(c, isOpen) {
     <label style="font-size:11px;color:#5a7a9a;margin-left:8px">
       <input type="checkbox" ${c.has_bot?'checked':''} onchange="toggleBot('${c.id}',this.checked)"> AI Bot
     </label>
+  <button class="adv-toggle" onclick="toggleAdv('${c.id}')">&#9881; Advanced</button>
   </div>
+  <div class="adv-panel" id="adv_${c.id}">
+    <div class="adv-tabs">
+      <div class="adv-tab active" onclick="switchAdvTab('${c.id}','cat',this)">&#128193; Category</div>
+      <div class="adv-tab" onclick="switchAdvTab('${c.id}','kw',this)">&#128683; Keywords</div>
+      <div class="adv-tab" onclick="switchAdvTab('${c.id}','loc',this)">&#128205; Location</div>
+      <div class="adv-tab" onclick="switchAdvTab('${c.id}','sched',this)">&#128336; Schedule</div>
+      <div class="adv-tab" onclick="switchAdvTab('${c.id}','call',this)">&#128222; Call Tracking</div>
+    </div>
+    <div class="adv-section active" id="adv_cat_${c.id}">
+      <span class="adv-label">&#128193; Strict Category Targeting</span>
+      <p class="adv-hint">Comma-separated Yelp category aliases (e.g. roofing,hvac,electricians). Locks ad to exact categories only.</p>
+      <input class="adv-input" id="adv_cat_input_${c.id}" placeholder="e.g. roofing,waterproofing,general_contractors" value="${(c.categories||[]).join(',')}">
+      <button class="adv-btn" onclick="saveCategory('${c.id}')">&#10003; Save</button>
+      <button class="adv-btn red" onclick="clearFeature('${c.id}','category')">&#10005; Clear</button>
+    </div>
+    <div class="adv-section" id="adv_kw_${c.id}">
+      <span class="adv-label">&#128683; Negative Keywords</span>
+      <p class="adv-hint">Block irrelevant searches. Press Enter after each word.</p>
+      <div class="adv-tag-row" id="adv_kw_tags_${c.id}"></div>
+      <input class="adv-input" id="adv_kw_input_${c.id}" placeholder="Type keyword + Enter" onkeydown="addKeyword(event,'${c.id}')">
+      <button class="adv-btn" onclick="saveKeywords('${c.id}')">&#10003; Save</button>
+    </div>
+    <div class="adv-section" id="adv_loc_${c.id}">
+      <span class="adv-label">&#128205; Custom Location Targeting</span>
+      <p class="adv-hint">Up to 25 locations (zip codes, cities, neighborhoods). One per line.</p>
+      <textarea class="adv-input" id="adv_loc_input_${c.id}" rows="4" placeholder="90210
+Beverly Hills CA
+Los Angeles">${(c.locations||[]).join('
+')}</textarea>
+      <button class="adv-btn" onclick="saveLocation('${c.id}')">&#10003; Save</button>
+      <button class="adv-btn red" onclick="clearFeature('${c.id}','location')">&#10005; Clear</button>
+    </div>
+    <div class="adv-section" id="adv_sched_${c.id}">
+      <span class="adv-label">&#128336; Ad Scheduling</span>
+      <p class="adv-hint">Click to toggle days and hours. Dark blue = active.</p>
+      <div class="adv-grid-day" id="adv_days_${c.id}">
+        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>'<div class="adv-day'+((c.sched_days||[1,2,3,4,5]).includes(i+1)?' on':'')+'" data-day="'+(i+1)+'" onclick="toggleDay(this)">'+d+'</div>').join('')}
+      </div>
+      <div class="adv-hours" id="adv_hours_${c.id}">
+        ${Array.from({length:24},(_,i)=>{const h=i===0?'12a':i<12?i+'a':i===12?'12p':(i-12)+'p';return '<div class="adv-hour'+((c.sched_hours||[8,9,10,11,12,13,14,15,16,17]).includes(i)?' on':'')+'" data-hr="'+i+'" onclick="toggleHour(this)">'+h+'</div>';}).join('')}
+      </div>
+      <button class="adv-btn" style="margin-top:8px" onclick="saveSchedule('${c.id}')">&#10003; Save</button>
+      <button class="adv-btn red" onclick="clearFeature('${c.id}','schedule')">&#10005; Clear</button>
+    </div>
+    <div class="adv-section" id="adv_call_${c.id}">
+      <span class="adv-label">&#128222; Call Tracking</span>
+      <p class="adv-hint">Enable to count phone calls as leads. Fixes the 0 calls issue.</p>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px">
+        <label class="toggle-switch">
+          <input type="checkbox" id="adv_call_chk_${c.id}" ${c.call_tracking?'checked':''} onchange="saveCallTracking('${c.id}',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <span id="adv_call_lbl_${c.id}" style="font-size:12px;color:#0d2d5e">Call Tracking <strong>${c.call_tracking?'ON':'OFF'}</strong></span>
+      </label>
+    </div>
+  </div>
+
 </div>`;
 }
 
-// ─── Toggle handlers ──────────────────────────────────────────────────────────
+// âââ Toggle handlers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function toggleGroup(id) {
   const rowEl  = document.querySelector(`#grp_${id} .group-row`);
   const rowsEl = document.getElementById('rows_' + id);
@@ -705,7 +792,7 @@ function toggleDetail(id) {
   }
 }
 
-// ─── KPIs ─────────────────────────────────────────────────────────────────────
+// âââ KPIs âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function updateKPIs() {
   const active = allPrograms.filter(p => p.status === 'ACTIVE');
   const spend  = allPrograms.reduce((s,p) => s + (p.spend_cents||0), 0) / 100;
@@ -713,17 +800,17 @@ function updateKPIs() {
   const calls  = allPrograms.reduce((s,p) => s + (p.calls||0), 0);
   const convs  = leads + calls;
   document.getElementById('kpi_clients').textContent = active.length;
-  document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString('en',{maximumFractionDigits:0}) : '—';
-  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend*0.193).toLocaleString('en',{maximumFractionDigits:0}) : '—';
-  document.getElementById('kpi_leads').textContent   = leads || '—';
-  document.getElementById('kpi_calls').textContent   = calls || '—';
-  document.getElementById('kpi_cpl').textContent     = convs ? '$' + (spend/convs).toFixed(0) : '—';
+  document.getElementById('kpi_spend').textContent   = spend ? '$' + spend.toLocaleString('en',{maximumFractionDigits:0}) : 'â';
+  document.getElementById('kpi_rebate').textContent  = spend ? '$' + (spend*0.193).toLocaleString('en',{maximumFractionDigits:0}) : 'â';
+  document.getElementById('kpi_leads').textContent   = leads || 'â';
+  document.getElementById('kpi_calls').textContent   = calls || 'â';
+  document.getElementById('kpi_cpl').textContent     = convs ? '$' + (spend/convs).toFixed(0) : 'â';
 }
 
-// ─── Data loading ─────────────────────────────────────────────────────────────
+// âââ Data loading âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function loadDashboard() {
   try {
-    toast('Loading campaigns…', 'success');
+    toast('Loading campaignsâ¦', 'success');
     const data = await yelpFn('programs', 'GET');
     const programs = (data.programs || data.data || []).filter(p => p.status === 'ACTIVE');
     if (!programs.length) {
@@ -737,23 +824,23 @@ async function loadDashboard() {
     }));
     renderAll();
     updateKPIs();
-    // Auto-pull: trigger fresh report if it's 7am–10am PST (15:00–18:00 UTC) and cache is from yesterday
+    // Auto-pull: trigger fresh report if it's 7amâ10am PST (15:00â18:00 UTC) and cache is from yesterday
   (function() {
     const nowUtc = new Date();
     const utcHour = nowUtc.getUTCHours();
     const mon = currentMonth || nowUtc.toISOString().slice(0,7);
     const cached = JSON.parse(localStorage.getItem('reporting_cache_' + mon) || 'null');
     const cacheAgeH = cached?.ts ? (Date.now() - cached.ts) / 3600000 : 999;
-    // 15:00–18:00 UTC = 7am–10am PST. Force refresh if cache is >20h old (yesterday's data)
+    // 15:00â18:00 UTC = 7amâ10am PST. Force refresh if cache is >20h old (yesterday's data)
     if (utcHour >= 15 && utcHour < 18 && cacheAgeH > 20) {
       localStorage.removeItem('reporting_cache_' + mon);
-      toast('🌅 Morning auto-refresh: fetching today\'s reporting data...');
+      toast('ð Morning auto-refresh: fetching today\'s reporting data...');
     }
     loadReportingData(currentMonth);
     initReportsSection();
   })();
     loadBotConfig();
-    toast('Loaded ' + allPrograms.length + ' campaigns ✓', 'success');
+    toast('Loaded ' + allPrograms.length + ' campaigns â', 'success');
   } catch(e) {
     console.error(e);
     toast('Error loading: ' + e.message, 'error');
@@ -762,12 +849,12 @@ async function loadDashboard() {
 
 async function syncFromYelp() {
   const b = document.getElementById('syncBtn');
-  b.textContent = 'Syncing…'; b.disabled = true;
+  b.textContent = 'Syncingâ¦'; b.disabled = true;
   await loadDashboard();
-  b.textContent = '↻ Sync'; b.disabled = false;
+  b.textContent = 'â» Sync'; b.disabled = false;
 }
 
-// ─── Campaign actions ─────────────────────────────────────────────────────────
+// âââ Campaign actions âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function pauseCampaign(id, e) {
   e.stopPropagation();
   // confirmed via modal
@@ -801,7 +888,7 @@ async function changeBudget(id, e) {
     await yelpFn('budget/' + id, 'POST', { budget: val });
     if (p) p.budget_cents = val * 100;
     renderAll();
-    toast('Budget updated: $' + val + '/mo ✓', 'success');
+    toast('Budget updated: $' + val + '/mo â', 'success');
   } catch(err) { toast('Budget failed: ' + err.message, 'error'); }
 }
 
@@ -855,7 +942,7 @@ async function loadBotConfig() {
   } catch(e) { console.warn('loadBotConfig failed:', e); }
 }
 
-// ─── Health check ─────────────────────────────────────────────────────────────
+// âââ Health check âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function checkHealth() {
   const dot = document.getElementById('serverDot');
   try {
@@ -864,15 +951,15 @@ async function checkHealth() {
   } catch(e) { dot.style.background = '#e53935'; }
 }
 
-// ─── AI Analysis ─────────────────────────────────────────────────────────────
+// âââ AI Analysis âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function runAnalysis(force) {
-  if (!CFG.anthropic) { toast('Add Anthropic API key in ⚙ Config', 'error'); openConfig(); return; }
+  if (!CFG.anthropic) { toast('Add Anthropic API key in â Config', 'error'); openConfig(); return; }
   if (!force && analysisCache.text && analysisCache.ts && (Date.now()-analysisCache.ts)/3600000 < 24) {
     renderAnalysis(analysisCache.text, analysisCache.ts, true); return;
   }
   const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Analyzing…';
-  document.getElementById('aiContent').innerHTML = '<div class="loading-bar"></div><div style="color:#5a7a9a;font-size:12px">Claude is analyzing your portfolio…</div>';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Analyzingâ¦';
+  document.getElementById('aiContent').innerHTML = '<div class="loading-bar"></div><div style="color:#5a7a9a;font-size:12px">Claude is analyzing your portfolioâ¦</div>';
   try {
     const spend = allPrograms.reduce((s,p) => s + (p.spend_cents||0), 0) / 100;
     const rows  = allPrograms.map(p => {
@@ -880,7 +967,7 @@ async function runAnalysis(force) {
       const cpl   = convs && p.spend_cents ? '$'+((p.spend_cents/100)/convs).toFixed(0) : 'N/A';
       return `${p.name} | Type:${p.campaign_type||'main'} | Budget:$${((p.budget_cents||0)/100).toFixed(0)} | Spend:$${((p.spend_cents||0)/100).toFixed(0)} | Impr:${p.impressions||0} | Clicks:${p.clicks||0} | CTR:${p.ctr||0}% | AvgCPC:$${p.avg_cpc||0} | Leads:${p.leads||0} | Calls:${p.calls||0} | CPL:${cpl}`;
     }).join('\n');
-    const prompt = `Shefa Marketing Yelp Portfolio Analysis — ${currentMonth}\nActive campaigns: ${allPrograms.length} | Total spend MTD: $${spend.toLocaleString()} | Rebate (19.3%): $${(spend*0.193).toFixed(0)}\n\n${rows}\n\nAnalyze this portfolio. Use ## headers. Be direct, specific, actionable. Max 6 action items (verb-first).\nSections: ## Portfolio Health | ## Top Performers | ## Needs Attention | ## Budget Recommendations | ## Action Items`;
+    const prompt = `Shefa Marketing Yelp Portfolio Analysis â ${currentMonth}\nActive campaigns: ${allPrograms.length} | Total spend MTD: $${spend.toLocaleString()} | Rebate (19.3%): $${(spend*0.193).toFixed(0)}\n\n${rows}\n\nAnalyze this portfolio. Use ## headers. Be direct, specific, actionable. Max 6 action items (verb-first).\nSections: ## Portfolio Health | ## Top Performers | ## Needs Attention | ## Budget Recommendations | ## Action Items`;
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'x-api-key':CFG.anthropic,'anthropic-version':'2023-06-01','Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
@@ -895,7 +982,7 @@ async function runAnalysis(force) {
     document.getElementById('aiContent').innerHTML = `<div style="color:#e53935;font-size:12px">Error: ${err.message}</div>`;
     toast('Analysis failed: ' + err.message, 'error');
   } finally {
-    btn.disabled = false; btn.innerHTML = '↻ Refresh';
+    btn.disabled = false; btn.innerHTML = 'â» Refresh';
   }
 }
 
@@ -903,17 +990,17 @@ function renderAnalysis(text, ts, cached) {
   const html = text
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^[-•] (.+)$/gm, '<li>$1</li>')
+    .replace(/^[-â¢] (.+)$/gm, '<li>$1</li>')
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>');
   const spend = allPrograms.reduce((s,p) => s + (p.spend_cents||0), 0) / 100;
   document.getElementById('aiContent').innerHTML = `
-    <div class="rebate-banner">💰 Portfolio rebate this month: $${(spend*0.193).toLocaleString('en',{maximumFractionDigits:0})}</div>
+    <div class="rebate-banner">ð° Portfolio rebate this month: $${(spend*0.193).toLocaleString('en',{maximumFractionDigits:0})}</div>
     ${html}
     <div class="ai-ts">${cached?'Cached':'Generated'} at ${new Date(ts).toLocaleTimeString()}</div>`;
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
+// âââ Toast ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function toast(msg, type='success') {
   const el = document.createElement('div');
   el.className = 'toast ' + type;
@@ -922,7 +1009,7 @@ function toast(msg, type='success') {
   setTimeout(() => el.remove(), 3500);
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
+// âââ Boot âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 loadConfig();
 buildMonthSelect();
 checkHealth();
@@ -961,7 +1048,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (ov) ov.addEventListener('click', function(e){ if (e.target === this) closeConfirm(); });
 });
 
-// ── Confirm wrappers ──────────────────────────────────────
+// ââ Confirm wrappers ââââââââââââââââââââââââââââââââââââââ
 function confirmPause(id, evt) {
   if (evt) evt.stopPropagation();
   const c = (window.allPrograms||[]).find(x=>x.id===id) || {};
@@ -1022,7 +1109,7 @@ function confirmCpc(id, evt) {
   });
 }
 
-// ── changeCpc ────────────────────────────────────────────
+// ââ changeCpc ââââââââââââââââââââââââââââââââââââââââââââ
 async function changeCpc(id) {
   const input = document.getElementById('cpc_' + id);
   const val = parseFloat(input ? input.value : 0);
@@ -1043,9 +1130,9 @@ async function changeCpc(id) {
 }
 
 
-// ═══════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 //  REPORTING API INTEGRATION
-// ═══════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 async function loadReportingData(month) {
   const mon = month || currentMonth || new Date().toISOString().slice(0,7);
@@ -1098,7 +1185,7 @@ async function loadReportingData(month) {
 
     // Cache immediately with bizInfoList
     localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
-    toast('📊 Reporting data loading... (~30 min)');
+    toast('ð Reporting data loading... (~30 min)');
 
     // Poll: first at 90s, then every 5 min, max 8 attempts
     let attempts = 0;
@@ -1124,7 +1211,7 @@ async function loadReportingData(month) {
 
 
 function applyReportingData(reportData) {
-  // ── Definitive per-program map: allPrograms.id → Reporting API program_id ──
+  // ââ Definitive per-program map: allPrograms.id â Reporting API program_id ââ
   // 29/30 matched. Mission 475 Gough (7_5g6jLCRkY7) = different Yelp biz, no data.
   const ALLPROG_TO_REPORT = {
     '_sZA3BJl7twy01kXTzjbwQ': '21LYbVh_2gSwDcRJKTbP0g', // Roof by Tom : 1990 N Californi (boost)
@@ -1161,7 +1248,7 @@ function applyReportingData(reportData) {
   const bizData = reportData.data || [];
   if (!bizData.length) { toast('No reporting data returned'); return; }
 
-  // Build reporting_prog_id → metrics map
+  // Build reporting_prog_id â metrics map
   const progMetrics = {};
   bizData.forEach(biz => {
     (biz.metrics || []).forEach(m => {
@@ -1198,16 +1285,16 @@ function applyReportingData(reportData) {
     if (currentMonth !== thisMon) {
       const [yr, mo] = currentMonth.split('-');
       const label = new Date(yr, mo-1).toLocaleDateString('en-US', {month:'long', year:'numeric'});
-      banner.innerHTML = '<span style="font-size:18px">📅</span><div><strong>' + label + '</strong> — Showing historical Reporting API data. Spend, impressions, clicks, leads and calls reflect the full month.</div>';
+      banner.innerHTML = '<span style="font-size:18px">ð</span><div><strong>' + label + '</strong> â Showing historical Reporting API data. Spend, impressions, clicks, leads and calls reflect the full month.</div>';
     }
   }
 }
 
 
 
-// ═══════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 //  REPORTS & ANALYTICS
-// ═══════════════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function showReportTab(tab) {
   ['analytics','keywords','ai','reports'].forEach(t => {
@@ -1233,7 +1320,7 @@ function showReportTab(tab) {
   }
 }
 
-// ── History snapshot saved on every reporting data load ───────────────────────
+// ââ History snapshot saved on every reporting data load âââââââââââââââââââââââ
 function saveHistorySnapshot() {
   if (!allPrograms?.length) return;
   const mon = currentMonth || new Date().toISOString().slice(0,7);
@@ -1251,7 +1338,7 @@ function loadHistory() {
   return JSON.parse(localStorage.getItem('shefa_history') || '{}');
 }
 
-// ── Analytics Tab ─────────────────────────────────────────────────────────────
+// ââ Analytics Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderAnalytics() {
   if (!allPrograms?.length) return;
   saveHistorySnapshot();
@@ -1268,7 +1355,7 @@ function renderAnalytics() {
   const totalSpend  = cur.reduce((s,p) => s + (p.spend||0), 0);
   const totalLeads  = cur.reduce((s,p) => s + (p.leads||0), 0);
   const totalCalls  = cur.reduce((s,p) => s + (p.calls||0), 0);
-  const avgCPL      = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : '—';
+  const avgCPL      = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : 'â';
   const topPerf     = [...cur].filter(p=>p.campaign_type!=='boost').sort((a,b)=>(b.leads||0)-(a.leads||0))[0];
 
   // Group by company (main campaigns only, exclude boost sub-rows)
@@ -1292,29 +1379,29 @@ function renderAnalytics() {
       <div class="summary-card"><div class="big">${cur.reduce((s,p)=>s+(p.messages||0),0).toLocaleString()}</div><div class="sm">Chat Leads</div></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:13px;font-weight:700;color:#0d2d5e">📈 Performance by Client — ${(([yr,mo]) => new Date(+yr, +mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(curMon.split('-'))}</div>
-      <div style="font-size:11px;color:#94a3b8">${months.length} months of history · Click card for full details</div>
+      <div style="font-size:13px;font-weight:700;color:#0d2d5e">ð Performance by Client â ${(([yr,mo]) => new Date(+yr, +mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(curMon.split('-'))}</div>
+      <div style="font-size:11px;color:#94a3b8">${months.length} months of history Â· Click card for full details</div>
     </div>
     <div class="analytics-grid">
       ${uniqueCompanies.sort((a,b)=>(b.leads||0)-(a.leads||0)||(b.spend||0)-(a.spend||0)).map(p => {
         const biz = p.name?.split(' : ')[0] || p.name;
-        const spend = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
-        const cpl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : '—';
+        const spend = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : 'â';
+        const cpl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : 'â';
         // Get prev month for trend
         const prevMon = months.find(m => m < curMon);
         const prevData = prevMon ? history[prevMon]?.find(x=>x.id===p.id) : null;
         const trendLeads = prevData?.leads ? (p.leads||0) - prevData.leads : null;
         const trendHtml = trendLeads !== null 
-          ? `<span class="${trendLeads>0?'trend-up':trendLeads<0?'trend-dn':'trend-flat'}">${trendLeads>0?'▲':'▼'} ${Math.abs(trendLeads)} leads vs last month</span>`
+          ? `<span class="${trendLeads>0?'trend-up':trendLeads<0?'trend-dn':'trend-flat'}">${trendLeads>0?'â²':'â¼'} ${Math.abs(trendLeads)} leads vs last month</span>`
           : '<span class="trend-flat">No comparison data</span>';
         return `<div class="company-card" onclick="openCompanyModal('${p.id}')">
           <h4>${biz}</h4>
           <div class="metrics">
-            <div class="metric"><div class="val">${p.leads||'—'}</div><div class="lbl">Leads</div></div>
-            <div class="metric"><div class="val">${p.calls||'—'}</div><div class="lbl">Calls</div></div>
+            <div class="metric"><div class="val">${p.leads||'â'}</div><div class="lbl">Leads</div></div>
+            <div class="metric"><div class="val">${p.calls||'â'}</div><div class="lbl">Calls</div></div>
             <div class="metric"><div class="val">${spend}</div><div class="lbl">Spend</div></div>
             <div class="metric"><div class="val">${cpl}</div><div class="lbl">CPL</div></div>
-            <div class="metric" style="grid-column:span 2"><div class="val" style="font-size:12px">${p.impressions?(p.impressions/1000).toFixed(1)+'K':'—'}</div><div class="lbl">Impr</div></div>
+            <div class="metric" style="grid-column:span 2"><div class="val" style="font-size:12px">${p.impressions?(p.impressions/1000).toFixed(1)+'K':'â'}</div><div class="lbl">Impr</div></div>
           </div>
           <div class="trend">${trendHtml}</div>
         </div>`;
@@ -1324,7 +1411,7 @@ function renderAnalytics() {
   document.getElementById('analyticsContent').innerHTML = html;
 }
 
-// ── Company Modal ─────────────────────────────────────────────────────────────
+// ââ Company Modal âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function openCompanyModal(progId) {
   const history = loadHistory();
   const months = Object.keys(history).sort().reverse();
@@ -1335,12 +1422,12 @@ function openCompanyModal(progId) {
   const rows = months.map(mon => {
     const d = history[mon]?.find(p=>p.id===progId);
     if (!d) return '';
-    const spend = d.spend ? '$'+(d.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
-    const cpl = d.leads && d.spend ? '$'+(d.spend/d.leads/100).toFixed(0) : '—';
-    const ctr = d.clicks && d.impressions ? ((d.clicks/d.impressions)*100).toFixed(2)+'%' : d.ctr ? d.ctr+'%' : '—';
-    const cpc = d.avg_cpc ? '$'+d.avg_cpc : (d.clicks && d.spend ? '$'+(d.spend/d.clicks/100).toFixed(2) : '—');
+    const spend = d.spend ? '$'+(d.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : 'â';
+    const cpl = d.leads && d.spend ? '$'+(d.spend/d.leads/100).toFixed(0) : 'â';
+    const ctr = d.clicks && d.impressions ? ((d.clicks/d.impressions)*100).toFixed(2)+'%' : d.ctr ? d.ctr+'%' : 'â';
+    const cpc = d.avg_cpc ? '$'+d.avg_cpc : (d.clicks && d.spend ? '$'+(d.spend/d.clicks/100).toFixed(2) : 'â');
     const label = (([yr,mo]) => new Date(+yr,+mo-1).toLocaleDateString('en-US',{month:'short',year:'numeric'}))(mon.split('-'));
-    return `<tr><td>${label}</td><td>${spend}</td><td>${(d.impressions||0).toLocaleString()}</td><td>${d.clicks||'—'}</td><td>${ctr}</td><td>${cpc}</td><td><strong>${d.leads||'—'}</strong></td><td>${d.calls||'—'}</td><td>${cpl}</td></tr>`;
+    return `<tr><td>${label}</td><td>${spend}</td><td>${(d.impressions||0).toLocaleString()}</td><td>${d.clicks||'â'}</td><td>${ctr}</td><td>${cpc}</td><td><strong>${d.leads||'â'}</strong></td><td>${d.calls||'â'}</td><td>${cpl}</td></tr>`;
   }).join('');
 
   const modal = document.createElement('div');
@@ -1349,11 +1436,11 @@ function openCompanyModal(progId) {
   modal.innerHTML = `
     <div class="company-modal">
       <div class="company-modal-header">
-        <h2>📊 ${biz}</h2>
-        <button onclick="this.closest('.company-modal-overlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748b">✕</button>
+        <h2>ð ${biz}</h2>
+        <button onclick="this.closest('.company-modal-overlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748b">â</button>
       </div>
       <div class="company-modal-body">
-        <p style="font-size:12px;color:#64748b;margin:0 0 12px">${prog.name} · ${prog.campaign_type?.toUpperCase()} · Budget $${prog.budget_cents?(prog.budget_cents/100).toLocaleString():'N/A'}</p>
+        <p style="font-size:12px;color:#64748b;margin:0 0 12px">${prog.name} Â· ${prog.campaign_type?.toUpperCase()} Â· Budget $${prog.budget_cents?(prog.budget_cents/100).toLocaleString():'N/A'}</p>
         ${rows ? `<table class="history-table">
           <thead><tr><th>Month</th><th>Spend</th><th>Impr</th><th>Clicks</th><th>CTR</th><th>Avg CPC</th><th>Leads</th><th>Calls</th><th>CPL</th></tr></thead>
           <tbody>${rows}</tbody>
@@ -1364,7 +1451,7 @@ function openCompanyModal(progId) {
   document.body.appendChild(modal);
 }
 
-// ── Keywords Tab ──────────────────────────────────────────────────────────────
+// ââ Keywords Tab ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function handleKeywordCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -1396,7 +1483,7 @@ function renderKeywordTable(headers, rows) {
   if (clickIdx > 0) rows.sort((a,b) => parseInt(b[clickIdx]||0) - parseInt(a[clickIdx]||0));
   wrap.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div style="font-size:13px;font-weight:700;color:#0d2d5e">🔑 Keyword Performance · ${rows.length} keywords</div>
+      <div style="font-size:13px;font-weight:700;color:#0d2d5e">ð Keyword Performance Â· ${rows.length} keywords</div>
       <input placeholder="Search keywords..." oninput="filterKeywords(this.value)" style="padding:5px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;width:200px">
     </div>
     <table class="kw-table" id="kwTable">
@@ -1419,17 +1506,17 @@ function pullKeywordsWithSession() {
   fetch('https://biz.yelp.com/ads_stats/all_recent_month_stats', {
     headers: { Cookie: 'biz_session=' + token }
   }).then(r => r.json()).then(data => {
-    toast('Got response — parsing keywords...');
+    toast('Got response â parsing keywords...');
     console.log('Yelp keyword response:', data);
   }).catch(e => {
-    toast('Session pull failed (CORS) — please use CSV upload instead');
+    toast('Session pull failed (CORS) â please use CSV upload instead');
   });
 }
 
-// ── Auto Weekly Briefing toggle ───────────────────────────────────────────────
+// ââ Auto Weekly Briefing toggle âââââââââââââââââââââââââââââââââââââââââââââââ
 function toggleAutoWeekly(enabled) {
   localStorage.setItem('shefa_auto_weekly', enabled ? '1' : '0');
-  if (enabled) toast('Auto briefing enabled — generates every Monday');
+  if (enabled) toast('Auto briefing enabled â generates every Monday');
 }
 
 // Check on load if auto Monday briefing should run
@@ -1447,7 +1534,7 @@ function checkAutoWeekly() {
   setTimeout(() => runAnalysis(true), 3000); // auto-run after campaigns load
 }
 
-// ── Monthly Client Report ─────────────────────────────────────────────────────
+// ââ Monthly Client Report âââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function populateReportClients() {
   const sel = document.getElementById('reportClient');
   if (!sel || !allPrograms?.length) return;
@@ -1457,7 +1544,7 @@ function populateReportClients() {
     .map(p => p.name?.split(' : ')[0]?.trim())
     .filter(Boolean)
   )].sort();
-  sel.innerHTML = '<option value="">— Select client —</option>' + clients.map(c => `<option value="${c}">${c}</option>`).join('');
+  sel.innerHTML = '<option value="">â Select client â</option>' + clients.map(c => `<option value="${c}">${c}</option>`).join('');
 }
 
 function generateClientReport() {
@@ -1483,11 +1570,11 @@ function generateClientReport() {
   const totalCalls = camps.reduce((s,p)=>s+(p.calls||0),0);
   const totalImpr  = camps.reduce((s,p)=>s+(p.impressions||0),0);
   const totalClks  = camps.reduce((s,p)=>s+(p.clicks||0),0);
-  const cpl = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : '—';
-  const ctr = totalClks && totalImpr ? ((totalClks/totalImpr)*100).toFixed(2) : '—';
-  const avgCpc = totalClks && totalSpend ? (totalSpend/totalClks/100).toFixed(2) : '—';
+  const cpl = totalLeads ? (totalSpend/totalLeads/100).toFixed(0) : 'â';
+  const ctr = totalClks && totalImpr ? ((totalClks/totalImpr)*100).toFixed(2) : 'â';
+  const avgCpc = totalClks && totalSpend ? (totalSpend/totalClks/100).toFixed(2) : 'â';
   const monthLabel = (([yr,mo]) => new Date(+yr,+mo-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}))(mon.split('-'));
-  const budget = camps[0]?.budget_cents ? '$'+(camps[0].budget_cents/100).toLocaleString() : '—';
+  const budget = camps[0]?.budget_cents ? '$'+(camps[0].budget_cents/100).toLocaleString() : 'â';
 
   // Get prev month comparison
   const allMonths = Object.keys(history).sort();
@@ -1508,7 +1595,7 @@ function generateClientReport() {
   const fmtD = n => '$'+(Math.abs(n)/100).toLocaleString('en-US',{maximumFractionDigits:0})+(n<0?' (saved)':'');
 
   const report = `
-    <h1>📊 Monthly Campaign Report</h1>
+    <h1>ð Monthly Campaign Report</h1>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:20px">
       <div><strong>Client:</strong> ${client}</div>
       <div><strong>Period:</strong> ${monthLabel}</div>
@@ -1557,19 +1644,19 @@ function generateClientReport() {
       </tr></thead>
       <tbody>
         ${camps.map(p => {
-          const sp = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
-          const bg = p.budget_cents ? '$'+(p.budget_cents/100).toLocaleString() : '—';
-          const cl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : '—';
+          const sp = p.spend ? '$'+(p.spend/100).toLocaleString('en-US',{maximumFractionDigits:0}) : 'â';
+          const bg = p.budget_cents ? '$'+(p.budget_cents/100).toLocaleString() : 'â';
+          const cl = (p.leads && p.spend) ? '$'+(p.spend/p.leads/100).toFixed(0) : 'â';
           return `<tr style="border-bottom:1px solid #f1f5f9">
             <td style="padding:7px 8px;font-weight:600">${p.name?.split(' : ').slice(1).join(' : ') || p.name} ${p.campaign_type==='boost'?'<span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">BOOST</span>':''}</td>
             <td style="padding:7px 8px;text-align:right">${bg}</td>
             <td style="padding:7px 8px;text-align:right">${sp}</td>
-            <td style="padding:7px 8px;text-align:right;font-weight:700">${p.leads||'—'}</td>
-            <td style="padding:7px 8px;text-align:right">${p.calls||'—'}</td>
+            <td style="padding:7px 8px;text-align:right;font-weight:700">${p.leads||'â'}</td>
+            <td style="padding:7px 8px;text-align:right">${p.calls||'â'}</td>
             <td style="padding:7px 8px;text-align:right">${cl}</td>
             <td style="padding:7px 8px;text-align:right">${(p.impressions||0).toLocaleString()}</td>
-            <td style="padding:7px 8px;text-align:right">${p.clicks||'—'}</td>
-            <td style="padding:7px 8px;text-align:right">${p.clicks&&p.impressions?((p.clicks/p.impressions)*100).toFixed(2)+'%':'—'}</td>
+            <td style="padding:7px 8px;text-align:right">${p.clicks||'â'}</td>
+            <td style="padding:7px 8px;text-align:right">${p.clicks&&p.impressions?((p.clicks/p.impressions)*100).toFixed(2)+'%':'â'}</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1585,7 +1672,7 @@ function generateClientReport() {
       </ul>
     </div>
     <div style="margin-top:20px;font-size:11px;color:#94a3b8;text-align:center;border-top:1px solid #f1f5f9;padding-top:12px">
-      Report generated by Shefa Marketing Dashboard · ${new Date().toLocaleDateString()} · Data source: Yelp Advertising Platform
+      Report generated by Shefa Marketing Dashboard Â· ${new Date().toLocaleDateString()} Â· Data source: Yelp Advertising Platform
     </div>
   `;
 
@@ -1594,7 +1681,7 @@ function generateClientReport() {
   out.style.display = 'block';
 }
 
-// ── Hook into applyReportingData to save history ──────────────────────────────
+// ââ Hook into applyReportingData to save history ââââââââââââââââââââââââââââââ
 const _origApply = applyReportingData;
 window.applyReportingData = function(data) {
   _origApply(data);
@@ -1615,6 +1702,75 @@ function initReportsSection() {
     }
   }
 }
+
+// ── Advanced Controls JS ──────────────────────────────────────
+function toggleAdv(id){const p=document.getElementById('adv_'+id);if(p)p.classList.toggle('open');}
+function switchAdvTab(id,tab,el){
+  const panel=document.getElementById('adv_'+id);if(!panel)return;
+  panel.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
+  panel.querySelectorAll('.adv-section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  const sec=document.getElementById('adv_'+tab+'_'+id);if(sec)sec.classList.add('active');
+}
+function toggleDay(el){el.classList.toggle('on');}
+function toggleHour(el){el.classList.toggle('on');}
+async function saveCategory(id){
+  const val=document.getElementById('adv_cat_input_'+id)?.value?.trim();
+  if(!val)return toast('Enter at least one category','error');
+  const cats=val.split(',').map(s=>s.trim()).filter(Boolean);
+  const res=await yelpFn('features/category/'+id,'POST',{categories:cats});
+  if(res&&!res.error){toast('Categories saved ✔');updateClientField(id,'categories',cats);}
+  else toast('Error: '+(res?.error||'Unknown'),'error');
+}
+async function saveKeywords(id){
+  const tags=document.querySelectorAll('#adv_kw_tags_'+id+' .adv-tag');
+  const kws=Array.from(tags).map(t=>t.childNodes[0]?.textContent?.trim()).filter(Boolean);
+  if(!kws.length)return toast('Add at least one keyword','error');
+  const res=await yelpFn('features/keywords/'+id,'POST',{keywords:kws});
+  if(res&&!res.error){toast('Keywords saved ✔');updateClientField(id,'neg_keywords',kws);}
+  else toast('Error: '+(res?.error||'Unknown'),'error');
+}
+function addKeyword(e,id){
+  if(e.key!=='Enter'&&e.key!==',')return;
+  e.preventDefault();
+  const inp=document.getElementById('adv_kw_input_'+id);
+  const kw=inp.value.replace(',','').trim();if(!kw)return;
+  const tags=document.getElementById('adv_kw_tags_'+id);
+  const sp=document.createElement('span');sp.className='adv-tag';
+  sp.innerHTML=kw+' <span onclick="this.parentElement.remove()">&#215;</span>';
+  tags.appendChild(sp);inp.value='';
+}
+async function saveLocation(id){
+  const raw=document.getElementById('adv_loc_input_'+id)?.value?.trim();
+  if(!raw)return toast('Enter at least one location','error');
+  const locs=raw.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,25);
+  const res=await yelpFn('features/location/'+id,'POST',{locations:locs});
+  if(res&&!res.error){toast('Locations saved ('+locs.length+') ✔');updateClientField(id,'locations',locs);}
+  else toast('Error: '+(res?.error||'Unknown'),'error');
+}
+async function saveSchedule(id){
+  const days=Array.from(document.querySelectorAll('#adv_days_'+id+' .adv-day.on')).map(e=>parseInt(e.dataset.day));
+  const hours=Array.from(document.querySelectorAll('#adv_hours_'+id+' .adv-hour.on')).map(e=>parseInt(e.dataset.hr));
+  if(!days.length)return toast('Select at least one day','error');
+  const res=await yelpFn('features/schedule/'+id,'POST',{schedule:{days,hours}});
+  if(res&&!res.error){toast('Schedule saved ✔');updateClientField(id,'sched_days',days);updateClientField(id,'sched_hours',hours);}
+  else toast('Error: '+(res?.error||'Unknown'),'error');
+}
+async function saveCallTracking(id,enabled){
+  const lbl=document.getElementById('adv_call_lbl_'+id);
+  if(lbl)lbl.innerHTML='Call Tracking <strong>'+(enabled?'ON':'OFF')+'</strong>';
+  const res=await yelpFn('features/calltracking/'+id,'POST',{enabled});
+  if(res&&!res.error){toast('Call tracking '+(enabled?'enabled':'disabled')+' ✔');updateClientField(id,'call_tracking',enabled);}
+  else toast('Error: '+(res?.error||'Unknown'),'error');
+}
+async function clearFeature(id,feature){
+  if(!confirm('Clear '+feature+' for this campaign?'))return;
+  const res=await yelpFn('features/'+feature+'/'+id,'POST',{clear:true});
+  if(res&&!res.error)toast(feature+' cleared ✔');
+  else toast('Error: '+(res?.error||'Unknown'),'error');
+}
+function updateClientField(id,field,val){const c=(window.clients||[]).find(x=>x.id===id);if(c)c[field]=val;}
+
 </script>
 </body>
 </html>
