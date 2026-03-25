@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -202,8 +202,8 @@ exports.handler = async(event)=>{
   }
 
   // --- Reporting API v3 (correct endpoints) ---
-  // POST reporting/daily  ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ create daily report
-  // POST reporting/monthly ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ create monthly report  
+  // POST reporting/daily  ÃÂ¢ÃÂÃÂ create daily report
+  // POST reporting/monthly ÃÂ¢ÃÂÃÂ create monthly report  
   if (path === 'reporting/daily' || path === 'reporting/monthly') {
     const endpoint = path === 'reporting/daily'
       ? '/v3/reporting/businesses/daily'
@@ -262,7 +262,7 @@ exports.handler = async(event)=>{
   }
 
 
-  // Ã¢ÂÂÃ¢ÂÂ Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} Ã¢ÂÂÃ¢ÂÂ
+  // ââ Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} ââ
   if (path === 'reporting/monthly/create') {
     const { month, ids, fusion_key } = body;
     if (!fusion_key || !ids?.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing fusion_key or ids' }) };
@@ -276,7 +276,7 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Reporting API: GET reporting/monthly/poll/{report_id}  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ââ Reporting API: GET reporting/monthly/poll/{report_id}  ââââââââââââââââââ
   if (path.startsWith('reporting/monthly/poll/')) {
     const reportId = path.split('/')[3];
     const fusion_key = body?.fusion_key || req.headers?.['x-fusion-key'] || '';
@@ -287,14 +287,14 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Programs list all (for biz encid mapping) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ââ Programs list all (for biz encid mapping) âââââââââââââââââââââââââââââ
   if (path === 'programs/list/all') {
     const r = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&program_status=CURRENT', basicAuth());
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
 
-  // ââ Program Feature API routes ââââââââââââââââââââââââââââââââââ
+  // ── Program Feature API routes ──────────────────────────────────
   if (path.startsWith('features/')) {
     const parts = path.split('/');
     const action = parts[1];
@@ -373,7 +373,7 @@ exports.handler = async(event)=>{
   }
 
 
-  // ── Create Program (CPC / EP / BP / Layered) ──────────────────
+  //  Create Program (CPC / EP / BP / Layered) 
   if (path === 'create' && method === 'POST') {
     const body = JSON.parse(event.body || '{}');
     const { bizId, programType, budget, maxBid, isAutobid, start, end } = body;
@@ -496,6 +496,73 @@ exports.handler = async(event)=>{
     }
     locations.sort((a,b) => a.hasActive === b.hasActive ? (a.name||'').localeCompare(b.name||'') : a.hasActive ? 1 : -1);
     return { statusCode:200, headers:cors, body: JSON.stringify({ locations, total: locations.length }) };
+  }
+
+  // -- All partner locations: paginate all programs, dedupe by bizId --
+  if (path === 'all-locations') {
+    const bizMap = {};
+    let offset = 0;
+    const limit = 40;
+    let total = 9999;
+
+    // Paginate through ALL programs to collect every unique business
+    while (offset < total) {
+      const page = await httpGet(
+        'partner-api.yelp.com',
+        '/programs/v1?limit=' + limit + '&offset=' + offset + '&program_status=CURRENT',
+        basicAuth()
+      );
+      const programs = page.programs || page.payment_programs || [];
+      total = page.total || programs.length;
+      if (!programs.length) break;
+
+      programs.forEach(p => {
+        (p.businesses || []).forEach(b => {
+          const bid = b.yelp_business_id;
+          if (!bizMap[bid]) {
+            bizMap[bid] = {
+              bizId: bid,
+              name: b.name || b.business_name || bid,
+              address: [b.address1, b.city, b.state].filter(Boolean).join(', '),
+              phone: b.phone || '',
+              hasActive: p.program_status === 'ACTIVE' || p.program_status === 'CURRENT',
+              programType: p.program_type || null
+            };
+          }
+        });
+      });
+
+      offset += limit;
+      if (offset >= total) break;
+    }
+
+    // If businesses have no name yet, try Partner Support API batch lookup
+    const unnamed = Object.values(bizMap).filter(b => !b.name || b.name === b.bizId);
+    if (unnamed.length) {
+      const ids = unnamed.map(b => b.bizId).join(',');
+      try {
+        const bizInfo = await httpGet(
+          'partner-api.yelp.com',
+          '/v1/reseller/businesses?yelp_business_ids=' + encodeURIComponent(ids),
+          basicAuth()
+        );
+        (bizInfo.businesses || []).forEach(b => {
+          if (bizMap[b.yelp_business_id]) {
+            bizMap[b.yelp_business_id].name = b.name || b.business_name || b.yelp_business_id;
+            bizMap[b.yelp_business_id].address = [b.address1, b.city, b.state].filter(Boolean).join(', ');
+          }
+        });
+      } catch(e) {}
+    }
+
+    const locations = Object.values(bizMap);
+    // Sort: no active program first (can launch fresh), then active
+    locations.sort((a, b) => {
+      if (a.hasActive !== b.hasActive) return a.hasActive ? 1 : -1;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ locations, total: locations.length }) };
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
