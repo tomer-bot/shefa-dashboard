@@ -1794,7 +1794,7 @@ async function clearFeature(id,feature){
   if(res&&!res.error)toast(feature+' cleared (saved)');
   else toast('Error: '+(res?.error||'Unknown'),'error');
 }
-function updateClientField(id,field,val){const c=(window.clients||[]).find(x=>x.id===id);if(c)c[field]=val;}
+function updateClientField(id,field,val){const c=(window.allPrograms||window.clients||[]).find(x=>x.id===id);if(c)c[field]=val;}
 
 
 // ── Launch Campaign ───────────────────────────────────────────
