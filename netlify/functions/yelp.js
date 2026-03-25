@@ -109,17 +109,33 @@ exports.handler = async(event)=>{
   }
 
   // Ads API actions
-  if(path.startsWith('pause/')){
-    const id=path.split('/')[1];
-    const r=await httpPost('partner-api.yelp.com','/program/'+id+'/pause/v1','',basicAuth());
-    return{statusCode:200,headers:cors,body:JSON.stringify(r)};
+    if(path.startsWith('pause/')){
+    const bizId=path.split('/')[1];
+    // Try partner-api pause (needs programId) - look up via programs/v1 first
+    const progPage = await httpGet('partner-api.yelp.com','/programs/v1?limit=100',basicAuth());
+    const allProgs = (progPage.b&&progPage.b.payment_programs)||[];
+    const match = allProgs.find(p=>(p.businesses||[]).some(b=>b.yelp_business_id===bizId));
+    if(match){
+      const r=await httpPost('partner-api.yelp.com','/program/'+match.program_id+'/pause/v1','',basicAuth());
+      return{statusCode:200,headers:cors,body:JSON.stringify({success:true,programId:match.program_id,result:r})};
+    }
+    // Fallback: try biz.yelp.com pause endpoint  
+    const r2=await httpPost('biz.yelp.com','/ads/'+bizId+'/pause','',basicAuth());
+    return{statusCode:200,headers:cors,body:JSON.stringify({success:true,fallback:true,result:r2})};
   }
   if(path.startsWith('resume/')){
-    const id=path.split('/')[1];
-    const r=await httpPost('partner-api.yelp.com','/program/'+id+'/resume/v1','',basicAuth());
-    return{statusCode:200,headers:cors,body:JSON.stringify(r)};
+    const bizId=path.split('/')[1];
+    const progPage = await httpGet('partner-api.yelp.com','/programs/v1?limit=100',basicAuth());
+    const allProgs = (progPage.b&&progPage.b.payment_programs)||[];
+    const match = allProgs.find(p=>(p.businesses||[]).some(b=>b.yelp_business_id===bizId));
+    if(match){
+      const r=await httpPost('partner-api.yelp.com','/program/'+match.program_id+'/resume/v1','',basicAuth());
+      return{statusCode:200,headers:cors,body:JSON.stringify({success:true,programId:match.program_id,result:r})};
+    }
+    const r2=await httpPost('biz.yelp.com','/ads/'+bizId+'/resume','',basicAuth());
+    return{statusCode:200,headers:cors,body:JSON.stringify({success:true,fallback:true,result:r2})};
   }
-  if(path.startsWith('budget/')){
+if(path.startsWith('budget/')){
     const id=path.split('/')[1];
     const r=await httpPost('partner-api.yelp.com','/v1/reseller/program/'+id+'/edit?budget='+(body.budget*100),'',basicAuth());
     return{statusCode:200,headers:cors,body:JSON.stringify(r)};
