@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -202,8 +202,8 @@ exports.handler = async(event)=>{
   }
 
   // --- Reporting API v3 (correct endpoints) ---
-  // POST reporting/daily  ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ create daily report
-  // POST reporting/monthly ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ create monthly report  
+  // POST reporting/daily  ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ create daily report
+  // POST reporting/monthly ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ create monthly report  
   if (path === 'reporting/daily' || path === 'reporting/monthly') {
     const endpoint = path === 'reporting/daily'
       ? '/v3/reporting/businesses/daily'
@@ -262,7 +262,7 @@ exports.handler = async(event)=>{
   }
 
 
-  // Ã¢ÂÂÃ¢ÂÂ Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Reporting API: POST reporting/monthly  body:{month:'2026-03', ids:[...], fusion_key} ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   if (path === 'reporting/monthly/create') {
     const { month, ids, fusion_key } = body;
     if (!fusion_key || !ids?.length) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing fusion_key or ids' }) };
@@ -276,7 +276,7 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Reporting API: GET reporting/monthly/poll/{report_id}  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Reporting API: GET reporting/monthly/poll/{report_id}  ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   if (path.startsWith('reporting/monthly/poll/')) {
     const reportId = path.split('/')[3];
     const fusion_key = body?.fusion_key || req.headers?.['x-fusion-key'] || '';
@@ -287,14 +287,14 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Programs list all (for biz encid mapping) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Programs list all (for biz encid mapping) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   if (path === 'programs/list/all') {
     const r = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&program_status=CURRENT', basicAuth());
     return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
   }
 
 
-  // ââ Program Feature API routes ââââââââââââââââââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ Program Feature API routes Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   if (path.startsWith('features/')) {
     const parts = path.split('/');
     const action = parts[1];
@@ -373,7 +373,7 @@ exports.handler = async(event)=>{
   }
 
 
-  // ── Create Program (CPC / EP / BP / Layered) ──────────────────
+  // ââ Create Program (CPC / EP / BP / Layered) ââââââââââââââââââ
   if (path === 'create' && method === 'POST') {
     const body = JSON.parse(event.body || '{}');
     const { bizId, programType, budget, maxBid, isAutobid, start, end } = body;
@@ -409,6 +409,58 @@ exports.handler = async(event)=>{
     }
 
     return {statusCode:200, headers:cors, body:JSON.stringify({success:true, results})};
+  }
+
+
+  // ── All partner locations (for Launch modal) ──────────────────
+  if (path === 'all-locations') {
+    const auth = 'Basic ' + btoa(user + ':' + pass);
+    const headers = { Authorization: auth, Accept: 'application/json' };
+
+    // Step 1: get all programs to extract all unique biz IDs
+    const rProg = await fetch('https://partner-api.yelp.com/v1/reseller/programs', { headers });
+    const dProg = await rProg.json();
+    const programs = dProg.programs || dProg.payment_programs || [];
+
+    // Collect unique bizId -> existing program info
+    const bizMap = {};
+    programs.forEach(p => {
+      (p.businesses || []).forEach(b => {
+        const bid = b.yelp_business_id;
+        if (!bizMap[bid]) bizMap[bid] = { bizId: bid, status: p.program_status, programType: p.program_type, programId: p.program_id };
+      });
+    });
+
+    // Step 2: batch fetch business info (names) using Partner Support API
+    const allBizIds = Object.keys(bizMap);
+    const chunks = [];
+    for (let i = 0; i < allBizIds.length; i += 50) chunks.push(allBizIds.slice(i, i+50));
+
+    const locations = [];
+    for (const chunk of chunks) {
+      const idsParam = chunk.map(id => encodeURIComponent(id)).join(',');
+      const rBiz = await fetch('https://partner-api.yelp.com/v1/reseller/businesses?yelp_business_ids=' + idsParam, { headers });
+      const dBiz = await rBiz.json();
+      const businesses = dBiz.businesses || [];
+      businesses.forEach(b => {
+        locations.push({
+          bizId: b.yelp_business_id,
+          name: b.name || b.business_name || b.yelp_business_id,
+          address: [b.address1, b.city, b.state].filter(Boolean).join(', '),
+          phone: b.phone || '',
+          hasActive: bizMap[b.yelp_business_id]?.status === 'ACTIVE',
+          programType: bizMap[b.yelp_business_id]?.programType || null,
+        });
+      });
+    }
+
+    // Sort: active last (so new ones are at top), then alphabetically
+    locations.sort((a,b) => {
+      if (a.hasActive !== b.hasActive) return a.hasActive ? 1 : -1;
+      return (a.name||'').localeCompare(b.name||'');
+    });
+
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ locations, total: locations.length }) };
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
