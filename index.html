@@ -720,7 +720,7 @@ function renderDetail(c, isOpen) {
     <div class="detail-box"><div class="dv">${fmtCPL(c.spend_cents, (c.leads||0)+(c.calls||0))}</div><div class="dl">Cost/Lead</div></div>
   </div>
   <div class="controls-row">
-    ${c.status === 'ACTIVE'
+    ${(c.status === 'ACTIVE'||!c.status)
       ? `<button class="btn btn-red btn-sm" onclick="confirmPause('${c.id}',event)">&#9208; Pause</button>`
       : `<button class="btn btn-blue btn-sm" onclick="confirmResume('${c.id}',event)">&#9654; Resume</button>`}
     <input class="budget-input" id="bgt_${c.id}" type="number" value="${((c.budget_cents||0)/100).toFixed(0)}" placeholder="Budget $">
