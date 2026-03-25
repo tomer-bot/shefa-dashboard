@@ -1801,23 +1801,25 @@ function updateClientField(id,field,val){const c=(window.allPrograms||window.cli
 let _launchType = 'CPC';
 
 function openLaunch() {
-  // Populate business dropdown from loaded clients
-  const sel = document.getElementById('launchBizSelect');
-  sel.innerHTML = '<option value="">-- Select a business --</option>';
-  (window.clients||[]).forEach(c=>{
-    const opt = document.createElement('option');
-    opt.value = c.id;
-    opt.textContent = c.name + ' ($'+((c.budget_cents||0)/100).toLocaleString()+'/mo)';
-    sel.appendChild(opt);
-  });
   document.getElementById('launchModal').classList.add('open');
   document.getElementById('launchResult').style.display='none';
   document.getElementById('launchResult').className='launch-result';
-  // Set default start to today
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('launchStart').value = today;
+  document.getElementById('launchStart').value = new Date().toISOString().split('T')[0];
+  const sel = document.getElementById('launchBizSelect');
+  sel.innerHTML = '<option value="">Loading...</option>';
+  const list = window.allPrograms || [];
+  if(list.length) { _fillLaunchBiz(sel, list); }
+  else { yelpFn('programs','GET').then(res=>_fillLaunchBiz(sel,Array.isArray(res)?res:(res.programs||[]))).catch(()=>{sel.innerHTML='<option value="">Error - try again</option>';}); }
 }
-
+function _fillLaunchBiz(sel, list) {
+  sel.innerHTML = '<option value="">-- Select a business --</option>';
+  list.filter(c=>!c.status||c.status==='ACTIVE').forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c.id || c.bizId;
+    opt.textContent = c.name + ' ($'+((c.budget_cents||0)/100).toLocaleString()+'/mo)';
+    sel.appendChild(opt);
+  });
+}
 function closeLaunch() {
   document.getElementById('launchModal').classList.remove('open');
 }
