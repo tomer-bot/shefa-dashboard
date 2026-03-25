@@ -121,6 +121,33 @@ select.month-sel{background:#163a6e;border:1px solid #2a5298;color:#dce8f8;paddi
 .toggle-slider:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
 input:checked+.toggle-slider{background:#0d2d5e}
 input:checked+.toggle-slider:before{transform:translateX(18px)}
+
+.launch-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.launch-modal-overlay.open{display:flex}
+.launch-modal{background:#fff;border-radius:12px;padding:24px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.2)}
+.launch-modal h2{font-size:16px;font-weight:700;color:#0d2d5e;margin:0 0 16px}
+.launch-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.launch-type-card{border:2px solid #c8dcf0;border-radius:8px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.launch-type-card:hover{border-color:#0d2d5e;background:#f0f7ff}
+.launch-type-card.selected{border-color:#0d2d5e;background:#e8f0fb}
+.launch-type-card .ltc-icon{font-size:22px;margin-bottom:4px}
+.launch-type-card .ltc-name{font-size:12px;font-weight:700;color:#0d2d5e}
+.launch-type-card .ltc-desc{font-size:10px;color:#8aa5c0;margin-top:2px}
+.launch-field{margin-bottom:12px}
+.launch-field label{display:block;font-size:11px;font-weight:600;color:#0d2d5e;margin-bottom:4px}
+.launch-field input, .launch-field select{width:100%;background:#f8fbff;border:1px solid #c8dcf0;color:#1a2b45;padding:7px 10px;border-radius:6px;font-size:13px;box-sizing:border-box}
+.launch-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.launch-hint{font-size:10px;color:#8aa5c0;margin-top:3px}
+.launch-cpc-fields{display:none}
+.launch-cpc-fields.visible{display:block}
+.launch-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.launch-btn-cancel{background:#f0f5ff;color:#4a6a8a;border:1px solid #c8dcf0;padding:8px 18px;border-radius:7px;cursor:pointer;font-size:13px}
+.launch-btn-go{background:#0d2d5e;color:#fff;border:none;padding:8px 22px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+.launch-btn-go:hover{background:#1a4a8a}
+.launch-btn-go:disabled{background:#8aa5c0;cursor:not-allowed}
+.launch-result{margin-top:12px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.launch-result.ok{background:#e8fff0;border:1px solid #00c853;color:#006621;display:block}
+.launch-result.err{background:#fff0f0;border:1px solid #ff3b3b;color:#c0392b;display:block}
 .ai-panel{display:flex;flex-direction:column;background:#f5f9ff;overflow:hidden}
 .ai-header{padding:12px 16px;border-bottom:1px solid #d0e4f7;display:flex;align-items:center;justify-content:space-between}
 .ai-header h3{font-size:13px;font-weight:700;color:#0d2d5e}
@@ -269,6 +296,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">&#8635; Sync</button>
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('reportsSection').scrollIntoView({behavior:'smooth'});showReportTab('analytics')"> Reports</button>
     <button class="btn btn-ghost btn-sm" onclick="openConfig()">&#9881; Config</button>
+    <button class="btn btn-green btn-sm" onclick="openLaunch()">&#43; Launch Campaign</button>
   </div>
 </div>
 
@@ -1768,6 +1796,146 @@ async function clearFeature(id,feature){
 }
 function updateClientField(id,field,val){const c=(window.clients||[]).find(x=>x.id===id);if(c)c[field]=val;}
 
+
+// ── Launch Campaign ───────────────────────────────────────────
+let _launchType = 'CPC';
+
+function openLaunch() {
+  // Populate business dropdown from loaded clients
+  const sel = document.getElementById('launchBizSelect');
+  sel.innerHTML = '<option value="">-- Select a business --</option>';
+  (window.clients||[]).forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name + ' ($'+((c.budget_cents||0)/100).toLocaleString()+'/mo)';
+    sel.appendChild(opt);
+  });
+  document.getElementById('launchModal').classList.add('open');
+  document.getElementById('launchResult').style.display='none';
+  document.getElementById('launchResult').className='launch-result';
+  // Set default start to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('launchStart').value = today;
+}
+
+function closeLaunch() {
+  document.getElementById('launchModal').classList.remove('open');
+}
+
+function selectLaunchType(type, el) {
+  _launchType = type;
+  document.querySelectorAll('.launch-type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const cpcFields = document.getElementById('launchCpcFields');
+  cpcFields.classList.toggle('visible', type === 'CPC' || type === 'LAYERED');
+}
+
+function onLaunchBizChange() {}
+
+async function submitLaunch() {
+  const bizId  = document.getElementById('launchBizSelect').value;
+  const budget = parseFloat(document.getElementById('launchBudget').value)||0;
+  const maxBid = parseFloat(document.getElementById('launchMaxBid').value)||0;
+  const start  = document.getElementById('launchStart').value;
+  const end    = document.getElementById('launchEnd').value;
+  const result = document.getElementById('launchResult');
+  const goBtn  = document.getElementById('launchGoBtn');
+
+  if (!bizId) { result.className='launch-result err'; result.textContent='Please select a business.'; result.style.display='block'; return; }
+  if ((_launchType==='CPC'||_launchType==='LAYERED') && !budget) {
+    result.className='launch-result err'; result.textContent='Please enter a monthly budget.'; result.style.display='block'; return;
+  }
+
+  goBtn.disabled = true;
+  goBtn.textContent = 'Launching...';
+  result.style.display='none';
+
+  try {
+    const res = await yelpFn('create','POST',{
+      bizId, programType:_launchType, budget, maxBid: maxBid||null,
+      isAutobid: !maxBid, start: start||null, end: end||null
+    });
+    if (res && res.success) {
+      const lines = res.results.map(r=>{
+        const jid = r.result?.job_id || r.result?.program_id || JSON.stringify(r.result).substring(0,60);
+        return r.type+': Job '+jid;
+      }).join('\n');
+      result.className='launch-result ok';
+      result.innerHTML='&#10003; Campaign launched!<br><small>'+lines.replace(/\n/g,'<br>')+'</small>';
+      result.style.display='block';
+      setTimeout(()=>{ closeLaunch(); loadDashboard(); }, 3000);
+    } else {
+      result.className='launch-result err';
+      result.textContent='Error: '+(res?.error||res?.results?.[0]?.result?.error?.description||JSON.stringify(res).substring(0,100));
+      result.style.display='block';
+    }
+  } catch(e) {
+    result.className='launch-result err';
+    result.textContent='Error: '+e.message;
+    result.style.display='block';
+  }
+  goBtn.disabled=false;
+  goBtn.textContent='&#128640; Launch';
+}
+
 </script>
+
+<!-- Launch Campaign Modal -->
+<div class="launch-modal-overlay" id="launchModal" onclick="if(event.target===this)closeLaunch()">
+  <div class="launch-modal">
+    <h2>&#43; Launch New Campaign</h2>
+    <div class="launch-field">
+      <label>Business (select from active clients)</label>
+      <select id="launchBizSelect" onchange="onLaunchBizChange()">
+        <option value="">-- Select a business --</option>
+      </select>
+    </div>
+    <div class="launch-type-grid">
+      <div class="launch-type-card selected" onclick="selectLaunchType('CPC',this)">
+        <div class="ltc-icon">&#128270;</div>
+        <div class="ltc-name">CPC</div>
+        <div class="ltc-desc">Search Ad<br>Pay per click</div>
+      </div>
+      <div class="launch-type-card" onclick="selectLaunchType('EP',this)">
+        <div class="ltc-icon">&#11088;</div>
+        <div class="ltc-name">Enhanced Profile</div>
+        <div class="ltc-desc">Removes competitor ads, adds CTA</div>
+      </div>
+      <div class="launch-type-card" onclick="selectLaunchType('LAYERED',this)">
+        <div class="ltc-icon">&#127381;</div>
+        <div class="ltc-name">Layered</div>
+        <div class="ltc-desc">CPC + Enhanced Profile together</div>
+      </div>
+    </div>
+    <div class="launch-cpc-fields visible" id="launchCpcFields">
+      <div class="launch-row">
+        <div class="launch-field">
+          <label>Monthly Budget ($)</label>
+          <input type="number" id="launchBudget" placeholder="e.g. 500" min="50">
+        </div>
+        <div class="launch-field">
+          <label>Max CPC Bid ($)</label>
+          <input type="number" id="launchMaxBid" placeholder="e.g. 15" min="0.5" step="0.5">
+          <div class="launch-hint">Leave blank to use Yelp auto-bid</div>
+        </div>
+      </div>
+    </div>
+    <div class="launch-row">
+      <div class="launch-field">
+        <label>Start Date (optional)</label>
+        <input type="date" id="launchStart">
+      </div>
+      <div class="launch-field">
+        <label>End Date (optional)</label>
+        <input type="date" id="launchEnd">
+      </div>
+    </div>
+    <div id="launchResult" class="launch-result"></div>
+    <div class="launch-actions">
+      <button class="launch-btn-cancel" onclick="closeLaunch()">Cancel</button>
+      <button class="launch-btn-go" id="launchGoBtn" onclick="submitLaunch()">&#128640; Launch</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
