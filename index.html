@@ -1729,7 +1729,81 @@ function initReportsSection() {
 }
 
 // -- Advanced Controls JS --------------------------------------
-function toggleAdv(id){const p=document.getElementById('adv_'+id);if(p)p.classList.toggle('open');}
+function toggleAdv(id){
+  const p=document.getElementById('adv_'+id);
+  if(!p) return;
+  const wasOpen = p.classList.contains('open');
+  p.classList.toggle('open');
+  if(!wasOpen) loadAdvFeatures(id);
+}
+async function loadAdvFeatures(id) {
+  // Get programId for this bizId from the map
+  if(!window._bizProgramMap) {
+    try {
+      const r = await yelpFn('biz-program-map','GET');
+      window._bizProgramMap = r.map || {};
+    } catch(e) { return; }
+  }
+  const prog = window._bizProgramMap[id];
+  if(!prog) return;
+  const programId = prog.programId;
+  const active = prog.activeFeatures || [];
+  const avail = prog.availableFeatures || [];
+
+  // Fetch current feature details
+  try {
+    const r = await yelpFn('features/'+programId,'GET');
+    const f = (r.b && r.b.features) || r.features || {};
+
+    // Populate Category tab
+    const catInput = document.getElementById('adv_cat_input_'+id);
+    if(catInput && f.STRICT_CATEGORY_TARGETING) catInput.value = (f.STRICT_CATEGORY_TARGETING.categories||[]).join(',');
+
+    // Populate Keywords tab
+    const kwTags = document.getElementById('adv_kw_tags_'+id);
+    if(kwTags && f.NEGATIVE_KEYWORD_TARGETING) {
+      kwTags.innerHTML = '';
+      (f.NEGATIVE_KEYWORD_TARGETING.negative_keywords||[]).forEach(kw=>{
+        const sp=document.createElement('span'); sp.className='adv-tag';
+        sp.innerHTML=kw+' <span onclick="this.parentElement.remove()">&#215;</span>';
+        kwTags.appendChild(sp);
+      });
+    }
+
+    // Populate Location tab
+    const locInput = document.getElementById('adv_loc_input_'+id);
+    if(locInput && f.CUSTOM_LOCATION_TARGETING) locInput.value = (f.CUSTOM_LOCATION_TARGETING.locations||[]).join('\n');
+
+    // Populate Schedule tab
+    if(f.AD_SCHEDULING) {
+      const days = f.AD_SCHEDULING.days||[];
+      const hours = f.AD_SCHEDULING.hours||[];
+      document.querySelectorAll('#adv_days_'+id+' .adv-day').forEach(el=>{
+        el.classList.toggle('on', days.includes(parseInt(el.dataset.day)));
+      });
+      document.querySelectorAll('#adv_hours_'+id+' .adv-hour').forEach(el=>{
+        el.classList.toggle('on', hours.includes(parseInt(el.dataset.hr)));
+      });
+    }
+
+    // Populate Call Tracking tab
+    const callChk = document.getElementById('adv_call_chk_'+id);
+    const callLbl = document.getElementById('adv_call_lbl_'+id);
+    if(callChk) {
+      const enabled = active.includes('CALL_TRACKING') || !!f.CALL_TRACKING;
+      callChk.checked = enabled;
+      if(callLbl) callLbl.innerHTML = 'Call Tracking <strong>'+(enabled?'ON':'OFF')+'</strong>';
+    }
+
+    // Show available/active feature badges
+    const panel = document.getElementById('adv_'+id);
+    if(panel && avail.length) {
+      let badge = panel.querySelector('.adv-features-info');
+      if(!badge) { badge=document.createElement('div'); badge.className='adv-features-info'; badge.style.cssText='font-size:10px;color:#8aa5c0;margin-bottom:8px'; panel.insertBefore(badge,panel.firstChild); }
+      badge.textContent = 'Active features: '+(active.length?active.join(', '):'none')+' | Available: '+avail.join(', ');
+    }
+  } catch(e) {}
+}
 function switchAdvTab(id,tab,el){
   const panel=document.getElementById('adv_'+id);if(!panel)return;
   panel.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
@@ -1743,7 +1817,7 @@ async function saveCategory(id){
   const val=document.getElementById('adv_cat_input_'+id)?.value?.trim();
   if(!val)return toast('Enter at least one category','error');
   const cats=val.split(',').map(s=>s.trim()).filter(Boolean);
-  const res=await yelpFn('features/category/'+id,'POST',{categories:cats});
+  const res=const _pid=window._bizProgramMap&&window._bizProgramMap[id]?window._bizProgramMap[id].programId:id; const res=await yelpFn('features/category/'+_pid,'POST',{categories:cats});
   if(res&&!res.error){toast('Categories saved (saved)');updateClientField(id,'categories',cats);}
   else toast('Error: '+(res?.error||'Unknown'),'error');
 }
@@ -1751,7 +1825,7 @@ async function saveKeywords(id){
   const tags=document.querySelectorAll('#adv_kw_tags_'+id+' .adv-tag');
   const kws=Array.from(tags).map(t=>t.childNodes[0]?.textContent?.trim()).filter(Boolean);
   if(!kws.length)return toast('Add at least one keyword','error');
-  const res=await yelpFn('features/keywords/'+id,'POST',{keywords:kws});
+  const res=const _pid2=window._bizProgramMap&&window._bizProgramMap[id]?window._bizProgramMap[id].programId:id; const res=await yelpFn('features/keywords/'+_pid2,'POST',{keywords:kws});
   if(res&&!res.error){toast('Keywords saved (saved)');updateClientField(id,'neg_keywords',kws);}
   else toast('Error: '+(res?.error||'Unknown'),'error');
 }
@@ -1769,7 +1843,7 @@ async function saveLocation(id){
   const raw=document.getElementById('adv_loc_input_'+id)?.value?.trim();
   if(!raw)return toast('Enter at least one location','error');
   const locs=raw.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,25);
-  const res=await yelpFn('features/location/'+id,'POST',{locations:locs});
+  const res=const _pid3=window._bizProgramMap&&window._bizProgramMap[id]?window._bizProgramMap[id].programId:id; const res=await yelpFn('features/location/'+_pid3,'POST',{locations:locs});
   if(res&&!res.error){toast('Locations saved ('+locs.length+') (saved)');updateClientField(id,'locations',locs);}
   else toast('Error: '+(res?.error||'Unknown'),'error');
 }
@@ -1777,14 +1851,14 @@ async function saveSchedule(id){
   const days=Array.from(document.querySelectorAll('#adv_days_'+id+' .adv-day.on')).map(e=>parseInt(e.dataset.day));
   const hours=Array.from(document.querySelectorAll('#adv_hours_'+id+' .adv-hour.on')).map(e=>parseInt(e.dataset.hr));
   if(!days.length)return toast('Select at least one day','error');
-  const res=await yelpFn('features/schedule/'+id,'POST',{schedule:{days,hours}});
+  const res=const _pid4=window._bizProgramMap&&window._bizProgramMap[id]?window._bizProgramMap[id].programId:id; const res=await yelpFn('features/schedule/'+_pid4,'POST',{schedule:{days,hours}});
   if(res&&!res.error){toast('Schedule saved (saved)');updateClientField(id,'sched_days',days);updateClientField(id,'sched_hours',hours);}
   else toast('Error: '+(res?.error||'Unknown'),'error');
 }
 async function saveCallTracking(id,enabled){
   const lbl=document.getElementById('adv_call_lbl_'+id);
   if(lbl)lbl.innerHTML='Call Tracking <strong>'+(enabled?'ON':'OFF')+'</strong>';
-  const res=await yelpFn('features/calltracking/'+id,'POST',{enabled});
+  const res=const _pid5=window._bizProgramMap&&window._bizProgramMap[id]?window._bizProgramMap[id].programId:id; const res=await yelpFn('features/calltracking/'+_pid5,'POST',{enabled});
   if(res&&!res.error){toast('Call tracking '+(enabled?'enabled':'disabled')+' (saved)');updateClientField(id,'call_tracking',enabled);}
   else toast('Error: '+(res?.error||'Unknown'),'error');
 }
@@ -1797,7 +1871,7 @@ async function clearFeature(id,feature){
 function updateClientField(id,field,val){const c=(window.allPrograms||window.clients||[]).find(x=>x.id===id);if(c)c[field]=val;}
 
 
-// ── Launch Campaign ───────────────────────────────────────────
+//  Launch Campaign 
 let _launchType = 'CPC';
 
 function openLaunch() {
