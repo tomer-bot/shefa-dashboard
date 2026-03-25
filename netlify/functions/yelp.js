@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata Ã¢ÂÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata â maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names Ã¢ÂÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names â strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -425,47 +425,58 @@ exports.handler = async(event)=>{
 
   // -- All locations: paginate all programs, dedupe all businesses
   if (path === 'all-locations') {
-    // Step 1: paginate all programs to collect unique bizIds + status
     const bizMap = {};
     let offset = 0;
     const pageSize = 40;
-    let total = 9999;
-    while (offset < total) {
-      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit='+pageSize+'&offset='+offset+'&program_status=CURRENT', basicAuth());
+    let remaining = true;
+
+    // Paginate ALL programs (no status filter) to collect every unique business
+    while (remaining) {
+      const page = await httpGet(
+        'partner-api.yelp.com',
+        '/programs/v1?limit=' + pageSize + '&offset=' + offset,
+        basicAuth()
+      );
       const programs = (page.b && page.b.payment_programs) || [];
-      if (page.b && typeof page.b.total === 'number') total = page.b.total;
       if (!programs.length) break;
+
       programs.forEach(p => {
         (p.businesses || []).forEach(b => {
           const bid = b.yelp_business_id;
-          if (!bizMap[bid]) bizMap[bid] = {
-            bizId: bid,
-            name: b.name || b.business_name || null,
-            address: [b.address1, b.city, b.state].filter(Boolean).join(', '),
-            hasActive: p.program_status === 'ACTIVE' || p.program_status === 'CURRENT',
-            programType: p.program_type || null
-          };
+          if (!bizMap[bid]) {
+            // Try to get name from SNAPSHOT first (has proper names for active campaigns)
+            const snap = SNAPSHOT.find(s => s.id === bid);
+            bizMap[bid] = {
+              bizId: bid,
+              name: snap ? snap.name : (b.name || b.business_name || null),
+              address: snap ? '' : ([b.address1, b.city, b.state].filter(Boolean).join(', ')),
+              hasActive: p.program_status === 'ACTIVE' || p.program_status === 'CURRENT',
+              programType: p.program_type || null
+            };
+          } else if (!bizMap[bid].name || bizMap[bid].name === bid) {
+            // If we have the biz but no name yet, try again
+            const snap = SNAPSHOT.find(s => s.id === bid);
+            if (snap) bizMap[bid].name = snap.name;
+          }
         });
       });
+
+      const total = (page.b && page.b.total) || 0;
       offset += pageSize;
-      if (offset >= total) break;
+      remaining = (total > 0 && offset < total) && programs.length === pageSize;
     }
-    // Step 2: resolve names from CLIENTS list for any unnamed entries
-    const unnamed = Object.keys(bizMap).filter(bid => !bizMap[bid].name);
-    if (unnamed.length) {
-      unnamed.forEach(bid => {
-        const client = SNAPSHOT.find(c => c.id === bid);
-        if (client) { bizMap[bid].name = client.name; }
-        else bizMap[bid].name = bid;
-      });
-    }
-    // Step 3: sort and return
+
+    // For any still unnamed, use bizId as display name
+    Object.values(bizMap).forEach(b => { if (!b.name) b.name = b.bizId; });
+
     const locations = Object.values(bizMap);
-    locations.sort((a,b) => {
+    // Sort: no current program first (available to launch), then active
+    locations.sort((a, b) => {
       if (a.hasActive !== b.hasActive) return a.hasActive ? 1 : -1;
-      return (a.name||'').localeCompare(b.name||'');
+      return (a.name || '').localeCompare(b.name || '');
     });
-    return { statusCode:200, headers:cors, body: JSON.stringify({ locations, total: locations.length }) };
+
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ locations, total: locations.length }) };
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
