@@ -1737,79 +1737,55 @@ function toggleAdv(id){
   if(!wasOpen) loadAdvFeatures(id);
 }
 async function loadAdvFeatures(id) {
-  // Get programId for this bizId from the map
-  if(!window._bizProgramMap) {
-    try {
-      const r = await yelpFn('biz-program-map','GET');
-      window._bizProgramMap = r.map || {};
-    } catch(e) { return; }
+  // Load saved settings from localStorage first (instant, always works)
+  const saved = JSON.parse(localStorage.getItem('adv_'+id)||'{}');
+
+  // Populate Category
+  const catInput = document.getElementById('adv_cat_input_'+id);
+  if(catInput) catInput.value = saved.categories || '';
+
+  // Populate Keywords
+  const kwTags = document.getElementById('adv_kw_tags_'+id);
+  if(kwTags) {
+    kwTags.innerHTML = '';
+    (saved.neg_keywords||[]).forEach(kw=>{
+      const sp=document.createElement('span'); sp.className='adv-tag';
+      sp.innerHTML=kw+' <span onclick="this.parentElement.remove()">&#215;</span>';
+      kwTags.appendChild(sp);
+    });
   }
-  const prog = window._bizProgramMap[id];
-  if(!prog) return;
-  const programId = prog.programId;
-  const active = prog.activeFeatures || [];
-  const avail = prog.availableFeatures || [];
 
-  // Fetch current feature details
-  try {
-    const r = await yelpFn('features/'+programId,'GET');
-    const f = (r.b && r.b.features) || r.features || {};
+  // Populate Location
+  const locInput = document.getElementById('adv_loc_input_'+id);
+  if(locInput) locInput.value = (saved.locations||[]).join('\n');
 
-    // Populate Category tab
-    const catInput = document.getElementById('adv_cat_input_'+id);
-    if(catInput && f.STRICT_CATEGORY_TARGETING) catInput.value = (f.STRICT_CATEGORY_TARGETING.categories||[]).join(',');
+  // Populate Schedule
+  if(saved.sched_days) {
+    document.querySelectorAll('#adv_days_'+id+' .adv-day').forEach(el=>{
+      el.classList.toggle('on', (saved.sched_days||[]).includes(parseInt(el.dataset.day)));
+    });
+  }
+  if(saved.sched_hours) {
+    document.querySelectorAll('#adv_hours_'+id+' .adv-hour').forEach(el=>{
+      el.classList.toggle('on', (saved.sched_hours||[]).includes(parseInt(el.dataset.hr)));
+    });
+  }
 
-    // Populate Keywords tab
-    const kwTags = document.getElementById('adv_kw_tags_'+id);
-    if(kwTags && f.NEGATIVE_KEYWORD_TARGETING) {
-      kwTags.innerHTML = '';
-      (f.NEGATIVE_KEYWORD_TARGETING.negative_keywords||[]).forEach(kw=>{
-        const sp=document.createElement('span'); sp.className='adv-tag';
-        sp.innerHTML=kw+' <span onclick="this.parentElement.remove()">&#215;</span>';
-        kwTags.appendChild(sp);
-      });
-    }
+  // Populate Call Tracking
+  const callChk = document.getElementById('adv_call_chk_'+id);
+  const callLbl = document.getElementById('adv_call_lbl_'+id);
+  if(callChk) {
+    callChk.checked = !!saved.call_tracking;
+    if(callLbl) callLbl.innerHTML = 'Call Tracking <strong>'+(saved.call_tracking?'ON':'OFF')+'</strong>';
+  }
 
-    // Populate Location tab
-    const locInput = document.getElementById('adv_loc_input_'+id);
-    if(locInput && f.CUSTOM_LOCATION_TARGETING) locInput.value = (f.CUSTOM_LOCATION_TARGETING.locations||[]).join('\n');
-
-    // Populate Schedule tab
-    if(f.AD_SCHEDULING) {
-      const days = f.AD_SCHEDULING.days||[];
-      const hours = f.AD_SCHEDULING.hours||[];
-      document.querySelectorAll('#adv_days_'+id+' .adv-day').forEach(el=>{
-        el.classList.toggle('on', days.includes(parseInt(el.dataset.day)));
-      });
-      document.querySelectorAll('#adv_hours_'+id+' .adv-hour').forEach(el=>{
-        el.classList.toggle('on', hours.includes(parseInt(el.dataset.hr)));
-      });
-    }
-
-    // Populate Call Tracking tab
-    const callChk = document.getElementById('adv_call_chk_'+id);
-    const callLbl = document.getElementById('adv_call_lbl_'+id);
-    if(callChk) {
-      const enabled = active.includes('CALL_TRACKING') || !!f.CALL_TRACKING;
-      callChk.checked = enabled;
-      if(callLbl) callLbl.innerHTML = 'Call Tracking <strong>'+(enabled?'ON':'OFF')+'</strong>';
-    }
-
-    // Show available/active feature badges
-    const panel = document.getElementById('adv_'+id);
-    if(panel && avail.length) {
-      let badge = panel.querySelector('.adv-features-info');
-      if(!badge) { badge=document.createElement('div'); badge.className='adv-features-info'; badge.style.cssText='font-size:10px;color:#8aa5c0;margin-bottom:8px'; panel.insertBefore(badge,panel.firstChild); }
-      badge.textContent = 'Active features: '+(active.length?active.join(', '):'none')+' | Available: '+avail.join(', ');
-    }
-  } catch(e) {}
-}
-function switchAdvTab(id,tab,el){
-  const panel=document.getElementById('adv_'+id);if(!panel)return;
-  panel.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
-  panel.querySelectorAll('.adv-section').forEach(s=>s.classList.remove('active'));
-  el.classList.add('active');
-  const sec=document.getElementById('adv_'+tab+'_'+id);if(sec)sec.classList.add('active');
+  // Show last saved timestamp if available
+  const panel = document.getElementById('adv_'+id);
+  if(panel) {
+    let info = panel.querySelector('.adv-save-info');
+    if(!info){ info=document.createElement('div'); info.className='adv-save-info'; info.style.cssText='font-size:10px;color:#8aa5c0;margin-bottom:6px;text-align:right'; panel.insertBefore(info,panel.firstChild); }
+    info.textContent = saved._saved ? 'Last saved: '+new Date(saved._saved).toLocaleString() : 'No settings saved yet';
+  }
 }
 function toggleDay(el){el.classList.toggle('on');}
 function toggleHour(el){el.classList.toggle('on');}
