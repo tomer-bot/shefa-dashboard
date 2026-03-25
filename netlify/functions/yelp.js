@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata ÃÂ¢ÃÂÃÂ maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata Ã¢ÂÂ maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names ÃÂ¢ÃÂÃÂ strip ": None", trailing ": ", newlines, etc.
+// Clean display names Ã¢ÂÂ strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -202,8 +202,8 @@ exports.handler = async(event)=>{
   }
 
   // --- Reporting API v3 (correct endpoints) ---
-  // POST reporting/daily  → create daily report
-  // POST reporting/monthly → create monthly report  
+  // POST reporting/daily   create daily report
+  // POST reporting/monthly  create monthly report  
   if (path === 'reporting/daily' || path === 'reporting/monthly') {
     const endpoint = path === 'reporting/daily'
       ? '/v3/reporting/businesses/daily'
@@ -454,8 +454,8 @@ exports.handler = async(event)=>{
     const unnamed = Object.keys(bizMap).filter(bid => !bizMap[bid].name);
     if (unnamed.length) {
       unnamed.forEach(bid => {
-        const client = CLIENTS.find(c => c.bizId === bid);
-        if (client) { bizMap[bid].name = client.name; bizMap[bid].address = client.address || bizMap[bid].address; }
+        const client = SNAPSHOT.find(c => c.id === bid);
+        if (client) { bizMap[bid].name = client.name; }
         else bizMap[bid].name = bid;
       });
     }
