@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Group metadata â maps bizId to group_id and campaign_type (main vs layered)
+// Group metadata — maps bizId to group_id and campaign_type (main vs layered)
 // Rule: higher budget = main, lower budget = layered (for same-client campaigns)
 const GROUPS = {
   '_sZA3BJl7twy01kXTzjbwQ': { group_id: 'g_roof_tom',     campaign_type: 'layered' }, // $200
@@ -13,7 +13,7 @@ const GROUPS = {
   'vSnFEC7jCZ33-G9W1EAoDw': { group_id: 'g_green_rodent', campaign_type: 'layered' }, // $2500
 };
 
-// Clean display names â strip ": None", trailing ": ", newlines, etc.
+// Clean display names — strip ": None", trailing ": ", newlines, etc.
 function cleanName(name) {
   return name
     .replace(/\n/g, ' ')
@@ -439,43 +439,43 @@ exports.handler = async(event)=>{
       );
       const programs = (page.b && page.b.payment_programs) || [];
       if (!programs.length) break;
-
       programs.forEach(p => {
         (p.businesses || []).forEach(b => {
           const bid = b.yelp_business_id;
-          if (!bizMap[bid]) {
-            // Try to get name from SNAPSHOT first (has proper names for active campaigns)
-            const snap = SNAPSHOT.find(s => s.id === bid);
-            bizMap[bid] = {
-              bizId: bid,
-              name: snap ? snap.name : (b.name || b.business_name || null),
-              address: snap ? '' : ([b.address1, b.city, b.state].filter(Boolean).join(', ')),
-              hasActive: p.program_status === 'ACTIVE' || p.program_status === 'CURRENT',
-              programType: p.program_type || null
-            };
-          } else if (!bizMap[bid].name || bizMap[bid].name === bid) {
-            // If we have the biz but no name yet, try again
-            const snap = SNAPSHOT.find(s => s.id === bid);
-            if (snap) bizMap[bid].name = snap.name;
-          }
+          if (!bizMap[bid]) bizMap[bid] = {
+            bizId: bid,
+            name: null,
+            address: '',
+            hasActive: p.program_status === 'ACTIVE' || p.program_status === 'CURRENT',
+            programType: p.program_type || null
+          };
         });
       });
-
       const total = (page.b && page.b.total) || 0;
       offset += pageSize;
-      remaining = (total > 0 && offset < total) && programs.length === pageSize;
+      remaining = total > 0 && offset < total && programs.length === pageSize;
     }
 
-    // For any still unnamed, use bizId as display name
-    Object.values(bizMap).forEach(b => { if (!b.name) b.name = b.bizId; });
+    // Resolve names via Yelp Fusion API (GET /v3/businesses/{id})
+    const allBizIds = Object.keys(bizMap);
+    const fusionAuth = 'Bearer ' + FUSION_KEY;
+    await Promise.all(allBizIds.map(async bid => {
+      try {
+        const res = await httpGet('api.yelp.com', '/v3/businesses/' + bid, fusionAuth);
+        if (res.b && res.b.name) {
+          bizMap[bid].name = res.b.name;
+          const loc = res.b.location || {};
+          bizMap[bid].address = [loc.address1, loc.city, loc.state].filter(Boolean).join(', ');
+        }
+      } catch(e) {}
+      if (!bizMap[bid].name) bizMap[bid].name = bid;
+    }));
 
     const locations = Object.values(bizMap);
-    // Sort: no current program first (available to launch), then active
     locations.sort((a, b) => {
       if (a.hasActive !== b.hasActive) return a.hasActive ? 1 : -1;
       return (a.name || '').localeCompare(b.name || '');
     });
-
     return { statusCode: 200, headers: cors, body: JSON.stringify({ locations, total: locations.length }) };
   }
 
