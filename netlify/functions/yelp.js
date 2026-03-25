@@ -470,6 +470,27 @@ exports.handler = async(event)=>{
     return { statusCode: 200, headers: cors, body: JSON.stringify({ locations, total: locations.length }) };
   }
 
+
+  // -- bizId to programId mapping (for Advanced Controls) --
+  if (path === 'biz-program-map') {
+    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const programs = (page.b && page.b.payment_programs) || [];
+    const map = {};
+    programs.forEach(p => {
+      if (p.program_status === 'ACTIVE' || p.program_status === 'CURRENT') {
+        (p.businesses || []).forEach(b => {
+          if (!map[b.yelp_business_id]) map[b.yelp_business_id] = {
+            programId: p.program_id,
+            programType: p.program_type,
+            activeFeatures: p.active_features || [],
+            availableFeatures: p.available_features || []
+          };
+        });
+      }
+    });
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ map }) };
+  }
+
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 }
 async function httpPostJson(host, path, bodyObj, authHeader) {
