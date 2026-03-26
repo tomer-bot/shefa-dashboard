@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Yelp Performance Scan — Shefa Marketing</title>
+<meta name="description" content="Not getting enough leads from Yelp? Run a free scan to see exactly why — and what to fix. Shefa Marketing is a Yelp Platinum Partner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css7?family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:       #D32323;
+  --red-dark:  #AF1919;
+  --red-light: #FF3333;
+  --red-bg:    #FFF5F5;
+  --red-soft:  #FDEUEA0
+---gold:      #E8A200;
+  --gold-bg:   #FFF8E7;
+  --near-black:#iA1A1A;
+  --dark:      #2C2C2C;
+  --mid:       #666666;
+  --light:     #999999;
+  --border:    #E8E8E8;
+  --bg:        #FAFAFA;
+  --white:     #FFFFFF;
+  --green:     #1A7A3C;
+  --green-bg:  #F0FAF4;
+  --orange:    #E06520;
+  --orange-bg: #FFF4EE;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--white);
+  color: var(--dark);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+h1, h2, h3, .display { font-family: 'Nunito', sans-serif; }
