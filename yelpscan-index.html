@@ -1381,9 +1381,9 @@ async function submitScan(e) {
 
     // Metric bars
     const bars = document.getElementById('metricBars');
+        const photoScore = data.photos >= 15 ? 100 : data.photos >= 8 ? 75 : data.photos >= 4 ? 50 : data.photos >= 2 ? 30 : 10;
+    const leadConversion = Math.round((data.responseTime * 0.40) + (photoScore * 0.30) + (data.claimed ? 20 : 0) + (Math.min(100, Math.max(0, ((data.rating - 3.0) / 2.0) * 100)) * 0.10));
     bars.innerHTML = [
-      const photoScore = data.photos >= 15 ? 100 : data.photos >= 8 ? 75 : data.photos >= 4 ? 50 : data.photos >= 2 ? 30 : 10;
-      const leadConversion = Math.round((data.responseTime * 0.40) + (photoScore * 0.30) + (data.claimed ? 20 : 0) + (Math.min(100, Math.max(0, ((data.rating - 3.0) / 2.0) * 100)) * 0.10));
       metricBar('Response Time', data.responseTime, '⚡'),
       metricBar('Profile Completeness', data.profileCompleteness, '📋'),
       metricBar('Review Health', data.reviewHealth, '⭐'),
