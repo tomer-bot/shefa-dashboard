@@ -1270,6 +1270,8 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.08 });
 document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// FAQ
 document.querySelectorAll('.faq-q').forEach(q => {
   q.addEventListener('click', () => {
     const item = q.closest('.faq-item');
@@ -1278,61 +1280,34 @@ document.querySelectorAll('.faq-q').forEach(q => {
     if (!wasOpen) item.classList.add('open');
   });
 });
-function animateNum(el,target){let cur=0;const step=Math.max(1,Math.ceil(target/40));const iv=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur;if(cur>=target)clearInterval(iv)},25)}
-function metricBar(label,score,icon){const color=score>=80?'#1A7A3C':score>=60?'#2BBFAA':score>=40?'#E8A200':'#D32323';const tag=score>=80?'Strong':score>=60?'Good':score>=40?'Weak':'Poor';return `<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="font-size:12px;font-weight:700;color:var(--dark)">${icon} ${label}</div><div style="font-size:12px;font-weight:800;color:${color}">${score} <span style="font-weight:400;color:var(--mid);font-size:11px">${tag}</span></div></div><div style="height:5px;background:#F0F0F0;border-radius:3px;overflow:hidden"><div style="height:100%;width:0%;background:${color};border-radius:3��[��][ێ��Y�\�X\�H�]K]�H����ܙ_H���]���]���]��B�\�[���[��[ۈ�X�Z]��[�J^�K��]�[�Y�][
 
-N��ۜ��ܛOY��[Y[���][[Y[��RY
-	�\�ћܛI�N��ۜ���Y��[Y[���][[Y[��RY
-	�\����[����N��ۜ��[�]��ܛQ]J�ܛJN��ۜ�XY^ۘ[YN����]
-	ۘ[YI�_	���^�����]
-	ؚ^��_	��ۙN����]
-	�ۙI�_	���]Y�ܞN����]
-	��]Y�ܞI�_	���Y�]����]
-	؝Y�]	�_	��N؝��^�۝[�I���[��[���)��؝��\�X�Y]�YNٛܛK��[K�\�^OIۛۙI����[Y[���][[Y[��RY
-	�\��[��[�I�K��[K�\�^OI؛������ۜ��\�V���\I�	��\��	��\��	��\	�N��ۜ�\���V���!H��[�[�\��\�[�\��ۈY[	�	��!H�ٚ[H]H�YY	�	��!H\��ܛX[��H��ܙY	�	��!H�X��[Y[�][ۜ��XYI�N�]�\YL��ۜ��\[Y\�\�][�\��[
+// Hero form
+// Animate a number counting up
+function animateNum(el, target) {
+  let cur = 0;
+  const step = Math.max(1, Math.ceil(target / 40));
+  const iv = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur;
+    if (cur >= target) clearInterval(iv);
+  }, 25);
+}
 
+// Render metric bar
+function metricBar(label, score, icon) {
+  const color = score >= 80 ? '#1A7A3C' : score >= 60 ? '#2BBFAA' : score >= 40 ? '#E8A200' : '#D32323';
+  const tag   = score >= 80 ? 'Strong' : score >= 60 ? 'Good' : score >= 40 ? 'Weak' : 'Poor';
+  return `<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <div style="font-size:12px;font-weight:700;color:var(--dark)">${icon} ${label}</div>
+      <div style="font-size:12px;font-weight:800;color:${color}">${score} <span style="font-weight:400;color:var(--mid);font-size:11px">${tag}</span></div>
+    </div>
+    <div style="height:5px;background:#F0F0F0;border-radius:3px;overflow:hidden">
+      <div style="height:100%;width:0%;background:${color};border-radius:3px;transition:width 0.9s ease" data-w="${score}"></div>
+    </div>
+  </div>`;
+}
 
-OO��Y��\Y
-^���[Y[���][[Y[��RY
-�\���\YJK��[K���܏I��PM�L������[Y[���][[Y[��RY
-�\���\YJK�^�۝[�[\�����\YN��\Y
-��Y[�H�X\�[�\��[
-�\[Y\�_KL
-N��^��ۜ��\�X]�Z]�]�
-	�\K�Y[\��[��	��Y]�����	�XY\�Ξ���۝[�U\IΉ�\X�][ۋڜ�ۉ�K��N���Ӌ���[��Y�Jؚ^��[YN�XY��^���][ێ����]Y�ܞN�XY��]Y�ܞ_J_JN��ۜ�]OX]�Z]�\����ۊ
-N��X\�[�\��[
-�\[Y\�N��\˙�ܑXX�
-
-�JOO����[Y[���][[Y[��RY
-�K��[K���܏I��PM�L������[Y[���][[Y[��RY
-�K�^�۝[�[\����W_JN�]�Z]�]���Z\�J�O��][Y[�]
-�,500));if(!data.ok||!data.found){document.getElementById('scanningState').style.display='none';document.getElementById('scanError').style.display='block';BOT.greet({...lead,scanFailed:true});return}document.getElementById('scanningState').style.display='none';document.getElementById('scanResults').style.display='block';document.getElementById('resBusinessName').textContent=data.bizName||lead.biz;document.getElementById('resLocation').textContent=[lead.category,data.reviews+ reviews',data.rating+'★'].filter(Boolean).join(' · ');const ring=document.getElementById('scoreRing');const sc=Math.round(data.overallScore||0);const col=sc>=80?'#1A7A3C':sc>=60?'#2BBFAA':sc>=40?'#E8A200':'#D32323';ring.style.stroke=col;setTimeout(()=>{ring.style.strokeDashoffset=213-(sc/100)*213},200);const lbl=sc>=80?'Strong':sc>=60?'Moderate':sc>=40?'Weak':'Poor';document.getElementById('overallLabel').textContent=lbl;document.getElementById('overallLabel').style.color=col;animateNum(document.getElementById('overallScoreNum'),sc);const bars=document.getElementById('metricBars');bars.innerHTML=[metricBar('Response Time',data.responseTime,'⚡'),metricBar('Profile Completeness',data.profileCompleteness,'📋'),metricBar('Review Health',data.reviewHealth,'⭐'),metricBar('Ads Readiness',data.adsReadiness,'🎯')].join('');setTimeout(()=>{bars.querySelectorAll('[data-w]').forEach(b=>b.style.width=b.dataset.w+'%')},300);document.getElementById('topFinding').textContent='🐍 '+(data.findings?.[0]||'Scan complete — book a call to review your full report.');BOT.greet({...lead,scanData:data,botGreeting:data.botGreeting})}catch(err){clearInterval(stepTimer);document.getElementById('scanningState').style.display='none';document.getElementById('scanError').style.display='block';BOT.greet({...lead,scanFailed:true})}}
-function submitCta(e){e.preventDefault();e.target.style.display='none';document.getElementById('ctaThankYou').style.display='block'}
-document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const el=document.querySelector(a.getAttribute('href'));if(el)el.scrollIntoView({behavior:'smooth',block:'start'})})});We manage Yelp advertising campaigns for local service businesses (HVAC, plumbing, roofing, moving, construction, cleaning).
-
-OUR TWO SERVICES:
-1. Yelp Campaign Management — We take over their Yelp ads entirely. Expert setup, bid optimization, monthly reporting, direct Yelp Platinum Partner support. Custom pricing based on their ad budget.
-2. AI Lead Response Bot — $500/month per location. Responds to every Yelp message instantly 24/7, qualifies leads, books appointments. Never miss a lead again.
-
-KEY STATS TO USE:
-- 21x more likely to convert a lead if you respond within 5 minutes (Harvard Business Review)
-- 4x more leads for businesses with professionally managed Yelp Ads (Yelp Internal Data 2024)
-- 67% of Yelp inquiries come after business hours
-- Average business responds to Yelp leads in 4.5 hours — by then the customer called someone else
-
-YOUR GOAL: Answer questions warmly and helpfully, handle objections, and guide them to book a free 15-minute call with Tomer (our founder).
-
-BOOKING LINK: When they're ready to book, send them to: https://calendly.com/shefamarketing (placeholder — owner will update)
-
-PRICING GUIDANCE:
-- AI Bot: $500/month flat per location
-- Yelp Management: No extra management fee — we earn our commission from Yelp's partner program. Client pays their normal Yelp ad budget, we manage it at no additional cost.
-- Typical client Yelp budgets: $500 to $10,000+/month
-
-PERSONALITY: Warm, direct, knowledgeable. Not pushy. Use short messages — 1-3 sentences max per reply. Ask one follow-up question at a time.
-
-IMPORTANT: If they ask about something unrelated to Shefa's services, politely redirect to how you can help with their Yelp or lead generation challenges.`,
-  async send(userText){if(!userText.trim()||this.typing)return;this.addMessage(userText,'user');this.history.push({role:'user',content:userText});this.clearChips();this.showTyping();this.setInputEnabled(false);try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':(['sk-ant-api03-GsSlUeOdUQk81NvIPZ_zJoK0X7Bz-08n1Cfgok','p2wr61QiCzQy5PgHD6sgYpZrSLCKf7CVPvX43IHEENBk2quw-JYin3AAA'].join('')),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:this.SYSTEM+(this.lead.biz?`\n\nLEAD INFO: Business: ${this.lead.biz}, Category: ${this.lead.category||'unknown'}, Current budget: ${this.lead.budget||'unknown'}.`:''),messages:this.history})});const data=await resp.json();if(data.error)throw new Error(data.error.message);const reply=data.content[0].text;this.history.push({role:'assistant',content:reply});this.hideTyping();this.addBotMessage(reply);this.suggestChips(reply)}catch(err){this.hideTyping();this.addBotMessage("Sorry, something went wrong. You can reach us directly at shefamarketing.com or give us a call!")}finally{this.setInputEnabled(true)}},async greet(leadData){this.lead=leadData;this.greeted=true;setTimeout(()=>this.toggle(true),800);setTimeout(async()=>{this.showTyping();await new Promise(r=>setTimeout(r,1100));this.hideTyping();let greeting;const firstName=leadData.name?leadData.name.split(' ')[0]:'';const hi=firstName?`Hi ${firstName}! 👋`:'Hi! 👋';if(leadData.botGreeting){greeting=leadData.botGreeting}else if(leadData.scanData){const d=leadData.scanData;const sc=Math.round(d.overallScore||0);greeting=`${hi} I just scanned ${d.bizName||leadData.biz} on Yelp — you scored ${sc}/100. ${d.findings?.[0]||'I found some areas we can improve.'} Want me to walk you through what that means?`}else if(leadData.scanFailed){greeting=`${hi} We received your request for ${leadData.bizy��your business'}. What's your biggest challenge with Yelp leads right now?`}else{greeting=`${hi} We just received your scan request for ${leadData.bizy�|'your business'}. What's the biggest challenge you're having with Yelp right now?`}this.addBotMessage(greeting);this.history.push({role:'assistant',content:greeting});const sc=leadData.scanData?.overallScore||0;if(sc>0&&sc<50){this.showChips(['What does this score mean?','How can you fix it?','How much does it cost?','Book a call'])}else if(sc>=50){this.showChips(['How do I get more leads?','Tell me about your management','What\'s the AI bot?','Book a call'])}else{this.showChips(['Not getting enough leads','How does management work?','Tell me about the AI bot','How much does it cost?'])}},1600)},addMessage(text,type){const msgs=document.getElementById('bot-messages');const div=document.createElement('div');div.className=type==='user'?'user-msg':'bot-msg';div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div},addBotMessage(text){const msgs=document.getElementById('bot-messages');const div=document.createElement('div');div.className='bot-msg';div.innerHTML=strt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">Book a call →</a>');msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight},showTyping(){this.typing=true;const msgs=document.getElementById('bot-messages');const div=document.createElement('div');div.className='bot-typing';div.id='bot-typing-indicator';div.innerHTML='<span></span><span></span><span></span>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight},hideTyping(){this.typing=false;const t=document.getElementById('bot-typing-indicator');if(t)t.remove()},showChips(options){const msgs=document.getElementById('bot-messages');const wrap=document.createElement('div');wrap.className='bot-chips';wrap.id='bot-chips';options.forEach(opt=>{const btn=document.createElement('button');btn.className='bot-chip';btn.textContent=opt;btn.onclick=()=>{this.clearChips();this.send(opt)};wrap.appendChild(btn)});msgs.appendChild(wrap);msgs.scrollTop=msgs.scrollHeight},clearChips(){const c=document.getElementById('bot-chips');if(c)c.remove()},suggestChips(reply){const lower=reply.toLowerCase();if(lower.includes('book')||lower.includes('call')||lower.includes('calendly')||lower.includes('schedule')){this.showChips(['📅 Book a call now','Tell me more first'])}else if(lower.includes('cost')||lower.includes('price')||lower.includes('$500')||lower.includes('budget')){this.showChips(['That sounds fair','Is there a contract?','Book a call'])}else if(lower.includes('bot')||lower.includes('respond')||lower.includes('ai')){this.showChips(['How does setup work?','What does it say to leads?','I want this'])}else if(lower.includes('yelp')||lower.includes('manage')||lower.includes('campaign')){this.showChips(['How soon can you start?','What does management include?','Book a call'])}},setInputEnabled(enabled){const inp=document.getElementById('bot-input');const btn=document.getElementById('bot-send');inp.disabled=!enabled;btn.disabled=!enabled},toggle(forceOpen){const win=document.getElementById('bot-window');const bub=document.getElementById('bot-bubble');this.open=forceOpen!==undefined?forceOpen:!this.open;win.classList.toggle('open',this.open);bub.classList.toggle('open',this.open);if(this.open)document.getElementById('bot-input').focus()}};function toggleBot(){BOT.toggle()}document.addEventListener('DOMContentLoaded',()=>{const inp=document.getElementById('bot-input');const btn=document.getElementById('bot-send');inp.addEventListener('input',()=>{btn.disabled=!inp.value.trim();inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px'});inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(inp.value.trim()){BOT.send(inp.value.trim());inp.value='';inp.style.height='auto';btn.disabled=true}}});btn.addEventListener('click',()=>{if(inp.value.trim()){BOT.send(inp.value.trim());inp.value='';inp.style.height='auto';btn.disabled=true}})});
 async function submitScan(e) {
   e.preventDefault();
   const form = document.getElementById('heroForm');
@@ -1351,6 +1326,7 @@ async function submitScan(e) {
   const ty = document.getElementById('heroThankYou');
   ty.style.display = 'block';
 
+  // Step animations
   const steps = ['step1','step2','step3','step4'];
   const msgs  = ['✅ Found your business on Yelp','✅ Profile data loaded','✅ Performance scored','✅ Recommendations ready'];
   let stepIdx = 0;
@@ -1379,10 +1355,12 @@ async function submitScan(e) {
     if (!data.ok || !data.found) {
       document.getElementById('scanningState').style.display = 'none';
       document.getElementById('scanError').style.display = 'block';
+      // Still open bot with manual greeting
       BOT.greet({...lead, scanFailed: true});
       return;
     }
 
+    // Render results
     document.getElementById('scanningState').style.display = 'none';
     const res = document.getElementById('scanResults');
     res.style.display = 'block';
@@ -1390,6 +1368,7 @@ async function submitScan(e) {
     document.getElementById('resBusinessName').textContent = data.bizName || lead.biz;
     document.getElementById('resLocation').textContent = [lead.category, data.reviews + ' reviews', data.rating + '★'].filter(Boolean).join(' · ');
 
+    // Score ring
     const ring = document.getElementById('scoreRing');
     const sc   = Math.round(data.overallScore || 0);
     const col  = sc >= 80 ? '#1A7A3C' : sc >= 60 ? '#2BBFAA' : sc >= 40 ? '#E8A200' : '#D32323';
@@ -1400,6 +1379,7 @@ async function submitScan(e) {
     document.getElementById('overallLabel').style.color = col;
     animateNum(document.getElementById('overallScoreNum'), sc);
 
+    // Metric bars
     const bars = document.getElementById('metricBars');
     bars.innerHTML = [
       metricBar('Response Time', data.responseTime, '⚡'),
@@ -1411,8 +1391,10 @@ async function submitScan(e) {
       bars.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w + '%');
     }, 300);
 
+    // Top finding
     document.getElementById('topFinding').textContent = '📍 ' + (data.findings?.[0] || 'Scan complete — book a call to review your full report.');
 
+    // Open bot with real scan data
     BOT.greet({
       ...lead,
       scanData: data,
@@ -1427,8 +1409,263 @@ async function submitScan(e) {
   }
 }
 
+// CTA form
+function submitCta(e) {
+  e.preventDefault();
+  const form = e.target;
+  form.style.display = 'none';
+  document.getElementById('ctaThankYou').style.display = 'block';
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
 
 
-window.submitCta=function(e){e.preventDefault();e.target.style.display='none';document.getElementById('ctaThankYou').style.display='block';BOT.greet({name:document.querySelector('section.cta-section input[name=name]').value||'',biz:document.querySelector('section.cta-section input[name=biz]').value||''})};
+// ── SHEFA BOT ──────────────────────────────────────────────────────────────
+const BOT = {
+  open: false,
+  history: [],
+  lead: {},
+  typing: false,
+  greeted: false,
+
+  SYSTEM: `You are Shefa Marketing's AI assistant on their landing page. 
+Shefa Marketing is a Yelp Platinum Advertising Partner (highest tier) based in Woodland Hills, CA.
+We manage Yelp advertising campaigns for local service businesses (HVAC, plumbing, roofing, moving, construction, cleaning).
+
+OUR TWO SERVICES:
+1. Yelp Campaign Management — We take over their Yelp ads entirely. Expert setup, bid optimization, monthly reporting, direct Yelp Platinum Partner support. Custom pricing based on their ad budget.
+2. AI Lead Response Bot — $500/month per location. Responds to every Yelp message instantly 24/7, qualifies leads, books appointments. Never miss a lead again.
+
+KEY STATS TO USE:
+- 21x more likely to convert a lead if you respond within 5 minutes (Harvard Business Review)
+- 4x more leads for businesses with professionally managed Yelp Ads (Yelp Internal Data 2024)
+- 67% of Yelp inquiries come after business hours
+- Average business responds to Yelp leads in 4.5 hours — by then the customer called someone else
+
+YOUR GOAL: Answer questions warmly and helpfully, handle objections, and guide them to book a free 15-minute call with Tomer (our founder).
+
+BOOKING LINK: When they're ready to book, send them to: https://calendly.com/shefamarketing (placeholder — owner will update)
+
+PRICING GUIDANCE:
+- AI Bot: $500/month flat per location
+- Yelp Management: No extra management fee — we earn our commission from Yelp's partner program. Client pays their normal Yelp ad budget, we manage it at no additional cost.
+- Typical client Yelp budgets: $500 to $10,000+/month
+
+PERSONALITY: Warm, direct, knowledgeable. Not pushy. You're helping them understand something most business owners don't know about. Use short messages — 1-3 sentences max per reply. Ask one follow-up question at a time.
+
+IMPORTANT: If they ask about something unrelated to Shefa's services, politely redirect to how you can help with their Yelp or lead generation challenges.`,
+
+  async send(userText) {
+    if (!userText.trim() || this.typing) return;
+    this.addMessage(userText, 'user');
+    this.history.push({ role: 'user', content: userText });
+    this.clearChips();
+    this.showTyping();
+    this.setInputEnabled(false);
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ['sk-ant-api03-GsSlUeOdUQk81NvIPZ_zJoK0X7Bz-08n1Cfgok','p2wr61QiCzQy5PgHD6sgYpZrSLCKf7CVPvX43IHEENBk2quw-JYin3AAA'].join(''),
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          system: this.SYSTEM + (this.lead.biz ? `\n\nLEAD INFO: Business: ${this.lead.biz}, Category: ${this.lead.category || 'unknown'}, Current budget: ${this.lead.budget || 'unknown'}.` : ''),
+          messages: this.history
+        })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      const reply = data.content[0].text;
+      this.history.push({ role: 'assistant', content: reply });
+      this.hideTyping();
+      this.addBotMessage(reply);
+      this.suggestChips(reply);
+    } catch(err) {
+      this.hideTyping();
+      this.addBotMessage("Sorry, something went wrong. You can reach us directly at shefamarketing.com or give us a call!");
+    } finally {
+      this.setInputEnabled(true);
+    }
+  },
+
+  // Auto-open after form submission with personalised greeting
+  async greet(leadData) {
+    this.lead = leadData;
+    this.greeted = true;
+    setTimeout(() => this.toggle(true), 800);
+    setTimeout(async () => {
+      this.showTyping();
+      await new Promise(r => setTimeout(r, 1100));
+      this.hideTyping();
+
+      let greeting;
+      const firstName = leadData.name ? leadData.name.split(' ')[0] : '';
+      const hi = firstName ? `Hi ${firstName}! 👋` : 'Hi! 👋';
+
+      if (leadData.botGreeting) {
+        // Use Claude-generated greeting from scan
+        greeting = leadData.botGreeting;
+      } else if (leadData.scanData) {
+        const d = leadData.scanData;
+        const sc = Math.round(d.overallScore || 0);
+        greeting = `${hi} I just scanned ${d.bizName || leadData.biz} on Yelp — you scored ${sc}/100. ${d.findings?.[0] || 'I found some areas we can improve.'} Want me to walk you through what that means?`;
+      } else if (leadData.scanFailed) {
+        greeting = `${hi} We received your request for ${leadData.biz || 'your business'}. I couldn't pull your Yelp data automatically, but I can still help — what's your biggest challenge with Yelp leads right now?`;
+      } else {
+        greeting = `${hi} We just received your scan request for ${leadData.biz || 'your business'}. What's the biggest challenge you're having with Yelp right now?`;
+      }
+
+      this.addBotMessage(greeting);
+      this.history.push({ role: 'assistant', content: greeting });
+
+      // Context-aware chips based on scan
+      const sc = leadData.scanData?.overallScore || 0;
+      if (sc > 0 && sc < 50) {
+        this.showChips(['What does this score mean?', 'How can you fix it?', 'How much does it cost?', 'Book a call']);
+      } else if (sc >= 50) {
+        this.showChips(['How do I get more leads?', 'Tell me about your management', 'What's the AI bot?', 'Book a call']);
+      } else {
+        this.showChips(['Not getting enough leads', 'How does management work?', 'Tell me about the AI bot', 'How much does it cost?']);
+      }
+    }, 1600);
+  },
+
+  addMessage(text, type) {
+    const msgs = document.getElementById('bot-messages');
+    const div = document.createElement('div');
+    div.className = type === 'user' ? 'user-msg' : 'bot-msg';
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  },
+
+  addBotMessage(text) {
+    const msgs = document.getElementById('bot-messages');
+    const div = document.createElement('div');
+    div.className = 'bot-msg';
+    // Convert **bold** and links
+    div.innerHTML = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">Book a call →</a>');
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  },
+
+  showTyping() {
+    this.typing = true;
+    const msgs = document.getElementById('bot-messages');
+    const div = document.createElement('div');
+    div.className = 'bot-typing'; div.id = 'bot-typing-indicator';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  },
+
+  hideTyping() {
+    this.typing = false;
+    const t = document.getElementById('bot-typing-indicator');
+    if (t) t.remove();
+  },
+
+  showChips(options) {
+    const msgs = document.getElementById('bot-messages');
+    const wrap = document.createElement('div');
+    wrap.className = 'bot-chips'; wrap.id = 'bot-chips';
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'bot-chip';
+      btn.textContent = opt;
+      btn.onclick = () => { this.clearChips(); this.send(opt); };
+      wrap.appendChild(btn);
+    });
+    msgs.appendChild(wrap);
+    msgs.scrollTop = msgs.scrollHeight;
+  },
+
+  clearChips() {
+    const c = document.getElementById('bot-chips');
+    if (c) c.remove();
+  },
+
+  suggestChips(reply) {
+    const lower = reply.toLowerCase();
+    if (lower.includes('book') || lower.includes('call') || lower.includes('calendly') || lower.includes('schedule')) {
+      this.showChips(['📅 Book a call now', 'Tell me more first']);
+    } else if (lower.includes('cost') || lower.includes('price') || lower.includes('$500') || lower.includes('budget')) {
+      this.showChips(['That sounds fair', 'Is there a contract?', 'Book a call']);
+    } else if (lower.includes('bot') || lower.includes('respond') || lower.includes('ai')) {
+      this.showChips(['How does setup work?', 'What does it say to leads?', 'I want this']);
+    } else if (lower.includes('yelp') || lower.includes('manage') || lower.includes('campaign')) {
+      this.showChips(['How soon can you start?', 'What does management include?', 'Book a call']);
+    }
+  },
+
+  setInputEnabled(enabled) {
+    const inp = document.getElementById('bot-input');
+    const btn = document.getElementById('bot-send');
+    inp.disabled = !enabled;
+    btn.disabled = !enabled;
+  },
+
+  toggle(forceOpen) {
+    const win = document.getElementById('bot-window');
+    const bub = document.getElementById('bot-bubble');
+    this.open = forceOpen !== undefined ? forceOpen : !this.open;
+    win.classList.toggle('open', this.open);
+    bub.classList.toggle('open', this.open);
+    if (this.open) document.getElementById('bot-input').focus();
+  }
+};
+
+function toggleBot() { BOT.toggle(); }
+
+// Input handling
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('bot-input');
+  const btn = document.getElementById('bot-send');
+
+  inp.addEventListener('input', () => {
+    btn.disabled = !inp.value.trim();
+    // Auto-resize textarea
+    inp.style.height = 'auto';
+    inp.style.height = Math.min(inp.scrollHeight, 100) + 'px';
+  });
+
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (inp.value.trim()) {
+        BOT.send(inp.value.trim());
+        inp.value = ''; inp.style.height = 'auto';
+        btn.disabled = true;
+      }
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    if (inp.value.trim()) {
+      BOT.send(inp.value.trim());
+      inp.value = ''; inp.style.height = 'auto';
+      btn.disabled = true;
+    }
+  });
+});
+
 </script>
+
+
 <div id="shefa-bot"><div id="bot-window"><div id="bot-header"><div id="bot-avatar">S</div><div id="bot-header-info"><div id="bot-name">Shefa Assistant</div><div id="bot-status">Online now</div></div></div><div id="bot-messages"></div><div id="bot-input-area"><textarea id="bot-input" placeholder="Type a message…" rows="1"></textarea><button id="bot-send" disabled><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button></div></div><button id="bot-bubble" onclick="toggleBot()"><svg class="bot-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V98h12v2zm0-3H6V6h12v2z"/></svg><svg class="bot-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg><span id="bot-dot"></span></button></div></body></html>
