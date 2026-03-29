@@ -1333,7 +1333,102 @@ PERSONALITY: Warm, direct, knowledgeable. Not pushy. Use short messages — 1-3 
 
 IMPORTANT: If they ask about something unrelated to Shefa's services, politely redirect to how you can help with their Yelp or lead generation challenges.`,
   async send(userText){if(!userText.trim()||this.typing)return;this.addMessage(userText,'user');this.history.push({role:'user',content:userText});this.clearChips();this.showTyping();this.setInputEnabled(false);try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':(['sk-ant-api03-GsSlUeOdUQk81NvIPZ_zJoK0X7Bz-08n1Cfgok','p2wr61QiCzQy5PgHD6sgYpZrSLCKf7CVPvX43IHEENBk2quw-JYin3AAA'].join('')),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:this.SYSTEM+(this.lead.biz?`\n\nLEAD INFO: Business: ${this.lead.biz}, Category: ${this.lead.category||'unknown'}, Current budget: ${this.lead.budget||'unknown'}.`:''),messages:this.history})});const data=await resp.json();if(data.error)throw new Error(data.error.message);const reply=data.content[0].text;this.history.push({role:'assistant',content:reply});this.hideTyping();this.addBotMessage(reply);this.suggestChips(reply)}catch(err){this.hideTyping();this.addBotMessage("Sorry, something went wrong. You can reach us directly at shefamarketing.com or give us a call!")}finally{this.setInputEnabled(true)}},async greet(leadData){this.lead=leadData;this.greeted=true;setTimeout(()=>this.toggle(true),800);setTimeout(async()=>{this.showTyping();await new Promise(r=>setTimeout(r,1100));this.hideTyping();let greeting;const firstName=leadData.name?leadData.name.split(' ')[0]:'';const hi=firstName?`Hi ${firstName}! 👋`:'Hi! 👋';if(leadData.botGreeting){greeting=leadData.botGreeting}else if(leadData.scanData){const d=leadData.scanData;const sc=Math.round(d.overallScore||0);greeting=`${hi} I just scanned ${d.bizName||leadData.biz} on Yelp — you scored ${sc}/100. ${d.findings?.[0]||'I found some areas we can improve.'} Want me to walk you through what that means?`}else if(leadData.scanFailed){greeting=`${hi} We received your request for ${leadData.bizy��your business'}. What's your biggest challenge with Yelp leads right now?`}else{greeting=`${hi} We just received your scan request for ${leadData.bizy�|'your business'}. What's the biggest challenge you're having with Yelp right now?`}this.addBotMessage(greeting);this.history.push({role:'assistant',content:greeting});const sc=leadData.scanData?.overallScore||0;if(sc>0&&sc<50){this.showChips(['What does this score mean?','How can you fix it?','How much does it cost?','Book a call'])}else if(sc>=50){this.showChips(['How do I get more leads?','Tell me about your management','What\'s the AI bot?','Book a call'])}else{this.showChips(['Not getting enough leads','How does management work?','Tell me about the AI bot','How much does it cost?'])}},1600)},addMessage(text,type){const msgs=document.getElementById('bot-messages');const div=document.createElement('div');div.className=type==='user'?'user-msg':'bot-msg';div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div},addBotMessage(text){const msgs=document.getElementById('bot-messages');const div=document.createElement('div');div.className='bot-msg';div.innerHTML=strt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">Book a call →</a>');msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight},showTyping(){this.typing=true;const msgs=document.getElementById('bot-messages');const div=document.createElement('div');div.className='bot-typing';div.id='bot-typing-indicator';div.innerHTML='<span></span><span></span><span></span>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight},hideTyping(){this.typing=false;const t=document.getElementById('bot-typing-indicator');if(t)t.remove()},showChips(options){const msgs=document.getElementById('bot-messages');const wrap=document.createElement('div');wrap.className='bot-chips';wrap.id='bot-chips';options.forEach(opt=>{const btn=document.createElement('button');btn.className='bot-chip';btn.textContent=opt;btn.onclick=()=>{this.clearChips();this.send(opt)};wrap.appendChild(btn)});msgs.appendChild(wrap);msgs.scrollTop=msgs.scrollHeight},clearChips(){const c=document.getElementById('bot-chips');if(c)c.remove()},suggestChips(reply){const lower=reply.toLowerCase();if(lower.includes('book')||lower.includes('call')||lower.includes('calendly')||lower.includes('schedule')){this.showChips(['📅 Book a call now','Tell me more first'])}else if(lower.includes('cost')||lower.includes('price')||lower.includes('$500')||lower.includes('budget')){this.showChips(['That sounds fair','Is there a contract?','Book a call'])}else if(lower.includes('bot')||lower.includes('respond')||lower.includes('ai')){this.showChips(['How does setup work?','What does it say to leads?','I want this'])}else if(lower.includes('yelp')||lower.includes('manage')||lower.includes('campaign')){this.showChips(['How soon can you start?','What does management include?','Book a call'])}},setInputEnabled(enabled){const inp=document.getElementById('bot-input');const btn=document.getElementById('bot-send');inp.disabled=!enabled;btn.disabled=!enabled},toggle(forceOpen){const win=document.getElementById('bot-window');const bub=document.getElementById('bot-bubble');this.open=forceOpen!==undefined?forceOpen:!this.open;win.classList.toggle('open',this.open);bub.classList.toggle('open',this.open);if(this.open)document.getElementById('bot-input').focus()}};function toggleBot(){BOT.toggle()}document.addEventListener('DOMContentLoaded',()=>{const inp=document.getElementById('bot-input');const btn=document.getElementById('bot-send');inp.addEventListener('input',()=>{btn.disabled=!inp.value.trim();inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px'});inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(inp.value.trim()){BOT.send(inp.value.trim());inp.value='';inp.style.height='auto';btn.disabled=true}}});btn.addEventListener('click',()=>{if(inp.value.trim()){BOT.send(inp.value.trim());inp.value='';inp.style.height='auto';btn.disabled=true}})});
-window.submitScan=async function(e){e.preventDefault();const btn=document.getElementById('heroScanBtn');btn.textContent='';btn.disabled=true;const form=document.getElementById('heroForm');const fd=new FormData(form);const lead={name:fd.get('name')||'',biz:fd.get('biz')||'',phone:fd.get('phone')||'',category:fd.get('category')||'',budget:fd.get('budget')||''};form.style.display='none';document.getElementById('heroThankYou').style.display='block';await submitScanOrig({preventDefault:()=>{}});BOT.greet(lead)};
+async function submitScan(e) {
+  e.preventDefault();
+  const form = document.getElementById('heroForm');
+  const btn  = document.getElementById('heroScanBtn');
+  const fd   = new FormData(form);
+  const lead = {
+    name:     fd.get('name') || '',
+    biz:      fd.get('biz')  || '',
+    phone:    fd.get('phone') || '',
+    category: fd.get('category') || '',
+    budget:   fd.get('budget') || ''
+  };
+
+  btn.textContent = 'Scanning…'; btn.disabled = true;
+  form.style.display = 'none';
+  const ty = document.getElementById('heroThankYou');
+  ty.style.display = 'block';
+
+  const steps = ['step1','step2','step3','step4'];
+  const msgs  = ['✅ Found your business on Yelp','✅ Profile data loaded','✅ Performance scored','✅ Recommendations ready'];
+  let stepIdx = 0;
+  const stepTimer = setInterval(() => {
+    if (stepIdx < 4) {
+      document.getElementById(steps[stepIdx]).style.color = '#1A7A3C';
+      document.getElementById(steps[stepIdx]).textContent = msgs[stepIdx];
+      stepIdx++;
+    } else clearInterval(stepTimer);
+  }, 900);
+
+  try {
+    const resp = await fetch('api/yelp-scan.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bizName: lead.biz, location: '', category: lead.category })
+    });
+    const data = await resp.json();
+    clearInterval(stepTimer);
+    steps.forEach((s,i) => {
+      document.getElementById(s).style.color = '#1A7A3C';
+      document.getElementById(s).textContent = msgs[i];
+    });
+    await new Promise(r => setTimeout(r, 500));
+
+    if (!data.ok || !data.found) {
+      document.getElementById('scanningState').style.display = 'none';
+      document.getElementById('scanError').style.display = 'block';
+      BOT.greet({...lead, scanFailed: true});
+      return;
+    }
+
+    document.getElementById('scanningState').style.display = 'none';
+    const res = document.getElementById('scanResults');
+    res.style.display = 'block';
+
+    document.getElementById('resBusinessName').textContent = data.bizName || lead.biz;
+    document.getElementById('resLocation').textContent = [lead.category, data.reviews + ' reviews', data.rating + '★'].filter(Boolean).join(' · ');
+
+    const ring = document.getElementById('scoreRing');
+    const sc   = Math.round(data.overallScore || 0);
+    const col  = sc >= 80 ? '#1A7A3C' : sc >= 60 ? '#2BBFAA' : sc >= 40 ? '#E8A200' : '#D32323';
+    ring.style.stroke = col;
+    setTimeout(() => { ring.style.strokeDashoffset = 213 - (sc/100)*213; }, 200);
+    const lbl = sc >= 80 ? 'Strong' : sc >= 60 ? 'Moderate' : sc >= 40 ? 'Weak' : 'Poor';
+    document.getElementById('overallLabel').textContent = lbl;
+    document.getElementById('overallLabel').style.color = col;
+    animateNum(document.getElementById('overallScoreNum'), sc);
+
+    const bars = document.getElementById('metricBars');
+    bars.innerHTML = [
+      metricBar('Response Time', data.responseTime, '⚡'),
+      metricBar('Profile Completeness', data.profileCompleteness, '📋'),
+      metricBar('Review Health', data.reviewHealth, '⭐'),
+      metricBar('Ads Readiness', data.adsReadiness, '🎯'),
+    ].join('');
+    setTimeout(() => {
+      bars.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w + '%');
+    }, 300);
+
+    document.getElementById('topFinding').textContent = '📍 ' + (data.findings?.[0] || 'Scan complete — book a call to review your full report.');
+
+    BOT.greet({
+      ...lead,
+      scanData: data,
+      botGreeting: data.botGreeting
+    });
+
+  } catch(err) {
+    clearInterval(stepTimer);
+    document.getElementById('scanningState').style.display = 'none';
+    document.getElementById('scanError').style.display = 'block';
+    BOT.greet({...lead, scanFailed: true});
+  }
+}
+
+
+
 window.submitCta=function(e){e.preventDefault();e.target.style.display='none';document.getElementById('ctaThankYou').style.display='block';BOT.greet({name:document.querySelector('section.cta-section input[name=name]').value||'',biz:document.querySelector('section.cta-section input[name=biz]').value||''})};
 </script>
 <div id="shefa-bot"><div id="bot-window"><div id="bot-header"><div id="bot-avatar">S</div><div id="bot-header-info"><div id="bot-name">Shefa Assistant</div><div id="bot-status">Online now</div></div></div><div id="bot-messages"></div><div id="bot-input-area"><textarea id="bot-input" placeholder="Type a message…" rows="1"></textarea><button id="bot-send" disabled><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button></div></div><button id="bot-bubble" onclick="toggleBot()"><svg class="bot-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V98h12v2zm0-3H6V6h12v2z"/></svg><svg class="bot-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg><span id="bot-dot"></span></button></div></body></html>
