@@ -6,24 +6,25 @@
         const ls = await fetch('api/lead-score.php', {
           method: 'POST',
           headers: {'Content-Type':'application/x-www-form-urlencoded'},
-          body: 'url='+encodeURIComponent(data.yelpUrl)+'&category='+encodeURIComponent(form.category)+'&profileCompleteness='+data.profileCompleteness+'&claimed='+(data.claimed?'true':'false')+'&photos='+data.photos+'&adsReadiness='+data.adsReadiness+'&reviews='+data.reviews+'&rating='+data.rating+'&responseTimeText='+encodeURIComponent(data.responseTimeText||'')
+          body: 'category='+encodeURIComponent(form.category)+'&profileCompleteness='+data.profileCompleteness+'&claimed='+(data.claimed?'true':'false')+'&photos='+data.photos+'&adsReadiness='+data.adsReadiness+'&reviews='+data.reviews+'&rating='+data.rating+'&responseTimeText='+encodeURIComponent(data.responseTimeText||'')
         });
         const ld = await ls.json();
         if (ld.ok) {
-          const loBar = document.querySelector('#metric-bars .metric-bar:last-child');
+          const sc = ld.leadOptimized;
+          const col = sc >= 75 ? '#1A7A3C' : sc >= 50 ? '#E8A200' : '#C0392B';
+          const lbl = sc >= 75 ? 'Strong' : sc >= 50 ? 'Moderate' : 'Weak';
+          const loBar = document.querySelector('#metricBars > div:last-child');
           if (loBar) {
-            const fill = loBar.querySelector('.bar-fill');
-            const scoreEl = loBar.querySelector('.metric-score');
-            const labelEl = loBar.querySelector('.metric-label span:last-child');
-            const sc = ld.leadOptimized;
-            const col = sc >= 75 ? '#1A7A3C' : sc >= 50 ? '#E8A200' : '#C0392B';
-            const lbl = sc >= 75 ? 'Strong' : sc >= 50 ? 'Moderate' : 'Weak';
-            if (fill) { fill.style.width = sc + '%'; fill.style.background = col; }
-            if (scoreEl) { scoreEl.textContent = sc; scoreEl.style.color = col; }
-            if (labelEl) labelEl.textContent = lbl;
+            // child[2] = score+label div, child[3] = label span, child[4] = bar track, child[5] = fill
+            const scoreDiv = loBar.children[0]?.children[1]; // "0 Poor" div
+            const labelSpan = loBar.children[0]?.children[1]?.querySelector('span');
+            const fillDiv = loBar.children[1]?.children[0]; // the fill bar
+            if (scoreDiv) { scoreDiv.childNodes[0].textContent = sc + ' '; scoreDiv.style.color = col; }
+            if (labelSpan) { labelSpan.textContent = lbl; labelSpan.style.color = col; }
+            if (fillDiv) { fillDiv.style.width = sc + '%'; fillDiv.style.background = col; }
           }
         }
-      } catch(e) {}
+      } catch(e) { console.log('lead-score error', e); }
     })();YPE html>
 <html lang="en">
 <head>
