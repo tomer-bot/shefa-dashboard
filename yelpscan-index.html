@@ -6,7 +6,7 @@
         const ls = await fetch('api/lead-score.php', {
           method: 'POST',
           headers: {'Content-Type':'application/x-www-form-urlencoded'},
-          body: 'url='+encodeURIComponent(data.yelpUrl)+'&category='+encodeURIComponent(form.category)+'&profileCompleteness='+data.profileCompleteness+'&claimed='+(data.claimed?'true':'false')
+          body: 'url='+encodeURIComponent(data.yelpUrl)+'&category='+encodeURIComponent(form.category)+'&profileCompleteness='+data.profileCompleteness+'&claimed='+(data.claimed?'true':'false')+'&photos='+data.photos+'&adsReadiness='+data.adsReadiness+'&reviews='+data.reviews+'&rating='+data.rating+'&responseTimeText='+encodeURIComponent(data.responseTimeText||'')
         });
         const ld = await ls.json();
         if (ld.ok) {
