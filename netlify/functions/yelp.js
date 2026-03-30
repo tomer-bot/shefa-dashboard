@@ -72,23 +72,27 @@ function httpGet(host, path, auth) {
 
   // Helper: find programId by matching client name across all programs
   async function findProgramId(clientName) {
+    // Get all programs from programs/v1
     const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
     const programs = (page.b && page.b.payment_programs) || [];
     const fusionKey = FUSION_KEY;
     const cn = normName(clientName.split(':')[0]);
-    // Resolve names in parallel (max 20 at a time)
-    const chunks = [];
-    for(let i=0;i<programs.length;i+=20) chunks.push(programs.slice(i,i+20));
-    for(const chunk of chunks) {
-      const resolved = await Promise.all(chunk.map(async p => {
-        const bid = p.businesses && p.businesses[0] && p.businesses[0].yelp_business_id;
-        if(!bid) return null;
-        const fr = await httpGet('api.yelp.com', '/v3/businesses/'+bid, 'Bearer '+fusionKey);
-        const name = fr.b && fr.b.name;
-        return name ? { programId: p.program_id, name, type: p.program_type } : null;
-      }));
-      const match = resolved.find(r => r && normName(r.name).split(' ').slice(0,2).join(' ') === cn.split(' ').slice(0,2).join(' '));
-      if(match) return match;
+    // Try each program until we find a name match
+    for (const prog of programs) {
+      const bid = prog.businesses && prog.businesses[0] && prog.businesses[0].yelp_business_id;
+      if (!bid) continue;
+      try {
+        const fr = await httpGet('api.yelp.com', '/v3/businesses/' + bid, 'Bearer ' + fusionKey);
+        const bizName = fr.b && fr.b.name;
+        if (!bizName) continue;
+        const bn = normName(bizName);
+        // Match on first 2 words of name
+        const cnWords = cn.split(' ').slice(0,2).join(' ');
+        const bnWords = bn.split(' ').slice(0,2).join(' ');
+        if (cnWords === bnWords || bn.startsWith(cnWords) || cn.startsWith(bnWords)) {
+          return { programId: prog.program_id, name: bizName, type: prog.program_type };
+        }
+      } catch(e) {}
     }
     return null;
   }
@@ -136,34 +140,31 @@ exports.handler = async(event)=>{
   }
 
   // Ads API actions
-      if(path.startsWith('pause/')){
+        if(path.startsWith('pause/')){
     const bizId = path.split('/')[1];
-    const clientName = body && body.clientName ? body.clientName : '';
-    // Try name-based programId lookup via Fusion API
+    const clientName = (body && body.clientName) || '';
     let programId = null;
-    if(clientName) {
+    if (clientName) {
       const found = await findProgramId(clientName);
-      if(found) programId = found.programId;
+      if (found) programId = found.programId;
     }
-    // Fallback: direct bizId as programId (works if it's already a real programId)
-    if(!programId) programId = bizId;
-    const r = await httpPost('partner-api.yelp.com', '/program/'+programId+'/pause/v1', '', basicAuth());
-    const success = r.s === 202 || r.s === 200;
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ success, programId, s: r.s, b: r.b }) };
+    if (!programId) programId = bizId;
+    const r = await httpPost('partner-api.yelp.com', '/program/' + programId + '/pause/v1', '', basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ success: r.s === 202 || r.s === 200, programId, s: r.s, b: r.b }) };
   }
   if(path.startsWith('resume/')){
     const bizId = path.split('/')[1];
-    const clientName = body && body.clientName ? body.clientName : '';
+    const clientName = (body && body.clientName) || '';
     let programId = null;
-    if(clientName) {
+    if (clientName) {
       const found = await findProgramId(clientName);
-      if(found) programId = found.programId;
+      if (found) programId = found.programId;
     }
-    if(!programId) programId = bizId;
-    const r = await httpPost('partner-api.yelp.com', '/program/'+programId+'/resume/v1', '', basicAuth());
-    const success = r.s === 202 || r.s === 200;
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ success, programId, s: r.s, b: r.b }) };
+    if (!programId) programId = bizId;
+    const r = await httpPost('partner-api.yelp.com', '/program/' + programId + '/resume/v1', '', basicAuth());
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ success: r.s === 202 || r.s === 200, programId, s: r.s, b: r.b }) };
   }
+
 
 if(path.startsWith('budget/')){
     const id=path.split('/')[1];
