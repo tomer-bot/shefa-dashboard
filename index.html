@@ -294,6 +294,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   <div class="topbar-right">
     <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
     <button class="btn btn-blue btn-sm" id="syncBtn" onclick="syncFromYelp()">&#8635; Sync</button>
+    <button id="liveReportBtn" class="btn btn-blue topbar-btn" onclick="loadLiveReporting('current')" style="background:#8e44ad">&#128202; Live Data</button>
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('reportsSection').scrollIntoView({behavior:'smooth'});showReportTab('analytics')"> Reports</button>
     <button class="btn btn-ghost btn-sm" onclick="openConfig()">&#9881; Config</button>
     <button class="btn btn-green btn-sm" onclick="openLaunch()">&#43; Launch Campaign</button>
@@ -2003,6 +2004,41 @@ async function submitLaunch() {
   goBtn.textContent='&#128640; Launch';
 }
 
+
+async function loadLiveReporting(period) {
+  const btn = document.getElementById('liveReportBtn');
+  if(btn) { btn.textContent = 'Loading...'; btn.disabled = true; }
+  try {
+    const r = await yelpFn('reporting/'+(period||'current'),'GET');
+    window._liveMetrics = r.metrics || {};
+    const rtbl=document.getElementById('liveReportingTable'); if(rtbl) rtbl.style.display='block';
+    const count = Object.keys(window._liveMetrics).length;
+    if(btn) { btn.textContent = '\u{1F4CA} Live: '+count; btn.style.background='#27ae60'; btn.disabled=false; }
+    updateCardsWithLiveMetrics();
+    toast('Live data loaded for '+count+' campaigns');
+  } catch(e) {
+    if(btn) { btn.textContent = '\u26A0 Retry'; btn.disabled = false; }
+    toast('Reporting failed: '+e.message,'error');
+  }
+}
+
+function updateCardsWithLiveMetrics() {
+  const m = window._liveMetrics || {};
+  const reportingDiv = document.getElementById('liveReportingTable');
+  if(!reportingDiv) return;
+  const rows = Object.entries(m).map(([id,d])=>
+    '<tr><td style="font-size:11px;color:#8aa5c0">'+id.substring(0,16)+'</td>'
+    +'<td style="text-align:center;font-weight:bold;color:#27ae60">'+(d.leads||0)+'</td>'
+    +'<td style="text-align:center">'+(d.calls||0)+'</td>'
+    +'<td style="text-align:center">'+(d.clicks||0)+'</td>'
+    +'<td style="text-align:center;color:#e74c3c">$'+((d.spend||0)/100).toFixed(0)+'</td>'
+    +'</tr>'
+  ).join('');
+  reportingDiv.innerHTML = rows.length
+    ? '<div style="background:#1a2a3a;border-radius:8px;padding:12px;margin-bottom:16px"><div style="color:#8aa5c0;font-size:11px;margin-bottom:8px">LIVE REPORTING DATA (this month)</div>'
+      +'<table style="width:100%;border-collapse:collapse"><thead><tr style="color:#8aa5c0;font-size:11px"><th style="text-align:left;padding:4px">Business ID</th><th>Leads</th><th>Calls</th><th>Clicks</th><th>Spend</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+    : '<div style="color:#8aa5c0;padding:12px">No reporting data returned.</div>';
+}
 </script>
 
 <!-- Launch Campaign Modal -->
