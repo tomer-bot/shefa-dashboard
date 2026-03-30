@@ -2039,6 +2039,19 @@ function updateCardsWithLiveMetrics() {
       +'<table style="width:100%;border-collapse:collapse"><thead><tr style="color:#8aa5c0;font-size:11px"><th style="text-align:left;padding:4px">Business ID</th><th>Leads</th><th>Calls</th><th>Clicks</th><th>Spend</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
     : '<div style="color:#8aa5c0;padding:12px">No reporting data returned.</div>';
 }
+
+async function fetchReportingData() {
+  if(window._reportingData && (Date.now()-(window._reportingTs||0)<300000)) return window._reportingData;
+  try {
+    const r = await yelpFn('reporting','POST',{});
+    if(r && r.data) {
+      window._reportingData = {};
+      r.data.forEach(d=>{ window._reportingData[d.business_id] = d; });
+      window._reportingTs = Date.now();
+    }
+  } catch(e) { console.log('Reporting fetch error:',e); }
+  return window._reportingData||{};
+}
 </script>
 
 <!-- Launch Campaign Modal -->
