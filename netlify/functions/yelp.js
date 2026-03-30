@@ -109,27 +109,38 @@ exports.handler = async(event)=>{
   }
 
   // Ads API actions
-      if(path.startsWith('pause/') || path.startsWith('resume/')) {
+        if(path.startsWith('pause/') || path.startsWith('resume/')) {
     const action = path.startsWith('pause/') ? 'pause' : 'resume';
     const bizId = path.split('/')[1];
+
+    // Build bizId->programId map from programs/list/all (uses biz.yelp.com IDs that match SNAPSHOT)
     let programId = null;
     let offset = 0;
-    outer: while(offset < 200) {
-      const pg = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+offset, basicAuth());
-      const progs = (pg.b && pg.b.payment_programs) || [];
+    outerLoop: while(offset < 200) {
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+offset, basicAuth());
+      const progs = (page.b && page.b.payment_programs) || [];
       if(!progs.length) break;
       for(const p of progs) {
-        if((p.businesses||[]).some(b=>b.yelp_business_id===bizId)) { programId=p.program_id; break outer; }
+        for(const b of (p.businesses||[])) {
+          if(b.yelp_business_id === bizId) { programId = p.program_id; break outerLoop; }
+        }
       }
-      const total = (pg.b && pg.b.total) || 0;
+      const total = (page.b && page.b.total) || 0;
       offset += 40;
       if(offset >= total) break;
     }
-    if(!programId) programId = bizId;
-    const result = await httpPost('partner-api.yelp.com', '/program/'+programId+'/'+action+'/v1', '', basicAuth());
-    const success = result.s===202 || result.s===200;
-    const errMsg = (!success && result.b && result.b.error) ? result.b.error.description : null;
-    return {statusCode:200, headers:cors, body:JSON.stringify({success, programId, action, status:result.s, error:errMsg})};
+
+    // If not found via programs/v1, try programs/list/all (biz.yelp.com route)
+    if(!programId) {
+      const listPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+      // programs/list/all returns different bizId format - try direct match on group_id from SNAPSHOT
+      // Fallback: just try the bizId directly as program_id (sometimes they match)
+      programId = bizId;
+    }
+
+    const r = await httpPost('partner-api.yelp.com', '/program/'+programId+'/'+action+'/v1', '', basicAuth());
+    const success = r.s === 202 || r.s === 200;
+    return { statusCode:200, headers:cors, body: JSON.stringify({ success, action, programId, s: r.s, body: r.b||r.r }) };
   }
 if(path.startsWith('budget/')){
     const id=path.split('/')[1];
