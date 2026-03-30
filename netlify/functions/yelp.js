@@ -517,71 +517,65 @@ if(path.startsWith('budget/')){
 
   // -- Reporting API: get leads/calls/clicks/impressions for all campaigns --
   if (  if (path === 'reporting' || path.startsWith('reporting/')) {
-    const parts = path.split('/');
-    const period = parts[1] || 'current';
-    const now = new Date();
-    let startDate, endDate;
-    if (period === 'current') {
-      startDate = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
-      endDate = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-    } else if (period === 'prev') {
-      const prev = new Date(now.getFullYear(), now.getMonth()-1, 1);
-      const prevEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-      startDate = prev.getFullYear()+'-'+String(prev.getMonth()+1).padStart(2,'0')+'-01';
-      endDate = prevEnd.getFullYear()+'-'+String(prevEnd.getMonth()+1).padStart(2,'0')+'-'+String(prevEnd.getDate()).padStart(2,'0');
-    } else {
-      const [yr,mo] = period.split('-');
-      startDate = period+'-01';
-      endDate = yr+'-'+mo+'-'+new Date(parseInt(yr), parseInt(mo), 0).getDate();
-    }
-
-    // Get all bizIds from programs/v1
-    const allBizIds = [];
-    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
-    const progs = (page.b && page.b.payment_programs) || [];
-    progs.forEach(p => (p.businesses||[]).forEach(b => {
-      if(!allBizIds.includes(b.yelp_business_id)) allBizIds.push(b.yelp_business_id);
-    }));
-
-    if(!allBizIds.length) {
-      return { statusCode:200, headers:cors, body:JSON.stringify({metrics:{}, period, startDate, endDate, debug:'no bizIds from programs/v1'}) };
-    }
-
-    // Call Reporting API with correct Bearer auth
-    const fusionAuth = 'Bearer ' + FUSION_KEY;
-    const metrics = {};
-    const errors = [];
-    const batchSize = 20;
-
-    for(let i=0; i<allBizIds.length; i+=batchSize) {
-      const batch = allBizIds.slice(i, i+batchSize);
-      const payload = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
-      const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', payload, fusionAuth);
-      
-      if(res.s === 200 && res.b && res.b.data) {
-        res.b.data.forEach(biz => {
-          const m = (biz.metrics||[]).reduce((acc, day) => ({
-            leads:      (acc.leads||0)      + (day.num_leads||0),
-            calls:      (acc.calls||0)      + (day.num_calls||0),
-            clicks:     (acc.clicks||0)     + ((day.num_mobile_cta_clicks||0)+(day.num_desktop_cta_clicks||0)),
-            impressions:(acc.impressions||0) + (day.num_mobile_search_appearances||day.num_total_page_views||0),
-            spend:      (acc.spend||0)      + (day.ad_spend_cents||0),
-            messages:   (acc.messages||0)   + (day.num_messages_to_business||0),
-            page_views: (acc.page_views||0) + (day.num_total_page_views||0)
-          }), {});
-          metrics[biz.business_id] = m;
-        });
+    try {
+      const parts = path.split('/');
+      const period = parts[1] || 'current';
+      const now = new Date();
+      let startDate, endDate;
+      if (period === 'current') {
+        const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), day = String(now.getDate()).padStart(2,'0');
+        startDate = y+'-'+m+'-01'; endDate = y+'-'+m+'-'+day;
       } else {
-        errors.push({s:res.s, err:(res.b&&res.b.error)?res.b.error.description:JSON.stringify(res.b||res.r||'').substring(0,100)});
+        const yr = parseInt(period.split('-')[0]), mo = parseInt(period.split('-')[1]);
+        startDate = period+'-01';
+        endDate = period+'-'+String(new Date(yr, mo, 0).getDate()).padStart(2,'0');
       }
-    }
 
-    return { statusCode:200, headers:cors, body:JSON.stringify({
-      metrics, period, startDate, endDate,
-      bizCount: allBizIds.length,
-      metricsCount: Object.keys(metrics).length,
-      errors: errors.length ? errors : undefined
-    })};
+      // Get bizIds
+      const allBizIds = [];
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+      const progs = (page.b && page.b.payment_programs) || [];
+      progs.forEach(function(p){ (p.businesses||[]).forEach(function(b){ if(allBizIds.indexOf(b.yelp_business_id)===-1) allBizIds.push(b.yelp_business_id); }); });
+
+      if (!allBizIds.length) {
+        return { statusCode:200, headers:cors, body:JSON.stringify({metrics:{}, bizCount:0, period, startDate, endDate}) };
+      }
+
+      // Batch call Reporting API
+      const fusionAuth = 'Bearer ' + FUSION_KEY;
+      const metrics = {};
+      const errors = [];
+      for (let i = 0; i < allBizIds.length; i += 20) {
+        const batch = allBizIds.slice(i, i+20);
+        const payload = JSON.stringify({ids: batch, start_date: startDate, end_date: endDate});
+        const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', payload, fusionAuth);
+        if (res.s === 200 && res.b && res.b.data) {
+          res.b.data.forEach(function(biz) {
+            const m = {leads:0,calls:0,clicks:0,impressions:0,spend:0,messages:0};
+            (biz.metrics||[]).forEach(function(day){
+              m.leads      += (day.num_leads||0);
+              m.calls      += (day.num_calls||0);
+              m.clicks     += (day.num_mobile_cta_clicks||0)+(day.num_desktop_cta_clicks||0);
+              m.impressions += (day.num_mobile_search_appearances||day.num_total_page_views||0);
+              m.spend      += (day.ad_spend_cents||0);
+              m.messages   += (day.num_messages_to_business||0);
+            });
+            metrics[biz.business_id] = m;
+          });
+        } else {
+          errors.push({s:res.s, batch:batch.length});
+        }
+      }
+
+      return { statusCode:200, headers:cors, body:JSON.stringify({
+        metrics, period, startDate, endDate,
+        bizCount: allBizIds.length,
+        metricsCount: Object.keys(metrics).length,
+        errors: errors.length ? errors : undefined
+      })};
+    } catch(err) {
+      return { statusCode:500, headers:cors, body:JSON.stringify({error:err.message, stack:err.stack?err.stack.substring(0,200):undefined}) };
+    }
   }
 
   return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
