@@ -1317,7 +1317,7 @@ async function submitScan(e) {
     name:     fd.get('name') || '',
     biz:      fd.get('biz')  || '',
     phone:    fd.get('phone') || '',
-    category: fd.get('category') || '',
+    category: ((fd.get('category') || '').split('/')[0].trim()),
     budget:   fd.get('budget') || ''
   };
 
@@ -1352,7 +1352,7 @@ async function submitScan(e) {
     });
     await new Promise(r => setTimeout(r, 500));
 
-    if (!data.ok || !data.found) {
+    if (!data.ok) {
       document.getElementById('scanningState').style.display = 'none';
       document.getElementById('scanError').style.display = 'block';
       // Still open bot with manual greeting
@@ -1381,24 +1381,24 @@ async function submitScan(e) {
 
     // Metric bars
     const bars = document.getElementById('metricBars');
-        const photoScore = data.photos >= 100 ? 100 : data.photos >= 50 ? 82 : data.photos >= 20 ? 62 : data.photos >= 10 ? 42 : data.photos >= 5 ? 22 : 5;
-    const catKws = {'plumbing':100,'hvac':100,'electrical':100,'roofing':100,'moving':70,'cleaning':70,'construction':70};
-    const catKey = Object.keys(catKws).find(k => form.category.toLowerCase().includes(k));
-    const catScore = catKey ? catKws[catKey] : 50;
-    const ctaMap = {'quote':100,'pricing':80,'estimate':80,'consult':65,'message':35};
-    const ctaKey = Object.keys(ctaMap).find(k => (data.responseTimeText||'').toLowerCase().includes(k));
-    const ctaScore = ctaKey ? ctaMap[ctaKey] : 50;
-    const revScore = data.reviews>=500?100:data.reviews>=200?80:data.reviews>=100?60:data.reviews>=50?45:data.reviews>=20?30:15;
-    const kwScore = Math.round(catScore*0.35 + ctaScore*0.25 + revScore*0.25 + data.adsReadiness*0.15);
-    const ratingScore = data.rating>=4.7?100:data.rating>=4.5?85:data.rating>=4.3?70:data.rating>=4.0?55:35;
-    const profScore = Math.round(data.profileCompleteness*0.35 + photoScore*0.30 + (data.claimed?100:0)*0.20 + ratingScore*0.15);
-    const leadOptScore = Math.round((kwScore + profScore) / 2);
+        const _photoScore = data.photos >= 100 ? 100 : data.photos >= 50 ? 82 : data.photos >= 20 ? 62 : data.photos >= 10 ? 42 : data.photos >= 5 ? 22 : 5;
+    const _catKws = {'plumbing':100,'hvac':100,'electrical':100,'roofing':100,'moving':70,'cleaning':70,'construction':70,'locksmith':100,'pest':100};
+    const _catKey = Object.keys(_catKws).find(k => (form.category||'').toLowerCase().includes(k));
+    const _catScore = _catKey ? _catKws[_catKey] : 50;
+    const _ctaMap = {'quote':100,'pricing':80,'estimate':80,'consult':65,'message':35};
+    const _ctaKey = Object.keys(_ctaMap).find(k => (data.responseTimeText||'').toLowerCase().includes(k));
+    const _ctaScore = _ctaKey ? _ctaMap[_ctaKey] : 50;
+    const _revScore = data.reviews>=500?100:data.reviews>=200?80:data.reviews>=100?60:data.reviews>=50?45:data.reviews>=20?30:15;
+    const _kwScore = Math.round(_catScore*0.35 + _ctaScore*0.25 + _revScore*0.25 + data.adsReadiness*0.15);
+    const _ratScore = data.rating>=4.7?100:data.rating>=4.5?85:data.rating>=4.3?70:data.rating>=4.0?55:35;
+    const _profScore = Math.round(data.profileCompleteness*0.35 + _photoScore*0.30 + (data.claimed?100:0)*0.20 + _ratScore*0.15);
+    const _leadOptScore = Math.round((_kwScore + _profScore) / 2);
     bars.innerHTML = [
       metricBar('Response Time', data.responseTime, '⚡'),
       metricBar('Profile Completeness', data.profileCompleteness, '📋'),
       metricBar('Review Health', data.reviewHealth, '⭐'),
       metricBar('Ads Readiness', data.adsReadiness, '🎯'),
-      metricBar('Lead Optimized', leadOptScore, '🦲'),
+      metricBar('Lead Optimized', _leadOptScore, '🦲'),
     ].join('');
     setTimeout(() => {
       bars.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w + '%');
