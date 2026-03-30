@@ -578,6 +578,54 @@ if(path.startsWith('budget/')){
     }
   }
 
+  
+  //  Reporting API: fetch leads/calls/metrics for all campaigns 
+  if (path === 'reporting') {
+    // Get current month date range
+    const now = new Date();
+    const startDate = body.start_date || (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01');
+    const endDate = body.end_date || (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'));
+
+    // Get all bizIds from programs/list/all (these work with Reporting API)
+    const listPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const programs = (listPage.b && listPage.b.payment_programs) || [];
+    const bizIds = [...new Set(programs.flatMap(p => (p.businesses||[]).map(b=>b.yelp_business_id)).filter(Boolean))];
+
+    if (!bizIds.length) return { statusCode: 200, headers: cors, body: JSON.stringify({ data: [], error: 'no bizIds found' }) };
+
+    // Call Reporting API in batches of 10 (API limit)
+    const batchSize = 10;
+    const allData = [];
+    const fusionAuth = 'Bearer ' + FUSION_KEY;
+
+    for (let i = 0; i < bizIds.length; i += batchSize) {
+      const batch = bizIds.slice(i, i + batchSize);
+      try {
+        const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', JSON.stringify({
+          ids: batch,
+          start_date: startDate,
+          end_date: endDate
+        }), fusionAuth);
+        if (res.b && res.b.data) allData.push(...res.b.data);
+      } catch(e) {}
+    }
+
+    // Aggregate metrics per bizId across all dates
+    const byBiz = {};
+    allData.forEach(item => {
+      const bid = item.business_id;
+      if (!byBiz[bid]) byBiz[bid] = { business_id: bid, leads: 0, calls: 0, impressions: 0, clicks: 0, spend: 0 };
+      (item.metrics || []).forEach(m => {
+        byBiz[bid].leads += (m.num_leads || 0);
+        byBiz[bid].calls += (m.num_calls || 0);
+        byBiz[bid].impressions += (m.num_desktop_search_appearances || 0) + (m.num_mobile_search_appearances || 0);
+        byBiz[bid].clicks += (m.num_desktop_cta_clicks || 0) + (m.num_mobile_cta_clicks || 0);
+      });
+    });
+
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: Object.values(byBiz), startDate, endDate, bizCount: bizIds.length }) };
+  }
+
   return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 }
 async function httpPostJson(host, path, bodyObj, authHeader) {
