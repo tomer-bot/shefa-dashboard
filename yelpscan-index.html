@@ -1,4 +1,30 @@
-<!DOCTYPE html>
+<!DOCT
+
+    // Async Lead Optimized score
+    (async () => {
+      try {
+        const ls = await fetch('api/lead-score.php', {
+          method: 'POST',
+          headers: {'Content-Type':'application/x-www-form-urlencoded'},
+          body: 'url='+encodeURIComponent(data.yelpUrl)+'&category='+encodeURIComponent(form.category)+'&profileCompleteness='+data.profileCompleteness+'&claimed='+(data.claimed?'true':'false')
+        });
+        const ld = await ls.json();
+        if (ld.ok) {
+          const loBar = document.querySelector('#metric-bars .metric-bar:last-child');
+          if (loBar) {
+            const fill = loBar.querySelector('.bar-fill');
+            const scoreEl = loBar.querySelector('.metric-score');
+            const labelEl = loBar.querySelector('.metric-label span:last-child');
+            const sc = ld.leadOptimized;
+            const col = sc >= 75 ? '#1A7A3C' : sc >= 50 ? '#E8A200' : '#C0392B';
+            const lbl = sc >= 75 ? 'Strong' : sc >= 50 ? 'Moderate' : 'Weak';
+            if (fill) { fill.style.width = sc + '%'; fill.style.background = col; }
+            if (scoreEl) { scoreEl.textContent = sc; scoreEl.style.color = col; }
+            if (labelEl) labelEl.textContent = lbl;
+          }
+        }
+      } catch(e) {}
+    })();YPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1381,14 +1407,12 @@ async function submitScan(e) {
 
     // Metric bars
     const bars = document.getElementById('metricBars');
-        const photoScore = data.photos >= 15 ? 100 : data.photos >= 8 ? 75 : data.photos >= 4 ? 50 : data.photos >= 2 ? 30 : 10;
-    const leadConversion = Math.round((data.responseTime * 0.40) + (photoScore * 0.30) + (data.claimed ? 20 : 0) + (Math.min(100, Math.max(0, ((data.rating - 3.0) / 2.0) * 100)) * 0.10));
     bars.innerHTML = [
       metricBar('Response Time', data.responseTime, '⚡'),
       metricBar('Profile Completeness', data.profileCompleteness, '📋'),
       metricBar('Review Health', data.reviewHealth, '⭐'),
       metricBar('Ads Readiness', data.adsReadiness, '🎯'),
-      metricBar('Lead Conversion', leadConversion, '🎯'),
+      metricBar('Lead Optimized', 0, '🧲'),
     ].join('');
     setTimeout(() => {
       bars.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w + '%');
