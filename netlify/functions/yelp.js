@@ -140,36 +140,7 @@ exports.handler = async(event)=>{
   }
 
   // Ads API actions
-            if(path.startsWith('pause/') || path.startsWith('resume/')) {
-    const action = path.startsWith('pause/') ? 'pause' : 'resume';
-    const bizId = path.split('/')[1];
-
-    // Step 1: look up program_id by paginating programs/v1
-    let programId = null;
-    let offset = 0;
-    while (!programId && offset < 200) {
-      const pg = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+offset, basicAuth());
-      const progs = (pg.b && pg.b.payment_programs) || [];
-      if (!progs.length) break;
-      const match = progs.find(p => (p.businesses||[]).some(b => b.yelp_business_id === bizId));
-      if (match) { programId = match.program_id; break; }
-      const total = (pg.b && pg.b.total) || 0;
-      offset += 40;
-      if (offset >= total) break;
-    }
-
-    // Step 2: if no match found, try bizId directly as program_id
-    if (!programId) programId = bizId;
-
-    // Step 3: call pause or resume
-    const endpoint = '/program/' + programId + '/' + action + '/v1';
-    const result = await httpPost('partner-api.yelp.com', endpoint, '', basicAuth());
-    const success = result.s === 202 || result.s === 200;
-    return { statusCode: 200, headers: cors, body: JSON.stringify({
-      success, programId, action,
-      status: result.s, body: result.b || result.r
-    })};
-  }
+            
 ;
 
 // Clean display names  strip ": None", trailing ": ", newlines, etc.
@@ -299,53 +270,7 @@ exports.handler = async(event)=>{
   }
 
   // Ads API actions
-          if(path.startsWith('pause/') || path.startsWith('resume/')){
-    const action = path.split('/')[0]; // 'pause' or 'resume'
-    const bizId = path.split('/')[1];
-    const clientName = (body && body.clientName) ? body.clientName.split(':')[0].trim() : '';
-    
-    let programId = null;
-    const debug = { clientName, searched: 0, fusionErrors: 0 };
-    
-    if (clientName) {
-      // Paginate all programs and find by Fusion API name match
-      const cn1 = normName(clientName).split(' ').slice(0,2).join(' ');
-      const cn2 = normName(clientName).split(' ')[0];
-      let offset = 0, total = 9999, found = false;
-      while (offset < total && !found) {
-        const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+offset, basicAuth());
-        const progs = (page.b && page.b.payment_programs) || [];
-        if (page.b && page.b.total) total = page.b.total;
-        if (!progs.length) break;
-        debug.searched += progs.length;
-        for (const prog of progs) {
-          const bid = prog.businesses && prog.businesses[0] && prog.businesses[0].yelp_business_id;
-          if (!bid) continue;
-          try {
-            const fr = await httpGet('api.yelp.com', '/v3/businesses/' + bid, 'Bearer ' + FUSION_KEY);
-            const bizName = fr.b && fr.b.name;
-            if (!bizName) { debug.fusionErrors++; continue; }
-            const bn = normName(bizName);
-            if (bn.split(' ').slice(0,2).join(' ') === cn1 || bn.split(' ')[0] === cn2 || cn1.startsWith(bn.split(' ')[0])) {
-              programId = prog.program_id;
-              debug.matchedName = bizName;
-              found = true;
-              break;
-            }
-          } catch(e) { debug.fusionErrors++; }
-        }
-        offset += 40;
-      }
-    }
-    
-    if (!programId) programId = bizId;
-    const apiPath = '/program/' + programId + '/' + action + '/v1';
-    const r = await httpPost('partner-api.yelp.com', apiPath, '', basicAuth());
-    return {
-      statusCode: 200, headers: cors,
-      body: JSON.stringify({ success: r.s === 202 || r.s === 200, programId, s: r.s, b: r.b, debug })
-    };
-  }
+          
 
 
 
@@ -719,6 +644,29 @@ if(path.startsWith('budget/')){
       }
     });
     return { statusCode: 200, headers: cors, body: JSON.stringify({ map }) };
+  }
+
+
+  if(path.startsWith('pause/') || path.startsWith('resume/')) {
+    const action = path.startsWith('pause/') ? 'pause' : 'resume';
+    const bizId = path.split('/')[1];
+    let programId = null;
+    let offset = 0;
+    outer: while(offset < 200) {
+      const pg = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+offset, basicAuth());
+      const progs = (pg.b && pg.b.payment_programs) || [];
+      if(!progs.length) break;
+      for(const p of progs) {
+        if((p.businesses||[]).some(b=>b.yelp_business_id===bizId)) { programId=p.program_id; break outer; }
+      }
+      const total = (pg.b && pg.b.total) || 0;
+      offset += 40;
+      if(offset >= total) break;
+    }
+    if(!programId) programId = bizId;
+    const result = await httpPost('partner-api.yelp.com', '/program/'+programId+'/'+action+'/v1', '', basicAuth());
+    const success = result.s===202 || result.s===200;
+    return {statusCode:200, headers:cors, body:JSON.stringify({success, programId, action, status:result.s})};
   }
 
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
