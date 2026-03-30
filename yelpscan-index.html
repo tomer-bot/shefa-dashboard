@@ -3,28 +3,16 @@
     // Async Lead Optimized score
     (async () => {
       try {
-        const ls = await fetch('api/lead-score.php', {
+        const _ld = await (await fetch('api/lead-score.php', {
           method: 'POST',
           headers: {'Content-Type':'application/x-www-form-urlencoded'},
           body: 'category='+encodeURIComponent(form.category)+'&profileCompleteness='+data.profileCompleteness+'&claimed='+(data.claimed?'true':'false')+'&photos='+data.photos+'&adsReadiness='+data.adsReadiness+'&reviews='+data.reviews+'&rating='+data.rating+'&responseTimeText='+encodeURIComponent(data.responseTimeText||'')
-        });
-        const ld = await ls.json();
-        if (ld.ok) {
-          const sc = ld.leadOptimized;
-          const col = sc >= 75 ? '#1A7A3C' : sc >= 50 ? '#E8A200' : '#C0392B';
-          const lbl = sc >= 75 ? 'Strong' : sc >= 50 ? 'Moderate' : 'Weak';
-          const loBar = document.querySelector('#metricBars > div:last-child');
-          if (loBar) {
-            // child[2] = score+label div, child[3] = label span, child[4] = bar track, child[5] = fill
-            const scoreDiv = loBar.children[0]?.children[1]; // "0 Poor" div
-            const labelSpan = loBar.children[0]?.children[1]?.querySelector('span');
-            const fillDiv = loBar.children[1]?.children[0]; // the fill bar
-            if (scoreDiv) { scoreDiv.childNodes[0].textContent = sc + ' '; scoreDiv.style.color = col; }
-            if (labelSpan) { labelSpan.textContent = lbl; labelSpan.style.color = col; }
-            if (fillDiv) { fillDiv.style.width = sc + '%'; fillDiv.style.background = col; }
-          }
+        })).json();
+        if (_ld.ok) {
+          const _bar = document.querySelector('#metricBars > div:last-child');
+          if (_bar) { const _tmp = document.createElement('div'); _tmp.innerHTML = metricBar('Lead Optimized', _ld.leadOptimized, '🧲'); _bar.replaceWith(_tmp.firstChild); }
         }
-      } catch(e) { console.log('lead-score error', e); }
+      } catch(e) {}
     })();YPE html>
 <html lang="en">
 <head>
