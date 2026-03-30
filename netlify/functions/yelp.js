@@ -128,7 +128,8 @@ exports.handler = async(event)=>{
     if(!programId) programId = bizId;
     const result = await httpPost('partner-api.yelp.com', '/program/'+programId+'/'+action+'/v1', '', basicAuth());
     const success = result.s===202 || result.s===200;
-    return {statusCode:200, headers:cors, body:JSON.stringify({success, programId, action, status:result.s})};
+    const errMsg = (!success && result.b && result.b.error) ? result.b.error.description : null;
+    return {statusCode:200, headers:cors, body:JSON.stringify({success, programId, action, status:result.s, error:errMsg})};
   }
 if(path.startsWith('budget/')){
     const id=path.split('/')[1];
