@@ -657,5 +657,3 @@ async function httpGetAuth(host, path, authHeader) {
     req.on('error', reject); req.end();
   });
 }
-
-;
