@@ -809,6 +809,16 @@ footer {
           <label>Phone Number</label>
           <input type="tel" name="phone" placeholder="(818) 555-0100" required>
         </div>
+        <div style="display:flex;gap:12px;">
+          <div class="form-field" style="flex:1">
+            <label>City</label>
+            <input type="text" name="city" placeholder="Los Angeles" required>
+          </div>
+          <div class="form-field" style="flex:0 0 90px">
+            <label>State</label>
+            <input type="text" name="state" placeholder="CA" maxlength="2" required>
+          </div>
+        </div>
         <div class="form-field">
           <label>Business Category</label>
           <select name="category" required>
@@ -876,7 +886,19 @@ footer {
           <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px" id="metricBars"></div>
 
           <!-- Top finding -->
-          <div style="background:#FFF5F5;border:1px solid #FFD5D5;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--dark);line-height:1.5" id="topFinding"></div>
+          <div style="background:#FFF5F5;border:1px solid #FFD5D5;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--dark);line-height:1.5" id="    const _scanErr = document.getElementById('scanError');
+    if (_scanErr) {
+      if (!data.found) {
+        _scanErr.innerHTML = '<div style="background:#FFF3F3;border:1px solid #E74C3C;border-radius:8px;padding:12px 16px;font-size:13px;color:#333;margin-top:8px;text-align:center">' +
+          '⚠️ <strong style="color:#C0392B">Could not verify ' + (lead.biz||'this business') + ' on Yelp in ' + (lead.city||'your area') + '.</strong><br>' +
+          'Scores shown are estimated. <a href="mailto:info@shefamarketing.com?subject=Manual+Yelp+Scan+for+' + encodeURIComponent(lead.biz||'') + '&body=Business%3A+' + encodeURIComponent(lead.biz||'') + '%0ACity%3A+' + encodeURIComponent(lead.city||'') + '%0AState%3A+' + encodeURIComponent(lead.state||'') + '" style="color:#C0392B;font-weight:700">Email us for a free manual review</a> →' +
+          '</div>';
+        _scanErr.style.display = 'block';
+      } else {
+        _scanErr.innerHTML = ''; _scanErr.style.display = 'none';
+      }
+    }
+    topFinding"></div>
 
           <!-- CTA -->
           <div style="text-align:center">
@@ -1317,7 +1339,9 @@ async function submitScan(e) {
     name:     fd.get('name') || '',
     biz:      fd.get('biz')  || '',
     phone:    fd.get('phone') || '',
-    category: ((fd.get('category') || '').split('/')[0].trim()),
+    category: ((fd.get('category')||'').split('/')[0].trim()),
+    city:     (fd.get('city')||'').trim(),
+    state:    (fd.get('state')||'').trim().toUpperCase(),
     budget:   fd.get('budget') || ''
   };
 
@@ -1342,7 +1366,7 @@ async function submitScan(e) {
     const resp = await fetch('api/yelp-scan.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bizName: lead.biz, location: '', category: lead.category })
+      body: JSON.stringify({ bizName: lead.biz, location: ((lead.city+' '+lead.state).trim()||'Los Angeles CA'), category: lead.category })
     });
     const data = await resp.json();
     clearInterval(stepTimer);
@@ -1381,24 +1405,24 @@ async function submitScan(e) {
 
     // Metric bars
     const bars = document.getElementById('metricBars');
-        const _photoScore = data.photos >= 100 ? 100 : data.photos >= 50 ? 82 : data.photos >= 20 ? 62 : data.photos >= 10 ? 42 : data.photos >= 5 ? 22 : 5;
-    const _catKws = {'plumbing':100,'hvac':100,'electrical':100,'roofing':100,'moving':70,'cleaning':70,'construction':70,'locksmith':100,'pest':100};
-    const _catKey = Object.keys(_catKws).find(k => (form.category||'').toLowerCase().includes(k));
-    const _catScore = _catKey ? _catKws[_catKey] : 50;
-    const _ctaMap = {'quote':100,'pricing':80,'estimate':80,'consult':65,'message':35};
-    const _ctaKey = Object.keys(_ctaMap).find(k => (data.responseTimeText||'').toLowerCase().includes(k));
-    const _ctaScore = _ctaKey ? _ctaMap[_ctaKey] : 50;
-    const _revScore = data.reviews>=500?100:data.reviews>=200?80:data.reviews>=100?60:data.reviews>=50?45:data.reviews>=20?30:15;
-    const _kwScore = Math.round(_catScore*0.35 + _ctaScore*0.25 + _revScore*0.25 + data.adsReadiness*0.15);
-    const _ratScore = data.rating>=4.7?100:data.rating>=4.5?85:data.rating>=4.3?70:data.rating>=4.0?55:35;
-    const _profScore = Math.round(data.profileCompleteness*0.35 + _photoScore*0.30 + (data.claimed?100:0)*0.20 + _ratScore*0.15);
-    const _leadOptScore = Math.round((_kwScore + _profScore) / 2);
+        const _ps=(data.photos||0)>=100?100:(data.photos||0)>=50?82:(data.photos||0)>=20?62:(data.photos||0)>=10?42:(data.photos||0)>=5?22:5;
+    const _ck={'plumbing':100,'hvac':100,'electrical':100,'roofing':100,'moving':70,'cleaning':70,'construction':70,'locksmith':100};
+    const _cv=Object.keys(_ck).find(k=>(lead.category||'').toLowerCase().includes(k));
+    const _cs=_cv?_ck[_cv]:50;
+    const _tm={'quote':100,'pricing':80,'estimate':80,'consult':65,'message':35};
+    const _tv=Object.keys(_tm).find(k=>(data.responseTimeText||'').toLowerCase().includes(k));
+    const _ts=_tv?_tm[_tv]:50;
+    const _rv=(data.reviews||0)>=500?100:(data.reviews||0)>=200?80:(data.reviews||0)>=100?60:(data.reviews||0)>=50?45:(data.reviews||0)>=20?30:15;
+    const _kw=Math.round(_cs*0.35+_ts*0.25+_rv*0.25+(data.adsReadiness||0)*0.15);
+    const _rs=(data.rating||0)>=4.7?100:(data.rating||0)>=4.5?85:(data.rating||0)>=4.3?70:(data.rating||0)>=4.0?55:35;
+    const _pf=Math.round((data.profileCompleteness||0)*0.35+_ps*0.30+(data.claimed?100:0)*0.20+_rs*0.15);
+    const _lo=Math.round((_kw+_pf)/2);
     bars.innerHTML = [
       metricBar('Response Time', data.responseTime, '⚡'),
       metricBar('Profile Completeness', data.profileCompleteness, '📋'),
       metricBar('Review Health', data.reviewHealth, '⭐'),
       metricBar('Ads Readiness', data.adsReadiness, '🎯'),
-      metricBar('Lead Optimized', _leadOptScore, '🦲'),
+      metricBar('Lead Optimized', _lo, '🦲'),
     ].join('');
     setTimeout(() => {
       bars.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w + '%');
