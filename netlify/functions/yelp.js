@@ -253,45 +253,45 @@ if(path.startsWith('budget/')){
       return { statusCode: 200, headers: cors, body: JSON.stringify(result || { pending: true }) };
     }
 
-    if (sub === 'fetch-all') {
-      // POST: fetch reporting for ALL active programs/list/all bizIds for a date range
-      // 1. Get all bizIds from programs/list/all
+      if (sub === 'fetch-all') {
       const fusionAuth = 'Bearer ' + FUSION_KEY;
-      // Paginate programs/list/all (biz.yelp.com) to get all client bizIds
+
+      // Get bizIds by paginating programs/v1 with CURRENT status
       const allBizIds = new Set();
-      let pgOffset = 0;
-      while(pgOffset < 200) {
-        const pgRes = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+pgOffset+'&program_status=CURRENT', basicAuth());
-        const pgProgs = (pgRes.b && pgRes.b.payment_programs) || [];
+      let pgOffset = 0, pgTotal = 9999;
+      while(pgOffset < pgTotal) {
+        const pg = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+pgOffset+'&program_status=CURRENT', basicAuth());
+        const pgProgs = (pg.b && pg.b.payment_programs) || [];
         if(!pgProgs.length) break;
-        pgProgs.forEach(p => (p.businesses||[]).forEach(b => allBizIds.add(b.yelp_business_id)));
-        const pgTotal = (pgRes.b && pgRes.b.total) || 0;
+        pgProgs.forEach(p => (p.businesses||[]).forEach(b => { if(b.yelp_business_id) allBizIds.add(b.yelp_business_id); }));
+        pgTotal = (pg.b && pg.b.total) || 0;
         pgOffset += 40;
         if(pgOffset >= pgTotal) break;
       }
       const bizIds = [...allBizIds];
-
       if (!bizIds.length) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no bizIds found' }) };
 
-      // 2. Submit report job
+      // Submit async report job
       const start = body.start || new Date(Date.now()-30*86400000).toISOString().split('T')[0];
       const end = body.end || new Date().toISOString().split('T')[0];
       const jobR = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', JSON.stringify({ ids: bizIds, start, end }), fusionAuth);
 
-      if (jobR.s !== 202) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'job failed', raw: jobR }) };
+      if (jobR.s !== 202) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'job failed', s: jobR.s, raw: jobR.b }) };
       const reportId = jobR.b && jobR.b.id;
+      if (!reportId) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no reportId', raw: jobR.b }) };
 
-      // 3. Poll until ready (up to 20s)
+      // Poll until data ready (max 20s)
       let data = null;
       for (let i = 0; i < 10; i++) {
         await new Promise(res => setTimeout(res, 2000));
         const pollR = await httpGet('api.yelp.com', '/v3/reporting/' + reportId, fusionAuth);
         if (pollR.s === 200 && pollR.b && pollR.b.data) { data = pollR.b.data; break; }
+        if (pollR.s !== 202) break;
       }
 
-      if (!data) return { statusCode: 200, headers: cors, body: JSON.stringify({ pending: true, reportId }) };
+      if (!data) return { statusCode: 200, headers: cors, body: JSON.stringify({ pending: true, reportId, bizIds: bizIds.length }) };
 
-      // 4. Aggregate per-bizId: sum calls, clicks, impressions, cost
+      // Aggregate per bizId
       const summary = {};
       data.forEach(biz => {
         const metrics = biz.metrics || [];
@@ -299,7 +299,7 @@ if(path.startsWith('budget/')){
           calls: metrics.reduce((s,m)=>s+(m.num_calls||0),0),
           clicks: metrics.reduce((s,m)=>s+(m.num_mobile_cta_clicks||0)+(m.num_desktop_cta_clicks||0),0),
           impressions: metrics.reduce((s,m)=>s+(m.num_mobile_search_appearances||0),0),
-          page_views: metrics.reduce((s,m)=>s+(m.num_mobile_page_views||0)+(m.num_total_page_views||0),0),
+          page_views: metrics.reduce((s,m)=>s+(m.num_total_page_views||0),0),
           ad_cost: metrics.reduce((s,m)=>s+(m.ad_cost||0),0)
         };
       });
