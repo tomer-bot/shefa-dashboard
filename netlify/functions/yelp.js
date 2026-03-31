@@ -519,55 +519,79 @@ if(path.startsWith('budget/')){
 
   
   //  Reporting API: live leads/calls/impressions/clicks per campaign 
-  if (path === 'reporting') {
+  if (path === 'reporting' || path.startsWith('reporting/')) {
+    const parts = path.split('/');
+    const monthParam = parts[1];
     const now = new Date();
-    const yr  = now.getUTCFullYear();
-    const mo  = String(now.getUTCMonth()+1).padStart(2,'0');
-    const dd  = String(now.getUTCDate()).padStart(2,'0');
-    const startDate = yr+'-'+mo+'-01';
-    const endDate   = yr+'-'+mo+'-'+dd;
-
-    // Get bizIds via same endpoint as programs/list/all (proven working)
-    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100&program_status=CURRENT', basicAuth());
-    const programs = (page.b && page.b.payment_programs) || [];
-    const bizIds = [];
-    programs.forEach(p => (p.businesses||[]).forEach(b => {
-      if(b.yelp_business_id && !bizIds.includes(b.yelp_business_id)) bizIds.push(b.yelp_business_id);
-    }));
-
-    if(!bizIds.length) return {statusCode:200, headers:cors, body:JSON.stringify({metrics:{}, error:'programs/v1 returned '+programs.length+' programs, 0 bizIds', debug:{s:page.s, keys:Object.keys(page.b||{})}})};
-
-    // Call Fusion Reporting API via https.request (server-side, no CORS)
-    const metrics = {};
-    const fusionAuth = 'Bearer ' + FUSION_KEY;
-    const batchSize = 10;
-    for(let i=0; i<bizIds.length; i+=batchSize) {
-      const batch = bizIds.slice(i, i+batchSize);
-      const body = JSON.stringify({ids:batch, start_date:startDate, end_date:endDate});
-      try {
-        const res = await new Promise((resolve)=>{
-          const req = https.request({
-            hostname:'api.yelp.com', path:'/v3/reporting/businesses/daily', method:'POST',
-            headers:{Authorization:fusionAuth, 'Content-Type':'application/json', 'Content-Length':Buffer.byteLength(body)}
-          }, res=>{
-            let data=''; res.on('data',c=>data+=c);
-            res.on('end',()=>{ try{resolve({s:res.statusCode,b:JSON.parse(data)});}catch(e){resolve({s:res.statusCode,r:data.substring(0,200)});} });
-          });
-          req.on('error',e=>resolve({s:500,r:e.message}));
-          req.write(body); req.end();
-        });
-        ((res.b && res.b.data)||[]).forEach(biz=>{
-          let leads=0,calls=0,impressions=0,clicks=0;
-          (biz.metrics||[]).forEach(m=>{
-            leads+=(m.num_leads||0); calls+=(m.num_calls||0);
-            impressions+=(m.num_mobile_search_appearances||0);
-            clicks+=(m.num_mobile_cta_clicks||0)+(m.num_desktop_cta_clicks||0);
-          });
-          metrics[biz.business_id]={leads,calls,impressions,clicks,days:(biz.metrics||[]).length};
-        });
-      } catch(e){}
+    let year = now.getUTCFullYear(), month = now.getUTCMonth();
+    if (monthParam && /^\d{4}-\d{2}$/.test(monthParam)) {
+      [year, month] = monthParam.split('-').map(Number); month--;
     }
-    return {statusCode:200,headers:cors,body:JSON.stringify({metrics,startDate,endDate,bizCount:bizIds.length,metricCount:Object.keys(metrics).length})};
+    const startDate = new Date(Date.UTC(year, month, 1)).toISOString().split('T')[0];
+    const isCurrentMonth = year===now.getUTCFullYear() && month===now.getUTCMonth();
+    const endDate = isCurrentMonth
+      ? new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()-1)).toISOString().split('T')[0]
+      : new Date(Date.UTC(year, month+1, 0)).toISOString().split('T')[0];
+
+    // Get bizIds using the working programs/list/all path (biz.yelp.com route)
+    const progPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const progs = (progPage.b && progPage.b.payment_programs) || [];
+    const bizIds = [...new Set(progs.flatMap(p=>(p.businesses||[]).map(b=>b.yelp_business_id)))].filter(Boolean);
+
+    if (!bizIds.length) {
+      return { statusCode:200, headers:cors, body:JSON.stringify({data:{}, month:monthParam||'current', error:'no bizIds found', debug:{s:progPage.s, keys:Object.keys(progPage.b||{})}}) };
+    }
+
+    // Batch POST to Yelp Reporting API v3
+    const allMetrics = {};
+    const batchSize = 20;
+    for (let i = 0; i < bizIds.length; i += batchSize) {
+      const batch = bizIds.slice(i, i+batchSize);
+      const postData = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
+      const res = await new Promise((resolve) => {
+        const req = https.request({
+          hostname: 'api.yelp.com',
+          path: '/v3/reporting/businesses/daily',
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + FUSION_KEY,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+          }
+        }, res => {
+          let d = '';
+          res.on('data', c => d+=c);
+          res.on('end', () => { try { resolve({s:res.statusCode, b:JSON.parse(d)}); } catch(e) { resolve({s:res.statusCode, r:d.substring(0,300)}); } });
+        });
+        req.on('error', e => resolve({s:0, r:e.message}));
+        req.write(postData);
+        req.end();
+      });
+
+      if (res.b && res.b.data) {
+        res.b.data.forEach(bizData => {
+          const bizId = bizData.business_id;
+          const metrics = bizData.metrics || [];
+          const totals = {leads:0, calls:0, clicks:0, impressions:0, pageviews:0};
+          metrics.forEach(day => {
+            totals.leads  += (day.num_mobile_cta_clicks||0)+(day.num_desktop_cta_clicks||0)+(day.num_messages_to_business||0);
+            totals.calls  += day.num_calls||0;
+            totals.clicks += (day.num_mobile_cta_clicks||0)+(day.num_desktop_cta_clicks||0);
+            totals.impressions += day.num_mobile_search_appearances||0;
+            totals.pageviews   += (day.num_mobile_page_views||0)+(day.num_total_page_views||0);
+          });
+          allMetrics[bizId] = totals;
+        });
+      }
+    }
+
+    return { statusCode:200, headers:cors, body:JSON.stringify({
+      data: allMetrics,
+      month: monthParam||(year+'-'+String(month+1).padStart(2,'0')),
+      dateRange: startDate+' to '+endDate,
+      bizCount: bizIds.length,
+      matchedCount: Object.keys(allMetrics).length
+    })};
   }
 
 
