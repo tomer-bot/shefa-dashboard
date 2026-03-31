@@ -132,7 +132,7 @@ exports.handler = async(event)=>{
 
     // If not found via programs/v1, try programs/list/all (biz.yelp.com route)
     if(!programId) {
-      const listPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+      const listPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&program_status=CURRENT', basicAuth());
       // programs/list/all returns different bizId format - try direct match on group_id from SNAPSHOT
       // Fallback: just try the bizId directly as program_id (sometimes they match)
       programId = bizId;
