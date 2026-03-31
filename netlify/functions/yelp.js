@@ -270,7 +270,7 @@ if(path.startsWith('budget/')){
 
     // Test single bizId first to verify API format
     const fusionAuth = 'Bearer ' + FUSION_KEY;
-    const testPayload = JSON.stringify({ ids: [bizIds[0]], start_date: startDate, end_date: endDate });
+    const testPayload = JSON.stringify({ ids: [bizIds[0]], start: startDate, end: endDate });
     const testRes = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', testPayload, fusionAuth);
 
     if(testRes.s !== 200) {
@@ -289,7 +289,7 @@ if(path.startsWith('budget/')){
     const batchSize = 10;
     for(let i=0; i<bizIds.length; i+=batchSize) {
       const batch = bizIds.slice(i, i+batchSize);
-      const payload = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
+      const payload = JSON.stringify({ ids: batch, start: startDate, end: endDate });
       const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', payload, fusionAuth);
       if(res.s !== 200) continue;
       const businesses = (res.b && (res.b.data || res.b.businesses || []));
@@ -606,7 +606,7 @@ if(path.startsWith('budget/')){
     const batchSize = 20;
     for (let i = 0; i < bizIds.length; i += batchSize) {
       const batch = bizIds.slice(i, i+batchSize);
-      const postData = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
+      const postData = JSON.stringify({ ids: batch, start: startDate, end: endDate });
       const res = await new Promise((resolve) => {
         const req = https.request({
           hostname: 'api.yelp.com',
@@ -736,7 +736,7 @@ if(path.startsWith('budget/')){
       const batch = bizIds.slice(i, i + batchSize);
       try {
         const res = await new Promise((resolve) => {
-          const postData = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
+          const postData = JSON.stringify({ ids: batch, start: startDate, end: endDate });
           const req = https.request({
             hostname: 'api.yelp.com',
             path: '/v3/reporting/businesses/daily',
