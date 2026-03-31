@@ -274,7 +274,12 @@ if(path.startsWith('budget/')){
       // Submit async report job
       const start = body.start || new Date(Date.now()-30*86400000).toISOString().split('T')[0];
       const end = body.end || new Date().toISOString().split('T')[0];
-      const jobR = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', JSON.stringify({ ids: bizIds, start, end }), fusionAuth);
+      const jobR = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', JSON.stringify({
+        ids: bizIds,
+        start,
+        end,
+        metrics: ['billed_impressions','billed_clicks','num_calls','num_mobile_cta_clicks','num_desktop_cta_clicks','num_mobile_search_appearances','num_total_page_views','ad_cost']
+      }), fusionAuth);
 
       if (jobR.s !== 202) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'job failed', s: jobR.s, raw: jobR.b }) };
       const reportId = jobR.b && jobR.b.id;
