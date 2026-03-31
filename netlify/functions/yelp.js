@@ -496,7 +496,7 @@ if(path.startsWith('budget/')){
 
   // -- bizId to programId mapping (for Advanced Controls) --
   if (path === 'biz-program-map') {
-    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100&program_status=CURRENT', basicAuth());
     const programs = (page.b && page.b.payment_programs) || [];
     const map = {};
     programs.forEach(p => {
