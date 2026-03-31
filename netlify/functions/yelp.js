@@ -614,6 +614,92 @@ if(path.startsWith('budget/')){
     return {statusCode:200,headers:cors,body:JSON.stringify({metrics:allMetrics,startDate,endDate,bizCount:bizIds.length})};
   }
 
+
+  // -- Reporting API: live leads/calls/clicks for all programs --
+  if (path === 'reporting' || path.startsWith('reporting/')) {
+    // Parse optional month param e.g. reporting/2026-03
+    const parts = path.split('/');
+    const monthParam = parts[1]; // e.g. "2026-03" or undefined
+
+    const now = new Date();
+    let year = now.getUTCFullYear();
+    let month = now.getUTCMonth(); // 0-indexed
+
+    if (monthParam && /^\d{4}-\d{2}$/.test(monthParam)) {
+      const [y, m] = monthParam.split('-').map(Number);
+      year = y; month = m - 1;
+    }
+
+    const startDate = new Date(Date.UTC(year, month, 1)).toISOString().split('T')[0];
+    const today = new Date();
+    const isCurrentMonth = year === today.getUTCFullYear() && month === today.getUTCMonth();
+    const endDate = isCurrentMonth
+      ? new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 1)).toISOString().split('T')[0]
+      : new Date(Date.UTC(year, month + 1, 0)).toISOString().split('T')[0];
+
+    // Get all bizIds from programs/v1
+    const progPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const progs = (progPage.b && progPage.b.payment_programs) || [];
+    const bizIds = [...new Set(progs.flatMap(p => (p.businesses || []).map(b => b.yelp_business_id)))].filter(Boolean);
+
+    if (!bizIds.length) {
+      return { statusCode: 200, headers: cors, body: JSON.stringify({ data: [], month: monthParam || 'current' }) };
+    }
+
+    // Call Reporting API in batches of 20
+    const batchSize = 20;
+    const allMetrics = {};
+    for (let i = 0; i < bizIds.length; i += batchSize) {
+      const batch = bizIds.slice(i, i + batchSize);
+      try {
+        const res = await new Promise((resolve) => {
+          const postData = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
+          const req = https.request({
+            hostname: 'api.yelp.com',
+            path: '/v3/reporting/businesses/daily',
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + FUSION_KEY,
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData)
+            }
+          }, res => {
+            let d = '';
+            res.on('data', c => d += c);
+            res.on('end', () => { try { resolve({ s: res.statusCode, b: JSON.parse(d) }); } catch(e) { resolve({ s: res.statusCode, r: d.substring(0, 200) }); } });
+          });
+          req.on('error', e => resolve({ s: 0, r: e.message }));
+          req.write(postData);
+          req.end();
+        });
+
+        if (res.b && res.b.data) {
+          res.b.data.forEach(bizData => {
+            const bizId = bizData.business_id;
+            const metrics = bizData.metrics || [];
+            // Sum up all days for the month
+            const totals = { leads: 0, calls: 0, clicks: 0, impressions: 0, pageviews: 0 };
+            metrics.forEach(day => {
+              totals.leads    += (day.num_mobile_cta_clicks || 0) + (day.num_desktop_cta_clicks || 0) + (day.num_messages_to_business || 0);
+              totals.calls    += day.num_calls || 0;
+              totals.clicks   += (day.num_mobile_cta_clicks || 0) + (day.num_desktop_cta_clicks || 0);
+              totals.impressions += (day.num_mobile_search_appearances || 0);
+              totals.pageviews   += (day.num_mobile_page_views || 0) + (day.num_total_page_views || 0);
+            });
+            allMetrics[bizId] = totals;
+          });
+        }
+      } catch(e) {}
+    }
+
+    return { statusCode: 200, headers: cors, body: JSON.stringify({
+      data: allMetrics,
+      month: monthParam || (year + '-' + String(month+1).padStart(2,'0')),
+      dateRange: startDate + ' to ' + endDate,
+      bizCount: bizIds.length
+    })};
+  }
+
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 }
 async function httpPostJson(host, path, bodyObj, authHeader) {
