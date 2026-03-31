@@ -1161,78 +1161,56 @@ async function changeCpc(id) {
 // ---
 
 async function loadReportingData(month) {
-  const mon = month || currentMonth || new Date().toISOString().slice(0,7);
-  const cfg = JSON.parse(localStorage.getItem('shefa_cfg') || '{}');
-  const fusionKey = cfg.fusion;
-  if (!fusionKey) return;
+  const CACHE_KEY = 'reporting_live_' + (month||new Date().toISOString().slice(0,7));
+  const cached = JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
+  const CACHE_TTL = 30*60*1000; // 30 min cache
 
-  const CACHE_KEY = 'reporting_cache_' + mon;
-  const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-  const now = Date.now();
-  const TWENTY_FOUR_H = 86400000;
-
-  try {
-    // Use cache if < 24h old
-    if (cached && cached.reportId && cached.bizInfoList?.length && (now - cached.ts) < TWENTY_FOUR_H) {
-      const r = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly/' + cached.reportId, {
-        headers: { Authorization: 'Bearer ' + fusionKey }
-      });
-      if (r.status === 200) {
-        const data = await r.json();
-        if (data.data?.length) { applyReportingData(data); return; }
+  let data = null;
+  if(cached && (Date.now()-cached.ts) < CACHE_TTL) {
+    data = cached.data;
+  } else {
+    try {
+      const r = await yelpFn('reporting','POST');
+      if(r && r.metrics) {
+        data = r;
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(), data}));
       }
+    } catch(e) { console.warn('Reporting API error:', e); }
+  }
+
+  if(!data || !data.metrics) return;
+  window._reportingMetrics = data.metrics;
+
+  // Update each campaign card with live leads/calls if we can match bizIds
+  // The reporting metrics are keyed by programs/list/all bizIds
+  // We'll display them in the Reports tab
+  const container = document.getElementById('reports-content') || document.getElementById('reportContainer');
+  if(container && Object.keys(data.metrics).length) {
+    const rows = Object.entries(data.metrics).map(([bizId, m])=>`
+      <tr>
+        <td style="font-size:11px;max-width:160px;overflow:hidden;white-space:nowrap">${bizId.substring(0,18)}...</td>
+        <td style="text-align:center">${m.leads||0}</td>
+        <td style="text-align:center">${m.calls||0}</td>
+        <td style="text-align:center">${(m.impressions||0).toLocaleString()}</td>
+        <td style="text-align:center">${m.clicks||0}</td>
+      </tr>`).join('');
+
+    const liveBlock = `<div class="report-section">
+      <h3 style="font-size:13px;color:#8aa5c0;margin-bottom:8px">Live Reporting API  MTD (${data.startDate} to ${data.endDate})</h3>
+      <table style="width:100%;font-size:12px;border-collapse:collapse">
+        <thead><tr style="color:#8aa5c0">
+          <th style="text-align:left">Business ID</th>
+          <th>Leads</th><th>Calls</th><th>Impressions</th><th>Clicks</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+    // Prepend live block if not already there
+    if(!container.querySelector('.report-section')) {
+      container.insertAdjacentHTML('afterbegin', liveBlock);
     }
-
-    // Get biz IDs from programs/list/all
-    const listRes = await yelpFn('programs/list/all', 'GET');
-    const progs = listRes.b?.payment_programs || [];
-    const bizIds = [...new Set(progs.map(p => p.businesses?.[0]?.yelp_business_id).filter(Boolean))];
-    if (!bizIds.length) return;
-
-    // Fetch bizInfo for bridge
-    const bizInfoRes = await fetch('/api/yelp?path=probe', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ host: 'partner-api.yelp.com', path: '/v1/business_info/' + bizIds.join(','), auth: 'basic' })
-    }).then(r => r.json());
-    const bizInfoList = bizInfoRes?.result?.b?.businesses || [];
-
-    // Submit report DIRECTLY to Yelp (bypasses backend - backend route was broken)
-    const createR = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly', {
-      method: 'POST',
-      headers: { Authorization: 'Bearer ' + fusionKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        start: mon, end: mon, ids: bizIds,
-        metrics: ['billed_impressions','billed_clicks','ad_cost','ad_driven_calls','ad_driven_messages_to_business']
-      })
-    });
-    const createBody = await createR.json();
-    const reportId = createBody.id;
-    if (!reportId) { console.warn('No report ID:', createBody); return; }
-
-    // Cache immediately with bizInfoList
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
-    toast(' Reporting data loading... (~30 min)');
-
-    // Poll: first at 90s, then every 5 min, max 8 attempts
-    let attempts = 0;
-    const poll = async () => {
-      attempts++;
-      const r = await fetch('https://api.yelp.com/v3/reporting/businesses/monthly/' + reportId, {
-        headers: { Authorization: 'Bearer ' + fusionKey }
-      });
-      if (r.status === 200) {
-        const data = await r.json();
-        if (data.data?.length) {
-          localStorage.setItem(CACHE_KEY, JSON.stringify({ reportId, bizInfoList, ts: now }));
-          applyReportingData(data);
-          return;
-        }
-      }
-      if (attempts < 8) setTimeout(poll, 300000);
-    };
-    setTimeout(poll, 90000);
-
-  } catch(e) { console.error('Reporting error:', e); }
+  }
 }
 
 
