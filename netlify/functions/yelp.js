@@ -243,19 +243,59 @@ if(path.startsWith('budget/')){
   }
 
   // GET reporting/daily/{id} or reporting/monthly/{id}
-  if (path.startsWith('reporting/daily/') || path.startsWith('reporting/monthly/')) {
+  if (path.startsWith('reporting/')) {
     const parts = path.split('/');
-    const type = parts[1]; // daily or monthly
-    const reportId = parts[2];
-    return new Promise((resolve) => {
-      const req = https.request(
-        { hostname: 'api.yelp.com', path: '/v3/reporting/businesses/' + type + '/' + reportId,
-          method: 'GET', headers: { Authorization: 'Bearer ' + FUSION_KEY, Accept: 'application/json' } },
-        res => { let d = ''; res.on('data', c => d += c); res.on('end', () => resolve({ statusCode: 200, headers: cors, body: d })); }
-      );
-      req.on('error', e => resolve({ statusCode: 500, headers: cors, body: JSON.stringify({ error: e.message }) }));
-      req.end();
-    });
+    const monthStr = parts[1]; // e.g. "2026-03"
+    const [year, mon] = monthStr.split('-').map(Number);
+    const startDate = monthStr + '-01';
+    const lastDay = new Date(year, mon, 0).getDate();
+    const endDate = monthStr + '-' + String(lastDay).padStart(2,'0');
+
+    // Step 1: Collect all bizIds from programs/list/all (paginated)
+    const bizIds = [];
+    let offset = 0;
+    let totalProgs = 9999;
+    while(offset < totalProgs) {
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+offset, basicAuth());
+      const progs = (page.b && page.b.payment_programs) || [];
+      if(!progs.length) break;
+      if(typeof page.b.total === 'number') totalProgs = page.b.total;
+      progs.forEach(p => (p.businesses||[]).forEach(b => {
+        if(b.yelp_business_id && !bizIds.includes(b.yelp_business_id)) bizIds.push(b.yelp_business_id);
+      }));
+      offset += 40;
+      if(offset >= totalProgs) break;
+    }
+
+    if(!bizIds.length) return { statusCode:200, headers:cors, body: JSON.stringify({error:'no bizIds', data:{}, month:monthStr}) };
+
+    // Step 2: Call Reporting API in batches of 10 (API limit)
+    const fusionAuth = 'Bearer ' + FUSION_KEY;
+    const allMetrics = {};
+    const batchSize = 10;
+    for(let i=0; i<bizIds.length; i+=batchSize) {
+      const batch = bizIds.slice(i, i+batchSize);
+      try {
+        const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily',
+          JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate }),
+          fusionAuth
+        );
+        const businesses = (res.b && res.b.data) || [];
+        businesses.forEach(biz => {
+          const metrics = (biz.metrics||[]).reduce((acc, day) => {
+            acc.calls      = (acc.calls||0)      + (day.num_calls||0);
+            acc.leads      = (acc.leads||0)      + (day.num_mobile_cta_clicks||0) + (day.num_desktop_cta_clicks||0);
+            acc.impressions= (acc.impressions||0) + (day.num_mobile_search_appearances||0);
+            acc.clicks     = (acc.clicks||0)     + (day.url_clicks||0);
+            acc.messages   = (acc.messages||0)   + (day.num_messages_to_business||0);
+            return acc;
+          }, {});
+          allMetrics[biz.business_id] = metrics;
+        });
+      } catch(e) {}
+    }
+
+    return { statusCode:200, headers:cors, body: JSON.stringify({ data: allMetrics, month: monthStr, bizCount: bizIds.length }) };
   }
 
 
