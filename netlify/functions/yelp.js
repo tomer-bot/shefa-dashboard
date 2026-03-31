@@ -257,9 +257,19 @@ if(path.startsWith('budget/')){
       // POST: fetch reporting for ALL active programs/list/all bizIds for a date range
       // 1. Get all bizIds from programs/list/all
       const fusionAuth = 'Bearer ' + FUSION_KEY;
-      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100&program_status=CURRENT', basicAuth());
-      const progs = (page.b && page.b.payment_programs) || (page.programs) || (page.payment_programs) || [];
-      const bizIds = [...new Set(progs.flatMap(p => (p.businesses || []).map(b => b.yelp_business_id)))];
+      // Paginate programs/list/all (biz.yelp.com) to get all client bizIds
+      const allBizIds = new Set();
+      let pgOffset = 0;
+      while(pgOffset < 200) {
+        const pgRes = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset='+pgOffset+'&program_status=CURRENT', basicAuth());
+        const pgProgs = (pgRes.b && pgRes.b.payment_programs) || [];
+        if(!pgProgs.length) break;
+        pgProgs.forEach(p => (p.businesses||[]).forEach(b => allBizIds.add(b.yelp_business_id)));
+        const pgTotal = (pgRes.b && pgRes.b.total) || 0;
+        pgOffset += 40;
+        if(pgOffset >= pgTotal) break;
+      }
+      const bizIds = [...allBizIds];
 
       if (!bizIds.length) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no bizIds found' }) };
 
