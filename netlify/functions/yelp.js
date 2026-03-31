@@ -572,7 +572,7 @@ if(path.startsWith('budget/')){
 
 
   //  Reporting API: fetch leads/calls/impressions/clicks for all campaigns 
-      if (path === 'reporting/monthly') {
+        if (path === 'reporting/monthly') {
     const now = new Date();
     const year = now.getUTCFullYear();
     const month = String(now.getUTCMonth()+1).padStart(2,'0');
@@ -587,31 +587,21 @@ if(path.startsWith('budget/')){
     if(!bizIds.length) return {statusCode:200,headers:cors,body:JSON.stringify({metrics:{},startDate,endDate,bizCount:0})};
 
     const allMetrics = {};
-    const batchSize = 20;
-
-    for(let i=0;i<bizIds.length;i+=batchSize) {
-      const batch = bizIds.slice(i,i+batchSize);
+    // Call one at a time using GET with query params (Chris's working approach)
+    for(const bizId of bizIds.slice(0,30)) {
       try {
-        const payload = JSON.stringify({
-          ids: batch,
-          start_date: startDate,
-          end_date: endDate
+        const qs = '?start_date='+startDate+'&end_date='+endDate;
+        const res = await httpGet('api.yelp.com','/v3/reporting/businesses/'+encodeURIComponent(bizId)+'/daily'+qs,'Bearer '+FUSION_KEY);
+        const metrics = (res.b&&res.b.metrics)||[];
+        const totals = {calls:0,leads:0,impressions:0,clicks:0,messages:0};
+        metrics.forEach(day=>{
+          totals.calls       += (day.num_calls||0);
+          totals.clicks      += (day.num_mobile_cta_clicks||0)+(day.num_desktop_cta_clicks||0);
+          totals.impressions += (day.num_mobile_search_appearances||0)+(day.num_desktop_search_appearances||0);
+          totals.messages    += (day.num_messages_to_business||0);
+          totals.leads       += (day.num_calls||0)+(day.num_messages_to_business||0)+(day.url_clicks||0);
         });
-        const res = await httpPost('api.yelp.com','/v3/reporting/businesses/daily',payload,'Bearer '+FUSION_KEY);
-        const data = (res.b&&res.b.data)||[];
-        data.forEach(biz => {
-          const metrics = biz.metrics||[];
-          const totals = {calls:0,leads:0,impressions:0,clicks:0,ad_cost:0,messages:0};
-          metrics.forEach(day=>{
-            totals.calls       += (day.ad_driven_calls||day.num_calls||0);
-            totals.leads       += (day.total_leads||0);
-            totals.impressions += (day.billed_impressions||day.num_mobile_search_appearances||0);
-            totals.clicks      += (day.billed_clicks||0);
-            totals.ad_cost     += (day.ad_cost||0);
-            totals.messages    += (day.ad_driven_messages_to_business||0);
-          });
-          allMetrics[biz.business_id] = totals;
-        });
+        allMetrics[bizId] = totals;
       } catch(e) {}
     }
 
