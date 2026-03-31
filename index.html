@@ -456,7 +456,7 @@ function saveConfig()  {
     anthropic: document.getElementById('cfg_anthropic').value.trim(),
   };
   localStorage.setItem('shefa_cfg', JSON.stringify(CFG));
-  closeConfig(); toast('Config saved', 'success'); checkHealth(); loadDashboard();
+  closeConfig(); toast('Config saved', 'success'); checkHealth(); loadDashboard(); setTimeout(()=>loadReportingData(), 3000);
 }
 function openConfig()  {
   loadConfig();
