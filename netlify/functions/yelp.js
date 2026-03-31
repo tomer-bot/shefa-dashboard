@@ -227,19 +227,75 @@ if(path.startsWith('budget/')){
   // --- Reporting API v3 (correct endpoints) ---
   // POST reporting/daily   create daily report
   // POST reporting/monthly  create monthly report  
-  if (path === 'reporting/daily' || path === 'reporting/monthly') {
-    const endpoint = path === 'reporting/daily'
-      ? '/v3/reporting/businesses/daily'
-      : '/v3/reporting/businesses/monthly';
-    const payload = JSON.stringify({
-      ...body,
-      metrics: body.metrics || [
-        'billed_impressions','billed_clicks','ad_cost','ad_driven_calls','ad_driven_messages_to_business',
-        'num_calls','total_leads'
-      ]
-    });
-    const r = await httpPost('api.yelp.com', endpoint, payload, 'Bearer ' + FUSION_KEY);
-    return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+  //  Reporting API (async job pattern) 
+  if (path.startsWith('reporting/')) {
+    const sub = path.split('/')[1]; // 'daily', 'poll', or 'fetch-all'
+
+    if (sub === 'daily') {
+      // POST: kick off async report job for given bizIds + date range
+      const fusionAuth = 'Bearer ' + FUSION_KEY;
+      const payload = JSON.stringify({ ids: body.ids, start: body.start, end: body.end });
+      const r = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', payload, fusionAuth);
+      return { statusCode: 200, headers: cors, body: JSON.stringify(r) };
+    }
+
+    if (sub === 'poll') {
+      // GET: poll a report job by ID, retry up to 6x with 2s delay
+      const reportId = path.split('/')[2];
+      const fusionAuth = 'Bearer ' + FUSION_KEY;
+      let result = null;
+      for (let i = 0; i < 6; i++) {
+        const r = await httpGet('api.yelp.com', '/v3/reporting/' + reportId, fusionAuth);
+        if (r.s === 200 && r.b && r.b.data) { result = r.b; break; }
+        if (r.s === 202) { await new Promise(res => setTimeout(res, 2000)); continue; }
+        break;
+      }
+      return { statusCode: 200, headers: cors, body: JSON.stringify(result || { pending: true }) };
+    }
+
+    if (sub === 'fetch-all') {
+      // POST: fetch reporting for ALL active programs/list/all bizIds for a date range
+      // 1. Get all bizIds from programs/list/all
+      const fusionAuth = 'Bearer ' + FUSION_KEY;
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+      const progs = (page.b && page.b.payment_programs) || [];
+      const bizIds = [...new Set(progs.flatMap(p => (p.businesses || []).map(b => b.yelp_business_id)))];
+
+      if (!bizIds.length) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no bizIds found' }) };
+
+      // 2. Submit report job
+      const start = body.start || new Date(Date.now()-30*86400000).toISOString().split('T')[0];
+      const end = body.end || new Date().toISOString().split('T')[0];
+      const jobR = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', JSON.stringify({ ids: bizIds, start, end }), fusionAuth);
+
+      if (jobR.s !== 202) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'job failed', raw: jobR }) };
+      const reportId = jobR.b && jobR.b.id;
+
+      // 3. Poll until ready (up to 20s)
+      let data = null;
+      for (let i = 0; i < 10; i++) {
+        await new Promise(res => setTimeout(res, 2000));
+        const pollR = await httpGet('api.yelp.com', '/v3/reporting/' + reportId, fusionAuth);
+        if (pollR.s === 200 && pollR.b && pollR.b.data) { data = pollR.b.data; break; }
+      }
+
+      if (!data) return { statusCode: 200, headers: cors, body: JSON.stringify({ pending: true, reportId }) };
+
+      // 4. Aggregate per-bizId: sum calls, clicks, impressions, cost
+      const summary = {};
+      data.forEach(biz => {
+        const metrics = biz.metrics || [];
+        summary[biz.business_id] = {
+          calls: metrics.reduce((s,m)=>s+(m.num_calls||0),0),
+          clicks: metrics.reduce((s,m)=>s+(m.num_mobile_cta_clicks||0)+(m.num_desktop_cta_clicks||0),0),
+          impressions: metrics.reduce((s,m)=>s+(m.num_mobile_search_appearances||0),0),
+          page_views: metrics.reduce((s,m)=>s+(m.num_mobile_page_views||0)+(m.num_total_page_views||0),0),
+          ad_cost: metrics.reduce((s,m)=>s+(m.ad_cost||0),0)
+        };
+      });
+
+      return { statusCode: 200, headers: cors, body: JSON.stringify({ summary, bizIds: bizIds.length, reportId, start, end }) };
+    }
   }
 
   // GET reporting/daily/{id} or reporting/monthly/{id}
