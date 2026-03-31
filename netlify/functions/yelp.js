@@ -570,6 +570,61 @@ if(path.startsWith('budget/')){
     return {statusCode:200,headers:cors,body:JSON.stringify({metrics,startDate,endDate,bizCount:bizIds.length,metricCount:Object.keys(metrics).length})};
   }
 
+
+  //  Reporting API: fetch leads/calls/impressions/clicks for all campaigns 
+  if (path === 'reporting/monthly') {
+    // Get current month date range
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth()+1).padStart(2,'0');
+    const startDate = year+'-'+month+'-01';
+    const lastDay = new Date(year, now.getUTCMonth()+1, 0).getUTCDate();
+    const endDate = year+'-'+month+'-'+String(lastDay).padStart(2,'0');
+
+    // Get all bizIds from programs/v1
+    const progPage = await httpGet('partner-api.yelp.com','/programs/v1?limit=100',basicAuth());
+    const programs = (progPage.b&&progPage.b.payment_programs)||[];
+    const bizIds = programs.map(p=>p.businesses&&p.businesses[0]&&p.businesses[0].yelp_business_id).filter(Boolean);
+
+    if(!bizIds.length) return {statusCode:200,headers:cors,body:JSON.stringify({metrics:{}})};
+
+    // Call Yelp Reporting API in batches of 20
+    const allMetrics = {};
+    const batchSize = 20;
+    for(let i=0;i<bizIds.length;i+=batchSize) {
+      const batch = bizIds.slice(i,i+batchSize);
+      try {
+        const res = await httpPost('api.yelp.com','/v3/reporting/businesses/daily',
+          JSON.stringify({ids:batch,start_date:startDate,end_date:endDate}),
+          'Bearer '+FUSION_KEY
+        );
+        const data = (res.b&&res.b.data)||[];
+        data.forEach(biz => {
+          const metrics = biz.metrics||[];
+          // Sum all days in the month
+          const totals = {
+            leads:0, calls:0, impressions:0, clicks:0,
+            url_clicks:0, direction_views:0, messages:0
+          };
+          metrics.forEach(day=>{
+            totals.calls     += (day.num_calls||0);
+            totals.clicks    += (day.num_desktop_cta_clicks||0)+(day.num_mobile_cta_clicks||0);
+            totals.impressions += (day.num_desktop_search_appearances||0)+(day.num_mobile_search_appearances||0);
+            totals.url_clicks  += (day.url_clicks||0);
+            totals.direction_views += (day.num_directions_and_map_views||0);
+            totals.messages    += (day.num_messages_to_business||0);
+            totals.leads       += (day.num_calls||0)+(day.num_messages_to_business||0)+(day.url_clicks||0);
+          });
+          allMetrics[biz.business_id] = totals;
+        });
+      } catch(e) {}
+    }
+
+    return {statusCode:200,headers:cors,body:JSON.stringify({
+      metrics:allMetrics, startDate, endDate, bizCount:bizIds.length
+    })};
+  }
+
 return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 }
 async function httpPostJson(host, path, bodyObj, authHeader) {
