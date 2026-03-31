@@ -572,7 +572,7 @@ if(path.startsWith('budget/')){
 
 
   //  Reporting API: fetch leads/calls/impressions/clicks for all campaigns 
-    if (path === 'reporting/monthly') {
+      if (path === 'reporting/monthly') {
     const now = new Date();
     const year = now.getUTCFullYear();
     const month = String(now.getUTCMonth()+1).padStart(2,'0');
@@ -580,7 +580,6 @@ if(path.startsWith('budget/')){
     const lastDay = new Date(year, now.getUTCMonth()+1, 0).getUTCDate();
     const endDate = year+'-'+month+'-'+String(lastDay).padStart(2,'0');
 
-    // Get all bizIds from programs/v1
     const progPage = await httpGet('partner-api.yelp.com','/programs/v1?limit=100',basicAuth());
     const programs = (progPage.b&&progPage.b.payment_programs)||[];
     const bizIds = programs.map(p=>p.businesses&&p.businesses[0]&&p.businesses[0].yelp_business_id).filter(Boolean);
@@ -589,12 +588,15 @@ if(path.startsWith('budget/')){
 
     const allMetrics = {};
     const batchSize = 20;
-    const metricFields = ['billed_impressions','billed_clicks','ad_cost','ad_driven_calls','ad_driven_messages_to_business','num_calls','total_leads'];
 
     for(let i=0;i<bizIds.length;i+=batchSize) {
       const batch = bizIds.slice(i,i+batchSize);
       try {
-        const payload = JSON.stringify({ids:batch,start:startDate,end:endDate,metrics:metricFields});
+        const payload = JSON.stringify({
+          ids: batch,
+          start_date: startDate,
+          end_date: endDate
+        });
         const res = await httpPost('api.yelp.com','/v3/reporting/businesses/daily',payload,'Bearer '+FUSION_KEY);
         const data = (res.b&&res.b.data)||[];
         data.forEach(biz => {
@@ -603,7 +605,7 @@ if(path.startsWith('budget/')){
           metrics.forEach(day=>{
             totals.calls       += (day.ad_driven_calls||day.num_calls||0);
             totals.leads       += (day.total_leads||0);
-            totals.impressions += (day.billed_impressions||0);
+            totals.impressions += (day.billed_impressions||day.num_mobile_search_appearances||0);
             totals.clicks      += (day.billed_clicks||0);
             totals.ad_cost     += (day.ad_cost||0);
             totals.messages    += (day.ad_driven_messages_to_business||0);
