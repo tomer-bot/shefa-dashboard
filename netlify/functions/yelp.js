@@ -516,51 +516,59 @@ if(path.startsWith('budget/')){
 
 
   if (path === 'reporting') {
-    var now = new Date();
-    var mm = String(now.getMonth()+1).padStart(2,'0');
-    var dd = String(now.getDate()).padStart(2,'0');
-    var yyyy = now.getFullYear();
-    var startDate = body.start_date || (yyyy+'-'+mm+'-01');
-    var endDate   = body.end_date   || (yyyy+'-'+mm+'-'+dd);
+    const now = new Date();
+    const yr = now.getUTCFullYear();
+    const mo = String(now.getUTCMonth()+1).padStart(2,'0');
+    const dd = String(now.getUTCDate()).padStart(2,'0');
+    const startDate = yr+'-'+mo+'-01';
+    const endDate   = yr+'-'+mo+'-'+dd;
 
-    // Get bizIds from programs/v1
-    var listPage = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
-    var programs2 = (listPage.b && listPage.b.payment_programs) || [];
-    var bizIds = [];
-    programs2.forEach(function(p){ (p.businesses||[]).forEach(function(b){ if(bizIds.indexOf(b.yelp_business_id)===-1) bizIds.push(b.yelp_business_id); }); });
+    // Get all bizIds from programs/v1 (paginate up to 100)
+    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const programs = (page.b && page.b.payment_programs) || [];
+    const bizIds = [];
+    programs.forEach(p => (p.businesses||[]).forEach(b => {
+      if(b.yelp_business_id && !bizIds.includes(b.yelp_business_id)) bizIds.push(b.yelp_business_id);
+    }));
 
-    if (!bizIds.length) return { statusCode:200, headers:cors, body: JSON.stringify({data:[], error:'no bizIds'}) };
+    if(!bizIds.length) return {statusCode:200, headers:cors, body: JSON.stringify({metrics:{}, error:'no bizIds from programs/v1'})};
 
-    var fusionAuth = 'Bearer ' + FUSION_KEY;
-    var allData = [];
+    // Call Fusion Reporting API in batches of 10
+    const metrics = {};
+    const batchSize = 10;
+    const fusionAuth = 'Bearer ' + FUSION_KEY;
+    const payload = JSON.stringify({ids:[], start_date:startDate, end_date:endDate});
 
-    // Batch requests of 10
-    for (var bi = 0; bi < bizIds.length; bi += 10) {
-      var batch = bizIds.slice(bi, bi+10);
+    for(let i=0; i<bizIds.length; i+=batchSize) {
+      const batch = bizIds.slice(i, i+batchSize);
       try {
-        var res2 = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily',
-          JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate }),
-          fusionAuth
-        );
-        if (res2.b && res2.b.data) allData = allData.concat(res2.b.data);
-      } catch(e2) {}
+        const body = JSON.stringify({ids:batch, start_date:startDate, end_date:endDate});
+        const res = await new Promise((resolve)=>{
+          const req = https.request({hostname:'api.yelp.com', path:'/v3/reporting/businesses/daily', method:'POST',
+            headers:{Authorization:fusionAuth, 'Content-Type':'application/json', 'Content-Length':Buffer.byteLength(body)}
+          }, res=>{
+            let d=''; res.on('data',c=>d+=c); res.on('end',()=>{
+              try{resolve({s:res.statusCode, b:JSON.parse(d)});}catch(e){resolve({s:res.statusCode, r:d.substring(0,200)});}
+            });
+          });
+          req.on('error', e=>resolve({s:500, r:e.message}));
+          req.write(body); req.end();
+        });
+        const data = (res.b && res.b.data) || [];
+        data.forEach(biz => {
+          let leads=0, calls=0, impressions=0, clicks=0;
+          (biz.metrics||[]).forEach(m => {
+            leads      += (m.num_leads||0);
+            calls      += (m.num_calls||0);
+            impressions+= (m.num_mobile_search_appearances||0);
+            clicks     += (m.num_mobile_cta_clicks||0)+(m.num_desktop_cta_clicks||0);
+          });
+          metrics[biz.business_id] = {leads, calls, impressions, clicks, days:(biz.metrics||[]).length};
+        });
+      } catch(e) {}
     }
 
-    // Aggregate per bizId
-    var byBiz = {};
-    allData.forEach(function(item) {
-      var bid = item.business_id;
-      if (!byBiz[bid]) byBiz[bid] = { business_id:bid, leads:0, calls:0, impressions:0, clicks:0 };
-      (item.metrics||[]).forEach(function(m) {
-        byBiz[bid].leads       += (m.num_leads||0);
-        byBiz[bid].calls       += (m.num_calls||0);
-        byBiz[bid].impressions += (m.num_desktop_search_appearances||0) + (m.num_mobile_search_appearances||0);
-        byBiz[bid].clicks      += (m.num_desktop_cta_clicks||0) + (m.num_mobile_cta_clicks||0);
-      });
-    });
-
-    var outData = Object.keys(byBiz).map(function(k){ return byBiz[k]; });
-    return { statusCode:200, headers:cors, body: JSON.stringify({ data:outData, startDate:startDate, endDate:endDate, bizCount:bizIds.length }) };
+    return {statusCode:200, headers:cors, body:JSON.stringify({metrics, startDate, endDate, bizCount:bizIds.length, metricCount:Object.keys(metrics).length})};
   }
 
   
