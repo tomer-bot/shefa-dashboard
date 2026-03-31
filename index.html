@@ -2023,7 +2023,7 @@ async function fetchReportingData() {
   try {
     const r = await yelpFn('reporting','POST',{});
     if(r && r.data) {
-      window._reportingData = {};
+      window._reportingData = {}; window._reportingMonth = '';
       r.data.forEach(d=>{ window._reportingData[d.business_id] = d; });
       window._reportingTs = Date.now();
     }
