@@ -563,7 +563,61 @@ if(path.startsWith('budget/')){
     return { statusCode:200, headers:cors, body: JSON.stringify({ data:outData, startDate:startDate, endDate:endDate, bizCount:bizIds.length }) };
   }
 
-  return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
+  
+  //  Reporting API: live leads/calls/impressions/clicks per campaign 
+  if (path === 'reporting') {
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth()+1).padStart(2,'0');
+    const day = String(now.getUTCDate()).padStart(2,'0');
+    const startDate = year+'-'+month+'-01';
+    const endDate = year+'-'+month+'-'+day;
+
+    // Step 1: get all bizIds from programs/list/all (these match Fusion API)
+    const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
+    const programs = (page.b && page.b.payment_programs) || [];
+    const bizIds = [];
+    programs.forEach(p => (p.businesses||[]).forEach(b => {
+      if(b.yelp_business_id && !bizIds.includes(b.yelp_business_id)) bizIds.push(b.yelp_business_id);
+    }));
+
+    if(!bizIds.length) return { statusCode:200, headers:cors, body: JSON.stringify({metrics:{}, error:'no bizIds'}) };
+
+    // Step 2: call Fusion Reporting API in batches of 10
+    const metrics = {};
+    const batchSize = 10;
+    const fusionAuth = 'Bearer ' + FUSION_KEY;
+
+    for(let i=0; i<bizIds.length; i+=batchSize) {
+      const batch = bizIds.slice(i, i+batchSize);
+      try {
+        const res = await httpPost(
+          'api.yelp.com',
+          '/v3/reporting/businesses/daily',
+          JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate }),
+          fusionAuth
+        );
+        const data = (res.b && res.b.data) || [];
+        data.forEach(biz => {
+          const bizMetrics = biz.metrics || [];
+          // Sum all days in the month
+          let leads=0, calls=0, impressions=0, clicks=0, spend=0;
+          bizMetrics.forEach(m => {
+            leads      += (m.num_leads||0);
+            calls      += (m.num_calls||0);
+            impressions+= (m.num_mobile_search_appearances||0)+(m.num_desktop_cta_clicks||0);
+            clicks     += (m.num_mobile_cta_clicks||0)+(m.num_desktop_cta_clicks||0);
+            spend      += (m.spend||0);
+          });
+          metrics[biz.business_id] = { leads, calls, impressions, clicks, spend, days: bizMetrics.length };
+        });
+      } catch(e) {}
+    }
+
+    return { statusCode:200, headers:cors, body: JSON.stringify({ metrics, startDate, endDate, bizCount: bizIds.length }) };
+  }
+
+return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 }
 async function httpPostJson(host, path, bodyObj, authHeader) {
   const https = require('https');
