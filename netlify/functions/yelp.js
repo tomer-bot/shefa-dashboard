@@ -273,10 +273,11 @@ if(path.startsWith('budget/')){
     const testPayload = JSON.stringify({ ids: [bizIds[0]], start: startDate, end: endDate, metrics: ["num_calls","num_mobile_cta_clicks","num_desktop_cta_clicks","num_mobile_search_appearances","url_clicks","num_messages_to_business","num_total_page_views","num_user_photos","num_check_ins"] });
     const testRes = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', testPayload, fusionAuth);
 
-    if(testRes.s !== 200) {
+    if(testRes.s !== 200 && testRes.s !== 202) {
       return { statusCode:200, headers:cors, body: JSON.stringify({
-        error: 'Reporting API error',
+        error: testRes.s===202?'async_202':testRes.s===200?null:'Reporting API error',
         apiStatus: testRes.s,
+        apiRaw: testRes.r||'',
         apiError: testRes.b,
         month: monthStr,
         testBizId: bizIds[0],
@@ -291,7 +292,7 @@ if(path.startsWith('budget/')){
       const batch = bizIds.slice(i, i+batchSize);
       const payload = JSON.stringify({ ids: batch, start: startDate, end: endDate, metrics: ["num_calls","num_mobile_cta_clicks","num_desktop_cta_clicks","num_mobile_search_appearances","url_clicks","num_messages_to_business","num_total_page_views","num_user_photos","num_check_ins"] });
       const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', payload, fusionAuth);
-      if(res.s !== 200) continue;
+      if(res.s !== 200 && res.s !== 202) continue;
       const businesses = (res.b && (res.b.data || res.b.businesses || []));
       if(Array.isArray(businesses)) {
         businesses.forEach(biz => {
