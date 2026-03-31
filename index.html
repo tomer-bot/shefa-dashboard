@@ -532,6 +532,36 @@ async function yelpFn(path, method, body) {
   return r.json();
 }
 
+async function fetchLiveReporting() {
+  const btn = document.getElementById('liveReportBtn');
+  if(btn){ btn.textContent='Fetching...'; btn.disabled=true; }
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const monthStart = today.substring(0,8)+'01';
+    const res = await yelpFn('reporting/fetch-all','POST',{start:monthStart, end:today});
+    if(!res || res.pending || res.error) {
+      if(btn){ btn.textContent='Live Data'; btn.disabled=false; }
+      toast(res&&res.error?res.error:'Reporting pending, try again shortly','error');
+      return;
+    }
+    window._liveReporting = res.summary || {};
+    (window.allPrograms||[]).forEach(c => {
+      const live = window._liveReporting[c.id];
+      if(!live) return;
+      if(live.calls !== undefined) c.calls = live.calls;
+      if(live.clicks !== undefined) c.clicks = live.clicks;
+      if(live.impressions !== undefined) c.impressions = live.impressions;
+      if(live.ad_cost) c.spend_cents = Math.round(live.ad_cost * 100);
+    });
+    renderClients();
+    toast('Live data updated for '+Object.keys(window._liveReporting).length+' campaigns');
+    if(btn){ btn.textContent='Live Data'; btn.disabled=false; }
+  } catch(e) {
+    if(btn){ btn.textContent='Live Data'; btn.disabled=false; }
+    toast('Reporting error: '+e.message,'error');
+  }
+}
+
 // --- Grouping logic 
 // Build display groups from flat programs list.
 // A "group" is either:
