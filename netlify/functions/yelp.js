@@ -253,10 +253,9 @@ if(path.startsWith('budget/')){
       return { statusCode: 200, headers: cors, body: JSON.stringify(result || { pending: true }) };
     }
 
-      if (sub === 'fetch-all') {
+        if (sub === 'fetch-all') {
       const fusionAuth = 'Bearer ' + FUSION_KEY;
-
-      // Get bizIds by paginating programs/v1 with CURRENT status
+      // Get bizIds by paginating programs/v1
       const allBizIds = new Set();
       let pgOffset = 0, pgTotal = 9999;
       while(pgOffset < pgTotal) {
@@ -270,33 +269,26 @@ if(path.startsWith('budget/')){
       }
       const bizIds = [...allBizIds];
       if (!bizIds.length) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no bizIds found' }) };
-
-      // Submit async report job
       const start = body.start || new Date(Date.now()-30*86400000).toISOString().split('T')[0];
       const end = body.end || new Date().toISOString().split('T')[0];
       const jobR = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', JSON.stringify({
-        ids: bizIds,
-        start,
-        end,
+        ids: bizIds, start, end,
         metrics: ['billed_impressions','billed_clicks','num_calls','num_mobile_cta_clicks','num_desktop_cta_clicks','num_mobile_search_appearances','num_total_page_views','ad_cost']
       }), fusionAuth);
-
       if (jobR.s !== 202) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'job failed', s: jobR.s, raw: jobR.b }) };
       const reportId = jobR.b && jobR.b.id;
-      if (!reportId) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no reportId', raw: jobR.b }) };
+      return { statusCode: 200, headers: cors, body: JSON.stringify({ reportId, bizIds: bizIds.length, start, end }) };
+    }
 
-      // Poll until data ready (max 20s)
-      let data = null;
-      for (let i = 0; i < 10; i++) {
-        await new Promise(res => setTimeout(res, 2000));
-        const pollR = await httpGet('api.yelp.com', '/v3/reporting/' + reportId, fusionAuth);
-        if (pollR.s === 200 && pollR.b && pollR.b.data) { data = pollR.b.data; break; }
-        if (pollR.s !== 202) break;
+    if (sub === 'poll') {
+      // Single poll attempt for a report ID
+      const reportId = path.split('/')[2];
+      const fusionAuth = 'Bearer ' + FUSION_KEY;
+      const pollR = await httpGet('api.yelp.com', '/v3/reporting/' + reportId, fusionAuth);
+      if (pollR.s === 202 || !pollR.b || !pollR.b.data) {
+        return { statusCode: 200, headers: cors, body: JSON.stringify({ pending: true }) };
       }
-
-      if (!data) return { statusCode: 200, headers: cors, body: JSON.stringify({ pending: true, reportId, bizIds: bizIds.length }) };
-
-      // Aggregate per bizId
+      const data = pollR.b.data || [];
       const summary = {};
       data.forEach(biz => {
         const metrics = biz.metrics || [];
@@ -308,8 +300,7 @@ if(path.startsWith('budget/')){
           ad_cost: metrics.reduce((s,m)=>s+(m.ad_cost||0),0)
         };
       });
-
-      return { statusCode: 200, headers: cors, body: JSON.stringify({ summary, bizIds: bizIds.length, reportId, start, end }) };
+      return { statusCode: 200, headers: cors, body: JSON.stringify({ summary, count: data.length }) };
     }
   }
 
