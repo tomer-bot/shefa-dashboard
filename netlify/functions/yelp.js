@@ -245,13 +245,13 @@ if(path.startsWith('budget/')){
   // GET reporting/daily/{id} or reporting/monthly/{id}
   if (path.startsWith('reporting/')) {
     const parts = path.split('/');
-    const monthStr = parts[1]; // e.g. "2026-03"
+    const monthStr = parts[1];
     const [year, mon] = monthStr.split('-').map(Number);
     const startDate = monthStr + '-01';
     const lastDay = new Date(year, mon, 0).getDate();
     const endDate = monthStr + '-' + String(lastDay).padStart(2,'0');
 
-    // Collect bizIds from programs/v1 (paginated)
+    // Collect bizIds from programs/v1
     const bizIds = [];
     let offset = 0, totalProgs = 9999;
     while(offset < totalProgs) {
@@ -268,22 +268,35 @@ if(path.startsWith('budget/')){
 
     if(!bizIds.length) return { statusCode:200, headers:cors, body: JSON.stringify({error:'no bizIds', data:{}, month:monthStr}) };
 
-    // Call Reporting API in batches of 10
+    // Test single bizId first to verify API format
     const fusionAuth = 'Bearer ' + FUSION_KEY;
+    const testPayload = JSON.stringify({ ids: [bizIds[0]], start_date: startDate, end_date: endDate });
+    const testRes = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', testPayload, fusionAuth);
+
+    if(testRes.s !== 200) {
+      return { statusCode:200, headers:cors, body: JSON.stringify({
+        error: 'Reporting API error',
+        apiStatus: testRes.s,
+        apiError: testRes.b,
+        month: monthStr,
+        testBizId: bizIds[0],
+        data: {}
+      })};
+    }
+
+    // API works - process all batches
     const allMetrics = {};
-    const debugInfo = [];
     const batchSize = 10;
     for(let i=0; i<bizIds.length; i+=batchSize) {
       const batch = bizIds.slice(i, i+batchSize);
       const payload = JSON.stringify({ ids: batch, start_date: startDate, end_date: endDate });
       const res = await httpPost('api.yelp.com', '/v3/reporting/businesses/daily', payload, fusionAuth);
-      debugInfo.push({batchStart:i, s:res.s, bKeys:Object.keys(res.b||{})});
-      // Response: {data:[{business_id, metrics:[{date, num_calls, ...}]}]}
-      const businesses = (res.b && (res.b.data || res.b.businesses || res.b.results)) || [];
+      if(res.s !== 200) continue;
+      const businesses = (res.b && (res.b.data || res.b.businesses || []));
       if(Array.isArray(businesses)) {
         businesses.forEach(biz => {
           const bizId = biz.business_id || biz.id;
-          const metrics = (biz.metrics||biz.daily_metrics||[]).reduce((acc, day) => {
+          const metrics = (biz.metrics||[]).reduce((acc, day) => {
             acc.calls      = (acc.calls||0)      + (day.num_calls||0);
             acc.leads      = (acc.leads||0)      + (day.num_mobile_cta_clicks||0) + (day.num_desktop_cta_clicks||0);
             acc.impressions= (acc.impressions||0) + (day.num_mobile_search_appearances||0);
@@ -300,7 +313,7 @@ if(path.startsWith('budget/')){
       data: allMetrics,
       month: monthStr,
       bizCount: bizIds.length,
-      debug: debugInfo
+      metricsCount: Object.keys(allMetrics).length
     })};
   }
 
