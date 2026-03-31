@@ -257,8 +257,8 @@ if(path.startsWith('budget/')){
       // POST: fetch reporting for ALL active programs/list/all bizIds for a date range
       // 1. Get all bizIds from programs/list/all
       const fusionAuth = 'Bearer ' + FUSION_KEY;
-      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100', basicAuth());
-      const progs = (page.b && page.b.payment_programs) || [];
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=100&program_status=CURRENT', basicAuth());
+      const progs = (page.b && page.b.payment_programs) || (page.programs) || (page.payment_programs) || [];
       const bizIds = [...new Set(progs.flatMap(p => (p.businesses || []).map(b => b.yelp_business_id)))];
 
       if (!bizIds.length) return { statusCode: 200, headers: cors, body: JSON.stringify({ error: 'no bizIds found' }) };
