@@ -846,7 +846,67 @@ if(path.startsWith('budget/')){
     })};
   }
 
-return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
+
+  // -- Program history for a specific bizId (all statuses including PAUSED/ENDED) --
+  if (path.startsWith('programs-history/')) {
+    const targetBizId = path.split('/')[1];
+    const allProgs = [];
+    let offset = 0;
+    // Search through all programs for this bizId
+    while (offset < 500) {
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=40&offset=' + offset, basicAuth());
+      const progs = (page.b && page.b.payment_programs) || [];
+      if (!progs.length) break;
+      progs.forEach(p => {
+        if ((p.businesses || []).some(b => b.yelp_business_id === targetBizId)) {
+          allProgs.push({
+            program_id: p.program_id,
+            program_type: p.program_type,
+            program_status: p.program_status,
+            program_pause_status: p.program_pause_status,
+            start_date: p.start_date,
+            end_date: p.end_date,
+            available_features: p.available_features,
+            active_features: p.active_features
+          });
+        }
+      });
+      const total = (page.b && page.b.total) || 0;
+      offset += 40;
+      if (offset >= total) break;
+    }
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ bizId: targetBizId, programs: allProgs, total: allProgs.length }) };
+  }
+
+  // -- All programs across all statuses (paginated, no status filter) --
+  if (path === 'programs-all') {
+    const allProgs = [];
+    let offset = 0;
+    const limit = 40;
+    let total = 9999;
+    while (offset < total) {
+      const page = await httpGet('partner-api.yelp.com', '/programs/v1?limit=' + limit + '&offset=' + offset, basicAuth());
+      const progs = (page.b && page.b.payment_programs) || [];
+      if (!progs.length) break;
+      total = (page.b && page.b.total) || 0;
+      progs.forEach(p => allProgs.push({
+        program_id: p.program_id,
+        program_type: p.program_type,
+        program_status: p.program_status,
+        program_pause_status: p.program_pause_status,
+        start_date: p.start_date,
+        end_date: p.end_date,
+        bizId: p.businesses && p.businesses[0] && p.businesses[0].yelp_business_id
+      }));
+      offset += limit;
+      if (offset >= total) break;
+    }
+    const byStatus = {};
+    allProgs.forEach(p => { byStatus[p.program_status] = (byStatus[p.program_status]||0)+1; });
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ total: allProgs.length, byStatus, programs: allProgs }) };
+  }
+
+  return{statusCode:404,headers:cors,body:JSON.stringify({error:'Unknown: '+path})};
 }
 async function httpPostJson(host, path, bodyObj, authHeader) {
   const https = require('https');
