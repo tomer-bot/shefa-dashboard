@@ -266,6 +266,11 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 .report-metric .rl{font-size:10px;color:#64748b;text-transform:uppercase}
 @media print{.reports-tabs,.tab-btn,.btn{display:none!important}.report-output{border:none;padding:0}}
 
+
+  .campaign-status-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; letter-spacing:.5px; margin-left:6px; vertical-align:middle; }
+  .campaign-status-badge.active { background:#27ae60; color:#fff; }
+  .campaign-status-badge.paused { background:#e67e22; color:#fff; }
+  .campaign-status-badge.unknown { background:#7f8c8d; color:#fff; }
 </style>
 </head>
 <body>
@@ -911,27 +916,14 @@ async function syncFromYelp() {
 }
 
 // --- Campaign actions 
-async function pauseCampaign(id, e) {
-  e.stopPropagation();
-  // confirmed via modal
-  try {
-    await yelpFn('pause/' + id, 'POST');
-    const p = allPrograms.find(x => x.id === id);
-    if (p) p.status = 'PAUSED';
-    renderAll(); updateKPIs();
-    toast('Campaign paused', 'success');
-  } catch(err) { toast('Pause failed: ' + err.message, 'error'); }
+async function pauseCampaign(id, name) {
+  if(!confirm(' PAUSE CAMPAIGN?\n\nThis will PAUSE the live Yelp campaign for:\n' + name + '\n\nAre you sure?')) return;
+  confirmPause(id, name);
 }
 
-async function resumeCampaign(id, e) {
-  e.stopPropagation();
-  try {
-    await yelpFn('resume/' + id, 'POST');
-    const p = allPrograms.find(x => x.id === id);
-    if (p) p.status = 'ACTIVE';
-    renderAll(); updateKPIs();
-    toast('Campaign resumed', 'success');
-  } catch(err) { toast('Resume failed: ' + err.message, 'error'); }
+async function resumeCampaign(id, name) {
+  if(!confirm(' RESUME CAMPAIGN?\n\nThis will RESUME the live Yelp campaign for:\n' + name + '\n\nAre you sure?')) return;
+  confirmResume(id, name);
 }
 
 async function changeBudget(id, e) {
@@ -1105,31 +1097,41 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // --- Confirm wrappers 
-function confirmPause(id, evt) {
-  if (evt) evt.stopPropagation();
-  const c = (window.allPrograms||[]).find(x=>x.id===id) || {};
-  openConfirm({
-    icon: 'II',
-    title: 'Pause Campaign',
-    desc: 'Ad delivery will stop immediately. You can resume it any time.',
-    val: c.name || id,
-    danger: true,
-    okLabel: 'Yes, Pause',
-    cb: () => pauseCampaign(id)
-  });
+async function confirmPause(id, name) {
+  const toastMsg = ' Pausing campaign for ' + (name||id) + '...';
+  toast(toastMsg);
+  try {
+    const res = await yelpFn('pause/'+id, 'POST');
+    if(res && res.success) {
+      toast(' Campaign PAUSED: ' + (name||id), 'success');
+      const c = (window.allPrograms||[]).find(x=>x.id===id);
+      if(c) c.status = 'PAUSED';
+      renderAll && renderAll();
+    } else {
+      const errMsg = (res&&res.body&&res.body.error&&res.body.error.description) || 'Unknown error';
+      toast(' Pause failed: ' + errMsg, 'error');
+    }
+  } catch(e) {
+    toast(' Pause error: ' + e.message, 'error');
+  }
 }
-function confirmResume(id, evt) {
-  if (evt) evt.stopPropagation();
-  const c = (window.allPrograms||[]).find(x=>x.id===id) || {};
-  openConfirm({
-    icon: '>',
-    title: 'Resume Campaign',
-    desc: 'Ads will start running again immediately.',
-    val: c.name || id,
-    danger: false,
-    okLabel: 'Yes, Resume',
-    cb: () => resumeCampaign(id)
-  });
+async function confirmResume(id, name) {
+  const toastMsg = ' Resuming campaign for ' + (name||id) + '...';
+  toast(toastMsg);
+  try {
+    const res = await yelpFn('resume/'+id, 'POST');
+    if(res && res.success) {
+      toast(' Campaign RESUMED: ' + (name||id), 'success');
+      const c = (window.allPrograms||[]).find(x=>x.id===id);
+      if(c) c.status = 'ACTIVE';
+      renderAll && renderAll();
+    } else {
+      const errMsg = (res&&res.body&&res.body.error&&res.body.error.description) || 'Unknown error';
+      toast(' Resume failed: ' + errMsg, 'error');
+    }
+  } catch(e) {
+    toast(' Resume error: ' + e.message, 'error');
+  }
 }
 function confirmBudget(id, evt) {
   if (evt) evt.stopPropagation();
